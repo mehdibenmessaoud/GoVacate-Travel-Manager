@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane fx:id="rootScroll" fitToWidth="true" hbarPolicy="NEVER" styleClass="root-scroll" stylesheets="/css/client_style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientController">
+    <VBox spacing="0" styleClass="main-container">
+
+        <HBox fx:id="navBar" spacing="16" alignment="CENTER_LEFT" style="-fx-padding:14 30; -fx-background-color: transparent;" opacity="0" translateY="-10">
+            <Label text="GoVacate" styleClass="nav-brand" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER" spacing="8" style="-fx-padding:0 20;">
+                <Button fx:id="categoryBtn" text="Catégories" styleClass="category-btn" />
+                <TextField fx:id="searchField" promptText="Rechercher une destination, pack..." styleClass="nav-search" />
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER_RIGHT" spacing="14">
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="Support" styleClass="quick-link" />
+                    <Button fx:id="quickRestaurants" text="Restaurants" styleClass="quick-link" />
+                    <Button text="Hôtels" styleClass="quick-link" />
+                </HBox>
+
+                <StackPane style="-fx-padding:0 6;">
+                    <ImageView fx:id="cartIcon" fitHeight="26" fitWidth="26" pickOnBounds="true" preserveRatio="true" />
+                    <Label fx:id="cartCount" text="0" styleClass="cart-count" />
+                </StackPane>
+
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Circle fx:id="avatarPlaceholder" radius="18" />
+                    <Label fx:id="profileName" text="Invité" styleClass="nav-profile-name" />
+                </HBox>
+            </HBox>
+        </HBox>
+
+        <!-- Mega category menu (hidden by default) -->
+        <StackPane fx:id="megaMenu" visible="false" managed="false" styleClass="mega-menu" pickOnBounds="true">
+            <HBox spacing="30" style="-fx-padding:18; -fx-max-width:1100; -fx-background-color: white; -fx-background-radius:8;">
+                <VBox fx:id="megaRestaurantsCol" spacing="8">
+                    <Label text="Restaurants" styleClass="mega-title" />
+                    <VBox spacing="6">
+                        <Button text="Italienne" styleClass="mega-item" />
+                        <Button text="Halal" styleClass="mega-item" />
+                        <Button text="Végétarienne" styleClass="mega-item" />
+                        <Button text="Cuisine locale" styleClass="mega-item" />
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="Hôtels" styleClass="mega-title" />
+                    <VBox spacing="6">
+                        <Button text="5 étoiles" styleClass="mega-item" />
+                        <Button text="Boutique" styleClass="mega-item" />
+                        <Button text="Budget" styleClass="mega-item" />
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="Packs &amp; Excursions" styleClass="mega-title" />
+                    <VBox spacing="6">
+                        <Button text="Romantique" styleClass="mega-item" />
+                        <Button text="Aventure" styleClass="mega-item" />
+                        <Button text="Famille" styleClass="mega-item" />
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="Autres" styleClass="mega-title" />
+                    <VBox spacing="6">
+                        <Button text="Transferts" styleClass="mega-item" />
+                        <Button text="Guide local" styleClass="mega-item" />
+                    </VBox>
+                </VBox>
+            </HBox>
+        </StackPane>
+
+        <StackPane fx:id="heroSection" prefHeight="700">
+            <StackPane fx:id="backgroundPane">
+                <ImageView fx:id="bgView1" fitHeight="700" fitWidth="1280" preserveRatio="false" />
+                <ImageView fx:id="bgView2" fitHeight="700" fitWidth="1280" preserveRatio="false" opacity="0" />
+                <Pane style="-fx-background-color: linear-gradient(to bottom, rgba(0,68,123,0.3), rgba(0,0,0,0.8));" />
+            </StackPane>
+
+            <VBox alignment="CENTER" spacing="20">
+                <Text text="EXPLOREZ LE MONDE" styleClass="hero-sub" />
+                <Text text="GoVacate : Votre Voyage Sur Mesure" styleClass="hero-main" />
+                <Button styleClass="btn-cta" text="DÉCOUVRIR NOS OFFRES" />
+            </VBox>
+        </StackPane>
+
+        <VBox spacing="40" style="-fx-padding: 60 50;">
+            <VBox spacing="10">
+                <Text text="Nos Incontournables" styleClass="section-title" />
+                <Text text="Les destinations et établissements les plus prisés du moment" styleClass="section-subtitle" />
+            </VBox>
+
+            <VBox spacing="15">
+                <Text text="🔥 Top Packs &amp; Hôtels" styleClass="category-label" />
+                <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" pannable="true" fitToHeight="true" styleClass="horizontal-scroll">
+                    <HBox fx:id="topDealsContainer" spacing="20" style="-fx-padding: 18 10;" />
+                </ScrollPane>
+            </VBox>
+        </VBox>
+
+        <VBox alignment="CENTER" spacing="40" style="-fx-background-color: #f8f9fa; -fx-padding: 60 50;">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="Communauté GoVacate" styleClass="section-title" />
+                <Text text="Partagez vos moments forts avec #GoVacate" styleClass="section-subtitle" />
+            </VBox>
+
+            <VBox fx:id="socialFeed" maxWidth="650" spacing="40">
+            </VBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

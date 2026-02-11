@@ -1,0 +1,56 @@
+/* Palette : Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
+
+.root-container {
+    -fx-background-color: #F8F9FA;
+}
+
+/* Panneau latéral animé */
+.side-pane {
+    -fx-background-color: linear-gradient(to bottom right, #00447B, #002d52);
+}
+
+/* Champs de texte stylisés */
+.text-field-custom {
+    -fx-background-color: white;
+    -fx-border-color: #C0C0C0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 14px;
+}
+.text-field-custom:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Bouton Orange (Principal) */
+.btn-orange {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+.btn-orange:hover {
+    -fx-background-color: #FFBD59;
+}
+
+/* Bouton Bleu (Secondaire / Outline) */
+.btn-outline-white {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-radius: 5;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+.btn-outline-white:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: #679AC1;
+    -fx-text-fill: #679AC1;
+}
+
+/* Titres */
+.title-dark {
+    -fx-fill: #00447B;
+    -fx-font-weight: bold;
+}
