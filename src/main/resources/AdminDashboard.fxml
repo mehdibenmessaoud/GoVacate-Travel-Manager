@@ -1,187 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.geometry.Insets?>
 
-<StackPane fx:id="rootStack" stylesheets="@../css/admin_light.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.AdminController">
-    <BorderPane fx:id="mainRoot" styleClass="main-bg">
-        <!-- SIDEBAR -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.AdminController">
+
+    <Pane styleClass="deep-water-bg">
+        <Circle fill="#FF8210" layoutX="150.0" layoutY="150.0" opacity="0.15" radius="180.0">
+            <effect><GaussianBlur radius="80.0" /></effect>
+        </Circle>
+        <Circle fill="#679AC1" layoutX="900.0" layoutY="600.0" opacity="0.1" radius="250.0">
+            <effect><GaussianBlur radius="100.0" /></effect>
+        </Circle>
+    </Pane>
+
+    <BorderPane fx:id="mainBorderPane">
+
         <left>
-            <VBox prefWidth="280" spacing="15" styleClass="sidebar">
-                <padding><Insets top="30" left="20" right="20" bottom="20"/></padding>
-                
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Circle radius="18" styleClass="logo-circle" />
-                    <Text text="GoVacate" styleClass="logo-text" />
+            <AnchorPane prefWidth="260.0" styleClass="sidebar-liquid">
+                <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="20.0">
+                    <Circle fill="#FF8210" radius="8.0" stroke="WHITE" strokeWidth="2.0" />
+                    <Label styleClass="logo-text" text="GoVacate" />
                 </HBox>
-                
-                <Separator />
-                
-                <Label text="NAVIGATION" styleClass="sidebar-label" />
-                <Button fx:id="navRestaurants" onAction="#loadRestaurantsTab" styleClass="nav-btn nav-active" text="🏨 Restaurants" />
-                <Button fx:id="navMenus" onAction="#loadMenusTab" styleClass="nav-btn" text="🍴 Menus" />
-                <Button fx:id="navReviews" onAction="#loadReviewsTab" styleClass="nav-btn" text="⭐ Reviews" />
-                
-                <Region VBox.vgrow="ALWAYS" />
-                <Separator />
-                
-                <HBox alignment="CENTER" spacing="10">
-                    <Label text="🌙 Mode" styleClass="mode-label"/>
-                    <ToggleButton fx:id="themeToggle" onAction="#handleThemeSwitch" styleClass="ios-switch" />
-                </HBox>
-            </VBox>
+
+                <Pane fx:id="slidingPane" layoutX="20.0" layoutY="140.0" mouseTransparent="true" prefHeight="45.0" prefWidth="220.0" styleClass="sliding-highlight" />
+
+                <VBox fx:id="menuContainer" layoutY="140.0" spacing="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                    <children>
+                        <Button fx:id="btnExplorer" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Explorer" />
+                        <Button fx:id="btnVoyages" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Mes Voyages" />
+                        <Button fx:id="btnFavoris" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Favoris" />
+                        <Button fx:id="btnMessages" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Messages" />
+                        <Button fx:id="btnRestaurant" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Restaurant Manager" />
+                        <Pane prefHeight="50.0" />
+                        <Button fx:id="btnParametres" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Paramètres" />
+                        <Button fx:id="btnLogout" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Déconnexion" />
+                    </children>
+                </VBox>
+            </AnchorPane>
         </left>
 
         <center>
-            <VBox spacing="0">
-                <!-- TOP BAR -->
-                <HBox alignment="CENTER_RIGHT" prefHeight="80" spacing="25" styleClass="top-bar">
-                    <padding><Insets left="30" right="30"/></padding>
-                    <Label fx:id="viewTitle" text="Gestion Restaurants" styleClass="view-title" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnRefresh" onAction="#refreshData" styleClass="btn-icon" text="🔄" />
-                    <Separator orientation="VERTICAL" prefHeight="40" />
-                    <Label text="Admin User" styleClass="admin-name" />
-                    <Circle fx:id="profileCircle" radius="25" fill="#6C6D6F" stroke="#FF8210" strokeWidth="2" />
-                </HBox>
-
-                <!-- CONTENT AREA -->
-                <StackPane VBox.vgrow="ALWAYS" styleClass="content-area">
-                    <!-- RESTAURANTS TAB -->
-                    <VBox fx:id="restaurantsContent" spacing="25" style="-fx-padding: 40;">
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <Text text="Gestion Restaurants" styleClass="section-header" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <TextField fx:id="resSearchField" promptText="🔍 Rechercher..." prefWidth="250" styleClass="search-field" />
-                            <Button onAction="#showRestaurantForm" styleClass="btn-primary" text="+ Nouveau Restaurant" />
+            <ScrollPane fx:id="mainContent" fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="40.0">
+                        <padding><Insets bottom="50.0" left="50.0" right="50.0" top="40.0" /></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                            <VBox>
+                                <Label styleClass="text-header" text="Bonjour, Voyageur" />
+                                <Label styleClass="text-sub" text="Prêt à surfer sur la vague ?" />
+                            </VBox>
                         </HBox>
-
-                        <TableView fx:id="restaurantsTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
-                            <columns>
-                                <TableColumn text="ID" prefWidth="50" fx:id="resColId" />
-                                <TableColumn text="Nom" prefWidth="150" fx:id="resColName" />
-                                <TableColumn text="Catégorie" prefWidth="100" fx:id="resColCategory" />
-                                <TableColumn text="Adresse" prefWidth="150" fx:id="resColAddress" />
-                                <TableColumn text="Statut" prefWidth="100" fx:id="resColStatus" />
-                                <TableColumn text="Capacité" prefWidth="80" fx:id="resColCapacity" />
-                                <TableColumn text="Actions" prefWidth="120" fx:id="resColActions" />
-                            </columns>
-                            <columnResizePolicy><TableView.CONSTRAINED_RESIZE_POLICY /></columnResizePolicy>
-                        </TableView>
                     </VBox>
-
-                    <!-- MENUS TAB -->
-                    <VBox fx:id="menusContent" spacing="25" style="-fx-padding: 40;" visible="false">
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <Text text="Gestion Menus" styleClass="section-header" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <TextField fx:id="menuSearchField" promptText="🔍 Rechercher..." prefWidth="250" styleClass="search-field" />
-                            <Button onAction="#showMenuForm" styleClass="btn-primary" text="+ Nouveau Menu" />
-                        </HBox>
-
-                        <TableView fx:id="menusTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
-                            <columns>
-                                <TableColumn text="ID" prefWidth="50" fx:id="menuColId" />
-                                <TableColumn text="Nom" prefWidth="150" fx:id="menuColName" />
-                                <TableColumn text="Restaurant" prefWidth="150" fx:id="menuColRestaurant" />
-                                <TableColumn text="Description" prefWidth="200" fx:id="menuColDescription" />
-                                <TableColumn text="Prix" prefWidth="100" fx:id="menuColPrice" />
-                                <TableColumn text="Statut" prefWidth="100" fx:id="menuColStatus" />
-                                <TableColumn text="Actions" prefWidth="120" fx:id="menuColActions" />
-                            </columns>
-                            <columnResizePolicy><TableView.CONSTRAINED_RESIZE_POLICY /></columnResizePolicy>
-                        </TableView>
-                    </VBox>
-
-                    <!-- REVIEWS TAB -->
-                    <VBox fx:id="reviewsContent" spacing="25" style="-fx-padding: 40;" visible="false">
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <Text text="Gestion Reviews" styleClass="section-header" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <TextField fx:id="reviewSearchField" promptText="🔍 Rechercher..." prefWidth="250" styleClass="search-field" />
-                        </HBox>
-
-                        <TableView fx:id="reviewsTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
-                            <columns>
-                                <TableColumn text="ID" prefWidth="50" fx:id="revColId" />
-                                <TableColumn text="Restaurant" prefWidth="150" fx:id="revColRestaurant" />
-                                <TableColumn text="Note" prefWidth="80" fx:id="revColRating" />
-                                <TableColumn text="Commentaire" prefWidth="300" fx:id="revColComment" />
-                                <TableColumn text="Date" prefWidth="120" fx:id="revColDate" />
-                                <TableColumn text="Actions" prefWidth="100" fx:id="revColActions" />
-                            </columns>
-                            <columnResizePolicy><TableView.CONSTRAINED_RESIZE_POLICY /></columnResizePolicy>
-                        </TableView>
-                    </VBox>
-                </StackPane>
-            </VBox>
+                </content>
+            </ScrollPane>
         </center>
     </BorderPane>
-
-    <!-- MODALS OVERLAY -->
-    <VBox fx:id="modalOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.7);" onMouseClicked="#hideModal">
-        <VBox fx:id="restaurantModal" spacing="18" styleClass="modal-card" maxWidth="500" onMouseClicked="#consumeEvent">
-            <padding><Insets top="30" left="30" right="30" bottom="30"/></padding>
-            
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text fx:id="modalTitle" text="Nouveau Restaurant" styleClass="modal-title" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#hideModal" styleClass="btn-close" text="✕" />
-            </HBox>
-
-            <Separator />
-
-            <Label text="Informations Générales" styleClass="form-section-label" />
-            <TextField fx:id="resModalName" promptText="Nom du restaurant *" styleClass="modern-input" />
-            <TextField fx:id="resModalCategory" promptText="Catégorie *" styleClass="modern-input" />
-            <TextField fx:id="resModalAddress" promptText="Adresse *" styleClass="modern-input" />
-
-            <Label text="Détails de Contact" styleClass="form-section-label" />
-            <TextField fx:id="resModalPhone" promptText="Téléphone" styleClass="modern-input" />
-            <TextField fx:id="resModalEmail" promptText="Email" styleClass="modern-input" />
-
-            <Label text="Autres Informations" styleClass="form-section-label" />
-            <HBox spacing="15">
-                <Spinner fx:id="resModalCapacity" prefWidth="200" />
-                <ComboBox fx:id="resModalStatus" promptText="Statut" prefWidth="200" />
-            </HBox>
-
-            <Separator />
-
-            <HBox spacing="15" alignment="CENTER_RIGHT">
-                <Button onAction="#hideModal" text="Annuler" styleClass="btn-secondary" />
-                <Button fx:id="btnSaveRestaurant" onAction="#handleSaveRestaurant" text="Enregistrer" styleClass="btn-primary" />
-            </HBox>
-        </VBox>
-
-        <VBox fx:id="menuModal" spacing="18" styleClass="modal-card" maxWidth="500" onMouseClicked="#consumeEvent" visible="false">
-            <padding><Insets top="30" left="30" right="30" bottom="30"/></padding>
-            
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text fx:id="menuModalTitle" text="Nouveau Menu" styleClass="modal-title" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#hideModal" styleClass="btn-close" text="✕" />
-            </HBox>
-
-            <Separator />
-
-            <ComboBox fx:id="menuModalRestaurant" promptText="Restaurant *" prefWidth="400" styleClass="modern-input" />
-            <TextField fx:id="menuModalName" promptText="Nom du plat *" styleClass="modern-input" />
-            <TextArea fx:id="menuModalDescription" promptText="Description" prefRowCount="3" wrapText="true" styleClass="modern-input" />
-
-            <HBox spacing="15">
-                <Spinner fx:id="menuModalPrice" prefWidth="200" />
-                <ComboBox fx:id="menuModalStatus" promptText="Statut" prefWidth="200" />
-            </HBox>
-
-            <Separator />
-
-            <HBox spacing="15" alignment="CENTER_RIGHT">
-                <Button onAction="#hideModal" text="Annuler" styleClass="btn-secondary" />
-                <Button fx:id="btnSaveMenu" onAction="#handleSaveMenu" text="Enregistrer" styleClass="btn-primary" />
-            </HBox>
-        </VBox>
-    </VBox>
 </StackPane>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox spacing="25.0" styleClass="content-pane" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantDetailController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="25.0" styleClass="water-card" style="-fx-padding: 30;">
+        <Button onAction="#handleBack" styleClass="btn-action-view" text="← Retour" />
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblName" styleClass="text-header" text="Nom du Restaurant" />
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label fx:id="lblCategory" styleClass="text-sub" text="Catégorie" style="-fx-text-fill: #FF8210; -fx-font-weight: bold;"/>
+                <Separator orientation="VERTICAL" prefHeight="15"/>
+                <Label fx:id="lblStatus" text="STATUT" />
+            </HBox>
+        </VBox>
+        <VBox alignment="CENTER_RIGHT" spacing="5">
+            <Label styleClass="text-sub" text="Capacité Totale" />
+            <Label fx:id="lblCapacity" styleClass="text-header" text="0" style="-fx-font-size: 24;"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="25" VBox.vgrow="ALWAYS">
+        <VBox spacing="25" HBox.hgrow="ALWAYS" prefWidth="600">
+            <VBox spacing="15" styleClass="water-card" style="-fx-padding: 20;">
+                <Label text="Informations de Contact" styleClass="form-label" />
+                <GridPane hgap="15" vgap="10">
+                    <Label text="📍 Adresse:" styleClass="text-sub" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblAddress" style="-fx-text-fill: white;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="📧 Email:" styleClass="text-sub" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblEmail" style="-fx-text-fill: white;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <Label text="📞 Téléphone:" styleClass="text-sub" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblPhone" style="-fx-text-fill: white;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                </GridPane>
+            </VBox>
+
+            <VBox spacing="10" VBox.vgrow="ALWAYS" styleClass="water-card" style="-fx-padding: 20;">
+                <Label text="Carte / Menu" styleClass="form-label" />
+                <TableView fx:id="menuTable" styleClass="glass-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMenuName" prefWidth="400" text="Plat / Boisson" />
+                        <TableColumn fx:id="colMenuPrice" prefWidth="120" text="Prix" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+
+        <VBox spacing="15" prefWidth="400" styleClass="water-card" style="-fx-padding: 20;">
+            <Label text="Galerie Photos" styleClass="form-label" />
+            <StackPane fx:id="carouselContainer" prefHeight="350.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 15; -fx-overflow: hidden;">
+                <children>
+                    <ImageView fx:id="mainCarouselImageView" fitHeight="330.0" fitWidth="410.0" preserveRatio="true" />
+
+                    <Button onAction="#handlePrevImage" styleClass="btn-nav" text="‹" StackPane.alignment="CENTER_LEFT">
+                        <StackPane.margin><Insets left="10.0" /></StackPane.margin>
+                    </Button>
+
+                    <Button onAction="#handleNextImage" styleClass="btn-nav" text="›" StackPane.alignment="CENTER_RIGHT">
+                        <StackPane.margin><Insets right="10.0" /></StackPane.margin>
+                    </Button>
+
+                    <Label fx:id="lblImageCounter" style="-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 15; -fx-font-size: 12;" text="0 / 0" StackPane.alignment="BOTTOM_CENTER">
+                        <StackPane.margin><Insets bottom="10.0" /></StackPane.margin>
+                    </Label>
+                </children>
+            </StackPane>
+        </VBox>
+    </HBox>
+</VBox>

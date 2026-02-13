@@ -151,4 +151,5 @@ public class RestaurantService implements IService<Restaurant> {
 
         return null; // Ou lancer une exception si non trouvé
     }
+
 }

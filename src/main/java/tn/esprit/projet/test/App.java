@@ -11,13 +11,13 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
         try {
             System.out.println("Loading FXML...");
-            Parent root = FXMLLoader.load(getClass().getResource("/Auth.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/AdminDashboard.fxml"));
             
             System.out.println("Creating scene...");
             Scene scene = new Scene(root);
 
             // Load initial light theme
-            String cssResource = getClass().getResource("/css/style.css").toExternalForm();
+            String cssResource = getClass().getResource("/css/admin_style.css").toExternalForm();
             scene.getStylesheets().add(cssResource);
             System.out.println("✓ CSS loaded: admin_light.css");
 

@@ -1,51 +1,460 @@
-/* Palette : Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
-
-.main-bg { -fx-background-color: #F5F5F0; }
-.sidebar { -fx-background-color: #00447B; }
-.header-title { -fx-font-size: 28; -fx-fill: #00447B; -fx-font-weight: bold; }
-
-.side-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: #C0C0C0;
-    -fx-alignment: CENTER_LEFT;
-    -fx-pref-width: 220;
-    -fx-padding: 12;
-    -fx-cursor: hand;
+.root-pane {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    /* Dark Navy Blue */
+    -fx-background-color: #001F3F;
 }
-.side-btn:hover { -fx-background-color: rgba(255,255,255,0.1); }
-.side-btn:focused { -fx-background-color: #FF8210; -fx-text-fill: white; }
 
-.btn-add {
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.sidebar-liquid {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* =========================================================
+   NAVIGATION & BUTTONS
+========================================================= */
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+}
+
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 0 15 25;
+    -fx-background-radius: 30px;
+}
+
+.liquid-btn:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.12;
+}
+
+.liquid-btn.active {
+    -fx-text-fill: white;
+}
+
+/* =========================================================
+   PRISMATIC GLASS COMPONENTS (SEARCH & CARDS)
+========================================================= */
+.search-field-large {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-padding: 0 20 0 20;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.4);
+}
+
+.search-field-large:focused {
+    -fx-border-color: #FF8210;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-orange-glow {
     -fx-background-color: #FF8210;
     -fx-text-fill: white;
+    -fx-background-radius: 15px;
     -fx-font-weight: bold;
-    -fx-padding: 10 25;
-    -fx-background-radius: 20;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 15, 0.3, 0, 0);
 }
 
-.form-card {
+.btn-orange-glow:hover {
+    -fx-background-color: #FFBD59;
+    -fx-scale-x: 1.02;
+}
+
+/* =========================================================
+   THE GLASS TABLE (DYNAMIC RESTAURANT LIST)
+========================================================= */
+.glass-table {
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1.2px;
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0.4),
+            rgba(0, 180, 255, 0.2),
+            rgba(140, 0, 255, 0.2)
+    );
+    -fx-padding: 5;
+}
+
+.glass-table .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.glass-table .column-header {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.2) transparent;
+    -fx-size: 45px;
+}
+
+.glass-table .column-header .label {
+    -fx-text-fill: #679AC1; /* Soft lagoon blue */
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.glass-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.05) transparent;
+    -fx-text-fill: white;
+}
+
+.glass-table .table-row-cell:filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-effect: dropshadow(gaussian, rgba(0, 180, 255, 0.1), 10, 0, 0, 0);
+}
+
+.glass-table .table-row-cell:filled:selected {
+    -fx-background-color: rgba(255, 130, 16, 0.15); /* Tint of orange */
+}
+
+.glass-table .table-cell {
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Table Scrollbars */
+.glass-table .scroll-bar:vertical,
+.glass-table .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.glass-table .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 10px;
+}
+
+/* =========================================================
+   TABLE ACTION BUTTONS
+========================================================= */
+.btn-action-view {
+    -fx-background-color: rgba(103, 154, 193, 0.2);
+    -fx-text-fill: #679AC1;
+    -fx-border-color: #679AC1;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.btn-action-view:hover { -fx-background-color: #679AC1; -fx-text-fill: white; }
+
+.btn-action-edit {
+    -fx-background-color: rgba(46, 204, 113, 0.1);
+    -fx-text-fill: #2ecc71;
+    -fx-border-color: #2ecc71;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.btn-action-edit:hover { -fx-background-color: #2ecc71; -fx-text-fill: white; }
+
+.btn-action-delete {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-background-radius: 50%;
+    -fx-min-width: 24px;
+    -fx-min-height: 24px;
+    -fx-max-width: 24px;
+    -fx-max-height: 24px;
+    -fx-padding: 0;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+.btn-action-delete:hover { -fx-background-color: #e74c3c; -fx-text-fill: white; }
+
+/* =========================================================
+   CARDS & TEXT
+========================================================= */
+.text-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub {
+    -fx-font-size: 14px;
+    -fx-text-fill: #679AC1;
+}
+
+.water-card {
+    -fx-background-color: linear-gradient(to bottom right, #0a1a33, #0e2a4d);
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1.2px;
+    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.45), rgba(0, 180, 255, 0.35), rgba(140, 0, 255, 0.35));
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 18, 0, 0, 6);
+}
+    /* Add these to your existing CSS file */
+
+.content-pane {
+    -fx-background-color: transparent;
+}
+
+/* Glass TabPane Styling */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: rgba(255, 130, 16, 0.2);
+    -fx-border-color: #FF8210 transparent transparent transparent;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+/* Glass Panel for Tab Content */
+.glass-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 0 0 20 20;
+    -fx-border-radius: 0 0 20 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 1 1 1;
+}
+
+/* Form Labels */
+.form-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ComboBox & Spinner Dark Styling */
+.combo-box, .spinner {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+}
+
+.combo-box .list-cell, .spinner .text-field {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box .list-view {
+    -fx-background-color: #001F3F;
+    -fx-border-color: #679AC1;
+}
+
+.image-thumbnail-container {
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10;
+    -fx-padding: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Add these to your existing CSS file */
+
+.content-pane {
+    -fx-background-color: transparent;
+}
+
+/* Glass TabPane Styling */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: rgba(255, 130, 16, 0.2);
+    -fx-border-color: #FF8210 transparent transparent transparent;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+/* Glass Panel for Tab Content */
+.glass-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 0 0 20 20;
+    -fx-border-radius: 0 0 20 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 1 1 1;
+}
+
+/* Form Labels */
+.form-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ComboBox & Spinner Dark Styling */
+.combo-box, .spinner {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+}
+
+.combo-box .list-cell, .spinner .text-field {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box .list-view {
+    -fx-background-color: #001F3F;
+    -fx-border-color: #679AC1;
+}
+
+.image-thumbnail-container {
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10;
+    -fx-padding: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Add these to your existing CSS file */
+
+.content-pane {
+    -fx-background-color: transparent;
+}
+
+/* Glass TabPane Styling */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: rgba(255, 130, 16, 0.2);
+    -fx-border-color: #FF8210 transparent transparent transparent;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+/* Glass Panel for Tab Content */
+.glass-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 0 0 20 20;
+    -fx-border-radius: 0 0 20 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 1 1 1;
+}
+
+/* Form Labels */
+.form-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ComboBox & Spinner Dark Styling */
+.combo-box, .spinner {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+}
+
+.combo-box .list-cell, .spinner .text-field {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box .list-view {
+    -fx-background-color: #001F3F;
+    -fx-border-color: #679AC1;
+}
+
+.image-thumbnail-container {
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10;
+    -fx-padding: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Navigation buttons within the Carousel */
+.btn-nav {
+    -fx-background-color: rgba(255, 255, 255, 0.6);
+    -fx-background-radius: 50;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-nav:hover {
     -fx-background-color: white;
-    -fx-padding: 30;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+#carouselContainer {
+    -fx-background-color: #2c3e50; /* Dark background for better image contrast */
     -fx-background-radius: 15;
-    -fx-border-color: #00447B;
-    -fx-border-width: 2;
+    -fx-overflow-x: hidden;
 }
 
-.input-field {
-    -fx-background-color: transparent;
-    -fx-border-color: #6C6D6F;
-    -fx-border-width: 0 0 1 0;
-    -fx-padding: 8;
-}
-.input-field:focused { -fx-border-color: #FF8210; }
-
-.btn-save { -fx-background-color: #00447B; -fx-text-fill: white; -fx-padding: 10 20; }
-.btn-cancel { -fx-background-color: #6C6D6F; -fx-text-fill: white; -fx-padding: 10 20; }
-
-.profile-btn {
-    -fx-background-color: transparent;
-    -fx-border-color: #FFBD59;
-    -fx-text-fill: #FFBD59;
-    -fx-border-radius: 5;
-}
