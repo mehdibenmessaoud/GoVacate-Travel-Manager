@@ -9,19 +9,57 @@
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="20.0">
-        <TextField fx:id="searchField" prefHeight="50.0" promptText="Rechercher par nom, catégorie ou adresse..." HBox.hgrow="ALWAYS" styleClass="search-field-large" />
-        <Button onAction="#handleAddRestaurant" prefHeight="50.0" prefWidth="220.0" styleClass="btn-orange-glow" text="+ Ajouter Restaurant" />
+    <VBox spacing="5.0">
+        <Label styleClass="text-header" text="Gestion des Restaurants" />
+        <Label styleClass="text-sub" text="Consultez, filtrez et gérez vos établissements partenaires." />
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="water-card" style="-fx-padding: 15;">
+        <TextField fx:id="searchField" prefHeight="45.0" promptText="🔍 Rechercher par nom, destination, téléphone..." HBox.hgrow="ALWAYS" styleClass="search-field-large" />
+
+        <MenuButton prefHeight="45.0" prefWidth="160.0" styleClass="menu-button" text="⚙️ Filtres &amp; Tri">
+            <items>
+                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-opacity: 1;" text="FILTRAGE" />
+                <CustomMenuItem hideOnClick="false">
+                    <content>
+                        <VBox spacing="5">
+                            <Label styleClass="form-label" text="Catégorie" />
+                            <ComboBox fx:id="categoryFilter" prefWidth="180.0" styleClass="combo-box-glass" />
+                        </VBox>
+                    </content>
+                </CustomMenuItem>
+                <CustomMenuItem hideOnClick="false">
+                    <content>
+                        <VBox spacing="5">
+                            <Label styleClass="form-label" text="Statut" />
+                            <ComboBox fx:id="statusFilter" prefWidth="180.0" styleClass="combo-box-glass" />
+                        </VBox>
+                    </content>
+                </CustomMenuItem>
+
+                <SeparatorMenuItem />
+                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-opacity: 1;" text="TRI AVANCÉ" />
+                <MenuItem onAction="#sortByNameAsc" text="Nom (A-Z)" />
+                <MenuItem onAction="#sortByCapacityDesc" text="Capacité (Max-Min)" />
+                <MenuItem onAction="#sortByDateDesc" text="Plus récents" />
+
+                <SeparatorMenuItem />
+                <MenuItem onAction="#resetFilters" styleClass="menu-item-reset" text="Réinitialiser" />
+            </items>
+        </MenuButton>
+
+        <Button onAction="#handleAddRestaurant" prefHeight="45.0" prefWidth="200.0" styleClass="btn-orange-glow" text="+ Nouveau Restaurant" />
     </HBox>
 
-    <TableView fx:id="restaurantTable" VBox.vgrow="ALWAYS" styleClass="glass-table">
+    <TableView fx:id="restaurantTable" styleClass="glass-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colName" prefWidth="150.0" text="Nom" />
             <TableColumn fx:id="colCategory" prefWidth="120.0" text="Catégorie" />
-            <TableColumn fx:id="colAddress" prefWidth="200.0" text="Adresse" />
-            <TableColumn fx:id="colPhone" prefWidth="120.0" text="Téléphone" />
-            <TableColumn fx:id="colCapacity" prefWidth="80.0" text="Capacité" />
-            <TableColumn fx:id="colStatus" prefWidth="100.0" text="Statut" />
+            <TableColumn fx:id="colDestination" prefWidth="150.0" text="Destination" />
+            <TableColumn fx:id="colAddress" prefWidth="180.0" text="Adresse" />
+            <TableColumn fx:id="colPhone" prefWidth="130.0" text="Téléphone" />
+            <TableColumn fx:id="colCapacity" prefWidth="90.0" text="Capacité" />
+            <TableColumn fx:id="colStatus" prefWidth="110.0" text="Statut" />
             <TableColumn fx:id="colActions" prefWidth="280.0" text="Actions" />
         </columns>
         <columnResizePolicy>

@@ -54,25 +54,35 @@
             </VBox>
         </VBox>
 
-        <VBox spacing="15" prefWidth="400" styleClass="water-card" style="-fx-padding: 20;">
+        <VBox spacing="15" prefWidth="450" styleClass="water-card" style="-fx-padding: 20;">
             <Label text="Galerie Photos" styleClass="form-label" />
+
             <StackPane fx:id="carouselContainer" prefHeight="350.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 15; -fx-overflow: hidden;">
                 <children>
                     <ImageView fx:id="mainCarouselImageView" fitHeight="330.0" fitWidth="410.0" preserveRatio="true" />
 
-                    <Button onAction="#handlePrevImage" styleClass="btn-nav" text="‹" StackPane.alignment="CENTER_LEFT">
-                        <StackPane.margin><Insets left="10.0" /></StackPane.margin>
+                    <Button onAction="#handlePrevImage" styleClass="btn-nav-glass" text="‹" StackPane.alignment="CENTER_LEFT">
+                        <StackPane.margin><Insets left="15.0" /></StackPane.margin>
                     </Button>
 
-                    <Button onAction="#handleNextImage" styleClass="btn-nav" text="›" StackPane.alignment="CENTER_RIGHT">
-                        <StackPane.margin><Insets right="10.0" /></StackPane.margin>
+                    <Button onAction="#handleNextImage" styleClass="btn-nav-glass" text="›" StackPane.alignment="CENTER_RIGHT">
+                        <StackPane.margin><Insets right="15.0" /></StackPane.margin>
                     </Button>
 
-                    <Label fx:id="lblImageCounter" style="-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 15; -fx-font-size: 12;" text="0 / 0" StackPane.alignment="BOTTOM_CENTER">
+                    <Label fx:id="lblImageCounter" styleClass="image-counter-badge" text="0 / 0" StackPane.alignment="BOTTOM_CENTER">
                         <StackPane.margin><Insets bottom="10.0" /></StackPane.margin>
                     </Label>
+
+                    <Button onAction="#handleFullScreen" styleClass="btn-full-glass" text="⛶" StackPane.alignment="TOP_RIGHT">
+                        <StackPane.margin><Insets top="10" right="10"/></StackPane.margin>
+                    </Button>
                 </children>
             </StackPane>
+            <HBox fx:id="paginationContainer" alignment="CENTER" spacing="8" />
+
+            <ScrollPane fitToHeight="true" minHeight="90" prefHeight="90" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                <HBox fx:id="thumbnailContainer" alignment="CENTER_LEFT" spacing="10" />
+            </ScrollPane>
         </VBox>
     </HBox>
 </VBox>

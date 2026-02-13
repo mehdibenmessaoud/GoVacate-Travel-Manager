@@ -203,13 +203,18 @@
     -fx-text-fill: #679AC1;
 }
 
+/* Refined Water Card with Inner Glow */
 .water-card {
-    -fx-background-color: linear-gradient(to bottom right, #0a1a33, #0e2a4d);
+    -fx-background-color: linear-gradient(to bottom right, #0a1a33, #08162b);
     -fx-background-radius: 20px;
     -fx-border-radius: 20px;
-    -fx-border-width: 1.2px;
-    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.45), rgba(0, 180, 255, 0.35), rgba(140, 0, 255, 0.35));
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 18, 0, 0, 6);
+    -fx-border-width: 1.5px;
+    /* Prismatic border effect */
+    -fx-border-color: linear-gradient(to bottom right,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 130, 16, 0.2),
+    rgba(0, 180, 255, 0.2));
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 25, 0, 0, 10);
 }
     /* Add these to your existing CSS file */
 
@@ -438,18 +443,17 @@
 
 /* Navigation buttons within the Carousel */
 .btn-nav {
-    -fx-background-color: rgba(255, 255, 255, 0.6);
-    -fx-background-radius: 50;
-    -fx-min-width: 40px;
-    -fx-min-height: 40px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 50;
+    -fx-backdrop-filter: blur(10px); /* Visual hint for modern UI */
 }
 
 .btn-nav:hover {
-    -fx-background-color: white;
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
+    -fx-background-color: #FF8210;
+    -fx-border-color: #FF8210;
+    -fx-effect: dropshadow(gaussian, #FF8210, 15, 0.4, 0, 0);
 }
 
 #carouselContainer {
@@ -458,3 +462,195 @@
     -fx-overflow-x: hidden;
 }
 
+.gallery-thumb {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-opacity: 0.5;
+    -fx-transition: 0.3s;
+}
+
+.gallery-thumb:hover {
+    -fx-opacity: 1.0;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.status-open {
+    -fx-text-fill: #2ecc71; /* Emerald Green */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    /* Adding a subtle glow to make it stand out on dark blue */
+    -fx-effect: dropshadow(gaussian, rgba(46, 204, 113, 0.4), 10, 0, 0, 0);
+}
+
+.status-closed {
+    -fx-text-fill: #e74c3c; /* Alizarin Red */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.status-suspended {
+    -fx-text-fill: #f1c40f; /* Sun Flower Yellow */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    /* Amber glow for warning state */
+    -fx-effect: dropshadow(gaussian, rgba(241, 196, 15, 0.4), 10, 0, 0, 0);
+}
+
+/* Glassmorphism Navigation Arrows */
+.btn-nav-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05); /* Very faint white */
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50%;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+    -fx-min-height: 50px;
+    -fx-max-height: 50px;
+    //-fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+    -fx-padding: 0 0 5 0; /* Centers the chevron vertically */
+    -fx-transition: 0.3s;
+}
+
+.btn-nav-glass:hover {
+    -fx-background-color: #FF8210; /* Your primary orange */
+    //-fx-border-color: #FFBD59;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    /* Neon glow effect */
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 15, 0.4, 0, 0);
+}
+
+/* Matching Fullscreen Button */
+.btn-full-glass {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-cursor: hand;
+}
+
+.btn-full-glass:hover {
+    -fx-background-color: #679AC1;
+    -fx-border-color: white;
+}
+
+/* Image Counter Badge */
+.image-counter-badge {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: white;
+    -fx-padding: 4 12;
+    -fx-background-radius: 15;
+    -fx-font-size: 11px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.combo-box-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+    -fx-padding: 2 5;
+}
+
+.combo-box-glass .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box-glass .list-view {
+    -fx-background-color: #001F3F; /* Dark navy to match background */
+    -fx-border-color: #FF8210;
+}
+
+/* Ensure the search field is distinct */
+.search-field-large {
+    -fx-font-size: 14px;
+    -fx-background-radius: 12px;
+}
+
+.menu-button {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.menu-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-border-color: #679AC1; /* Soft lagoon blue */
+}
+
+.menu-button .label {
+    -fx-text-fill: white;
+}
+
+/* The Dropdown Menu Popup */
+.context-menu {
+    -fx-background-color: #08162b; /* Dark Navy matches water-card */
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 20, 0, 0, 10);
+}
+
+/* Items inside the menu */
+.menu-item {
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 8px;
+}
+
+.menu-item:hover {
+    -fx-background-color: rgba(103, 154, 193, 0.15); /* Soft Blue Tint */
+}
+
+.menu-item .label {
+    -fx-text-fill: white;
+}
+
+/* Custom Menu Item (The one holding ComboBoxes) */
+.custom-menu-item:hover {
+    -fx-background-color: transparent; /* Don't highlight the background of the box itself */
+}
+
+/* Labels inside the CustomMenuItem */
+.custom-menu-item .label {
+    -fx-text-fill: #679AC1; /* Lagoon blue label */
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+/* Reset Button specifically */
+.menu-item-reset {
+    -fx-text-fill: #e74c3c !important;
+}
+
+.menu-item-reset:hover {
+    -fx-background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+.glass-table .table-cell.status-open {
+    -fx-text-fill: #2ecc71 !important;
+    -fx-font-weight: bold;
+}
+
+.glass-table .table-cell.status-closed {
+    -fx-text-fill: #e74c3c !important;
+    -fx-font-weight: bold;
+}
+
+.glass-table .table-cell.status-suspended {
+    -fx-text-fill: #f1c40f !important;
+    -fx-font-weight: bold;
+}

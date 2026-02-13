@@ -13,9 +13,12 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
+import tn.esprit.projet.entities.Destination;
 import tn.esprit.projet.entities.Menu;
 import tn.esprit.projet.entities.Restaurant;
 import tn.esprit.projet.entities.RestaurantImage;
+import tn.esprit.projet.services.DestinationService;
 import tn.esprit.projet.services.MenuService;
 import tn.esprit.projet.services.RestaurantImageService;
 import tn.esprit.projet.services.RestaurantService;
@@ -33,9 +36,9 @@ public class RestaurantFormController implements Initializable {
     @FXML private Label lblTitle;
     @FXML private TextField txtName, txtAddress, txtEmail, txtPhone, txtMenuItemName, txtMenuItemPrice;
     @FXML private ComboBox<String> cbCategory, cbStatus;
+    @FXML private ComboBox<Destination> cbDestination; // New: Destination Dropdown
     @FXML private Spinner<Integer> spnCapacity;
     @FXML private FlowPane imageFlowPane;
-    @FXML private Button btnAddMenuAction; // Rename fx:id if it conflicts with method name
 
     @FXML private TableView<Menu> menuTable;
     @FXML private TableColumn<Menu, String> colMenuName;
@@ -45,6 +48,7 @@ public class RestaurantFormController implements Initializable {
     private final RestaurantService rs = new RestaurantService();
     private final RestaurantImageService ris = new RestaurantImageService();
     private final MenuService ms = new MenuService();
+    private final DestinationService ds = new DestinationService(); // New Service
 
     private Restaurant currentRestaurant;
     private AdminController mainController;
@@ -53,16 +57,41 @@ public class RestaurantFormController implements Initializable {
     private final List<File> selectedFiles = new ArrayList<>();
     private final List<Integer> imagesToDelete = new ArrayList<>();
     private final List<Menu> menusToDelete = new ArrayList<>();
-    private Menu editingMenu = null;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Setup Enums
         cbStatus.setItems(FXCollections.observableArrayList("OPEN", "CLOSED", "SUSPENDED"));
         cbStatus.setValue("OPEN");
-        cbCategory.setItems(FXCollections.observableArrayList("Gastronomique", "Fast Food", "Pizzeria", "Café", "Bistro"));
+        cbCategory.setItems(FXCollections.observableArrayList("Gastronomique", "Bistro", "Fast Food", "Pizzeria",
+                "Cuisine Tunisienne", "Cuisine Italienne", "Cuisine Française",
+                "Cuisine Asiatique", "Fruits de Mer", "Steakhouse",
+                "Végétarien / Vegan", "Halel", "Brunch", "Street Food"));
         spnCapacity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 20));
 
         setupMenuTable();
+        loadDestinations();
+    }
+
+    private void loadDestinations() {
+        try {
+            List<Destination> list = ds.getAll();
+            cbDestination.setItems(FXCollections.observableArrayList(list));
+
+            // Define how to display the Destination object in the ComboBox
+            cbDestination.setConverter(new StringConverter<Destination>() {
+                @Override
+                public String toString(Destination destination) {
+                    return (destination == null) ? "" : destination.getNameDestination();
+                }
+                @Override
+                public Destination fromString(String string) {
+                    return null; // Not needed for selection
+                }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupMenuTable() {
@@ -104,6 +133,14 @@ public class RestaurantFormController implements Initializable {
         cbStatus.setValue(r.getStatus());
         spnCapacity.getValueFactory().setValue(r.getCapacity());
 
+        // Select the correct destination in the ComboBox
+        for (Destination d : cbDestination.getItems()) {
+            if (d.getId() == r.getDestinationId()) {
+                cbDestination.setValue(d);
+                break;
+            }
+        }
+
         loadExistingData(r.getId());
     }
 
@@ -114,18 +151,13 @@ public class RestaurantFormController implements Initializable {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // THIS METHOD NAME MUST MATCH FXML onAction='#btnAddMenuItem'
     @FXML
     private void btnAddMenuItem() {
         try {
             String name = txtMenuItemName.getText();
             String priceStr = txtMenuItemPrice.getText();
-
             if (name.isEmpty() || priceStr.isEmpty()) return;
-
-            BigDecimal price = new BigDecimal(priceStr);
-            tempMenuList.add(new Menu(0, name, "", price, "OPEN", 0));
-
+            tempMenuList.add(new Menu(0, name, "", new BigDecimal(priceStr), "OPEN", 0));
             txtMenuItemName.clear();
             txtMenuItemPrice.clear();
         } catch (Exception e) {
@@ -136,68 +168,51 @@ public class RestaurantFormController implements Initializable {
     @FXML
     private void handleUploadImage() {
         FileChooser fc = new FileChooser();
+        fc.setTitle("Sélectionner des images");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png"));
         List<File> files = fc.showOpenMultipleDialog(null);
         if (files != null) {
             files.forEach(f -> {
-                selectedFiles.add(f);
-                addThumbnail(f.toURI().toString(), null);
+                if (selectedFiles.stream().noneMatch(ef -> ef.getAbsolutePath().equals(f.getAbsolutePath()))) {
+                    selectedFiles.add(f);
+                    addThumbnail(f.toURI().toString(), null);
+                }
             });
         }
     }
 
     private void addThumbnail(String url, Integer dbId) {
-        // 1. Create the container
         StackPane container = new StackPane();
         container.setPrefSize(100, 100);
-        container.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 2;");
+        container.setStyle("-fx-border-color: #ddd; -fx-background-radius: 5;");
 
-        // 2. Setup the Image
         ImageView iv = new ImageView(new Image(url));
-        iv.setFitWidth(95);
-        iv.setFitHeight(95);
-        iv.setPreserveRatio(true);
+        iv.setFitWidth(90); iv.setFitHeight(90); iv.setPreserveRatio(true);
 
-        // 3. Setup the Delete Button (Red X)
         Button btnDel = new Button("×");
-        // Styling the button to be a small red circle
-        btnDel.setStyle(
-                "-fx-background-color: #e74c3c; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-background-radius: 50%; " +
-                        "-fx-min-width: 22px; " +
-                        "-fx-min-height: 22px; " +
-                        "-fx-max-width: 22px; " +
-                        "-fx-max-height: 22px; " +
-                        "-fx-padding: 0; " +
-                        "-fx-cursor: hand;"
-        );
-
-        // 4. Position the button in the TOP_RIGHT corner
+        btnDel.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 50%;");
         StackPane.setAlignment(btnDel, Pos.TOP_RIGHT);
 
-        // Offset the button slightly so it overlaps the corner neatly
-        btnDel.setTranslateX(5);
-        btnDel.setTranslateY(-5);
-
-        // 5. Delete Logic
         btnDel.setOnAction(e -> {
             imageFlowPane.getChildren().remove(container);
-            if (dbId != null) {
-                imagesToDelete.add(dbId);
-            } else {
-                selectedFiles.removeIf(f -> f.toURI().toString().equals(url));
-            }
+            if (dbId != null) imagesToDelete.add(dbId);
+            else selectedFiles.removeIf(f -> f.toURI().toString().equals(url));
         });
 
-        // 6. Assemble
         container.getChildren().addAll(iv, btnDel);
         imageFlowPane.getChildren().add(container);
     }
+
     @FXML
     private void handleSave() {
         try {
+            if (txtName.getText().isEmpty() || cbDestination.getValue() == null) {
+                new Alert(Alert.AlertType.WARNING, "Nom et Destination sont obligatoires.").show();
+                return;
+            }
+
             if (currentRestaurant == null) currentRestaurant = new Restaurant();
+
             currentRestaurant.setName(txtName.getText());
             currentRestaurant.setCategory(cbCategory.getValue());
             currentRestaurant.setAddress(txtAddress.getText());
@@ -205,24 +220,42 @@ public class RestaurantFormController implements Initializable {
             currentRestaurant.setEmail(txtEmail.getText());
             currentRestaurant.setCapacity(spnCapacity.getValue());
             currentRestaurant.setStatus(cbStatus.getValue());
+            currentRestaurant.setDestinationId(cbDestination.getValue().getId()); // FK Linked
 
             if (currentRestaurant.getId() == 0) {
                 rs.create(currentRestaurant);
-                // Simple way to get the generated ID if your service doesn't return it
-                currentRestaurant = rs.getAll().stream().filter(res -> res.getName().equals(txtName.getText())).findFirst().orElse(null);
+                // Refresh to get the ID back
+                currentRestaurant = rs.getAll().stream()
+                        .filter(res -> res.getName().equals(txtName.getText()))
+                        .findFirst().orElse(null);
             } else {
                 rs.update(currentRestaurant);
             }
 
+            if (currentRestaurant == null) return;
+            int restaurantId = currentRestaurant.getId();
+
             // Sync Menus
             for (Menu m : menusToDelete) ms.delete(m.getId());
             for (Menu m : tempMenuList) {
-                m.setRestaurantId(currentRestaurant.getId());
+                m.setRestaurantId(restaurantId);
                 if (m.getId() == 0) ms.create(m); else ms.update(m);
             }
 
+            // Sync Images
+            for (Integer imgId : imagesToDelete) ris.delete(imgId);
+            for (File file : selectedFiles) {
+                RestaurantImage newImg = new RestaurantImage();
+                newImg.setRestaurantId(restaurantId);
+                newImg.setImageUrl(file.toURI().toString());
+                ris.create(newImg);
+            }
+
             handleBack();
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Erreur BD: " + e.getMessage()).show();
+        }
     }
 
     @FXML private void handleBack() {
