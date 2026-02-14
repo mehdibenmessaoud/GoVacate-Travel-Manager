@@ -87,6 +87,40 @@ public class RestaurantService implements IService<Restaurant> {
         }
     }
 
+    public void deleteWithDependencies(int restaurantId) throws SQLException {
+        try {
+            cnx.setAutoCommit(false); // Start Transaction
+
+            // 1. Delete associated images
+            String sqlImages = "DELETE FROM restaurant_image WHERE restaurant_id = ?";
+            try (PreparedStatement ps = cnx.prepareStatement(sqlImages)) {
+                ps.setInt(1, restaurantId);
+                ps.executeUpdate();
+            }
+
+            // 2. Delete associated menus
+            String sqlMenus = "DELETE FROM menu WHERE restaurant_id = ? ";
+            try (PreparedStatement ps = cnx.prepareStatement(sqlMenus)) {
+                ps.setInt(1, restaurantId);
+                ps.executeUpdate();
+            }
+
+            // 3. Delete the restaurant itself
+            String sqlResto = "DELETE FROM restaurant WHERE id = ?";
+            try (PreparedStatement ps = cnx.prepareStatement(sqlResto)) {
+                ps.setInt(1, restaurantId);
+                ps.executeUpdate();
+            }
+
+            cnx.commit(); // Finish Transaction
+        } catch (SQLException e) {
+            cnx.rollback();
+            throw e;
+        } finally {
+            cnx.setAutoCommit(true);
+        }
+    }
+
     @Override
     public Restaurant getById(int id) throws SQLException {
         String sql = "SELECT r.*, d.name_destination FROM restaurant r " +

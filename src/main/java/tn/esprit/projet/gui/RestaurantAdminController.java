@@ -12,13 +12,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import tn.esprit.projet.entities.Restaurant;
+import tn.esprit.projet.services.MenuService;
+import tn.esprit.projet.services.RestaurantImageService;
 import tn.esprit.projet.services.RestaurantService;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RestaurantAdminController implements Initializable {
 
@@ -33,6 +35,7 @@ public class RestaurantAdminController implements Initializable {
     private final RestaurantService rs = new RestaurantService();
     private final ObservableList<Restaurant> masterData = FXCollections.observableArrayList();
     private FilteredList<Restaurant> filteredData;
+    private SortedList<Restaurant> sortedData;
     private AdminController mainAdminController;
 
     public void setMainAdminController(AdminController controller) {
@@ -54,13 +57,11 @@ public class RestaurantAdminController implements Initializable {
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
         colCapacity.setCellValueFactory(new PropertyValueFactory<>("capacity"));
 
-        // Status Column with CSS Class triggers
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                // Important: Clean up old classes to prevent color bleeding on scroll
                 getStyleClass().removeAll("status-open", "status-closed", "status-suspended");
 
                 if (empty || item == null) {
@@ -76,7 +77,6 @@ public class RestaurantAdminController implements Initializable {
             }
         });
 
-        // Actions Column
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnView = new Button("Détails");
             private final Button btnEdit = new Button("Modifier");
@@ -105,12 +105,12 @@ public class RestaurantAdminController implements Initializable {
 
         filteredData = new FilteredList<>(masterData, p -> true);
 
-        // Listeners for all filter inputs
         searchField.textProperty().addListener((obs, old, newVal) -> applyPredicate());
         categoryFilter.valueProperty().addListener((obs, old, newVal) -> applyPredicate());
         statusFilter.valueProperty().addListener((obs, old, newVal) -> applyPredicate());
 
-        SortedList<Restaurant> sortedData = new SortedList<>(filteredData);
+        sortedData = new SortedList<>(filteredData);
+        // Important: this allows manual sorting via table headers to still work
         sortedData.comparatorProperty().bind(restaurantTable.comparatorProperty());
         restaurantTable.setItems(sortedData);
     }
@@ -121,22 +121,19 @@ public class RestaurantAdminController implements Initializable {
         String stat = statusFilter.getValue();
 
         filteredData.setPredicate(r -> {
-            // Category Filter
             boolean matchesCategory = (cat == null || cat.equals("Toutes les catégories") ||
                     (r.getCategory() != null && r.getCategory().equals(cat)));
 
-            // Status Filter
             boolean matchesStatus = (stat == null || stat.equals("Tous les statuts") ||
                     (r.getStatus() != null && r.getStatus().equalsIgnoreCase(stat)));
 
             if (!matchesCategory || !matchesStatus) return false;
             if (search.isEmpty()) return true;
 
-            // Search text logic
             String name = (r.getName() != null) ? r.getName().toLowerCase() : "";
             String dest = (r.getDestinationName() != null) ? r.getDestinationName().toLowerCase() : "";
 
-            return name.contains(search) || dest.contains(search) || r.getPhone().contains(search);
+            return name.contains(search) || dest.contains(search) || (r.getPhone() != null && r.getPhone().contains(search));
         });
     }
 
@@ -150,19 +147,24 @@ public class RestaurantAdminController implements Initializable {
     }
 
     private void updateCategoryFilterOptions() {
-        Set<String> catSet = new TreeSet<>(); // TreeSet keeps them alphabetical
+        // Use LinkedHashSet to maintain the "First Item" order
+        Set<String> catSet = new LinkedHashSet<>();
         catSet.add("Toutes les catégories");
 
-        // Add existing ones from DB
+        // Sort the other categories alphabetically
+        List<String> otherCats = new ArrayList<>();
         masterData.forEach(r -> {
-            if (r.getCategory() != null && !r.getCategory().isEmpty()) catSet.add(r.getCategory());
+            if (r.getCategory() != null && !r.getCategory().isEmpty()) {
+                otherCats.add(r.getCategory());
+            }
         });
+        Collections.sort(otherCats);
+        catSet.addAll(otherCats);
 
         categoryFilter.setItems(FXCollections.observableArrayList(catSet));
         categoryFilter.setValue("Toutes les catégories");
     }
 
-    // Navigation Methods
     @FXML private void handleAddRestaurant() { switchToForm(null); }
 
     private void switchToForm(Restaurant r) {
@@ -181,30 +183,28 @@ public class RestaurantAdminController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/RestaurantDetailView.fxml"));
             Parent root = loader.load();
             RestaurantDetailController detailCtrl = loader.getController();
-
             detailCtrl.setMainController(this.mainAdminController);
             detailCtrl.setRestaurantData(r);
-
             mainAdminController.getMainBorderPane().setCenter(root);
         } catch (IOException e) {
-            System.err.println("Error loading Detail View: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void handleDelete(Restaurant r) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer '" + r.getName() + "' ?", ButtonType.YES, ButtonType.NO);
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer '" + r.getName() + "' ? Les images et menus associés seront également supprimés.", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(res -> {
             if (res == ButtonType.YES) {
                 try {
-                    rs.delete(r.getId());
+                    rs.deleteWithDependencies(r.getId());
                     loadData();
-                } catch (SQLException e) { e.printStackTrace(); }
+                } catch (SQLException e) {
+                    new Alert(Alert.AlertType.ERROR, "Erreur lors de la suppression: " + e.getMessage()).show();
+                }
             }
         });
     }
 
-    // Sort Menu Actions for FXML
     @FXML private void sortByNameAsc() {
         restaurantTable.getSortOrder().clear();
         colName.setSortType(TableColumn.SortType.ASCENDING);
@@ -217,11 +217,29 @@ public class RestaurantAdminController implements Initializable {
         restaurantTable.getSortOrder().add(colCapacity);
     }
 
-    @FXML private void sortByDateDesc() { /* If your entity has a date field */ }
+    /**
+     * Recent filter logic: Now sorts masterData directly to ensure it works
+     * regardless of UI column states.
+     */
+    @FXML private void sortByDateDesc() {
+        // Clear UI sorting to avoid conflicts
+        restaurantTable.getSortOrder().clear();
+
+        // Sort the master list directly: Newest first (Descending)
+        masterData.sort((r1, r2) -> {
+            if (r1.getCreatedAt() == null || r2.getCreatedAt() == null) return 0;
+            return r2.getCreatedAt().compareTo(r1.getCreatedAt());
+        });
+
+        // Refresh the table view
+        restaurantTable.refresh();
+    }
 
     @FXML private void resetFilters() {
         searchField.clear();
         categoryFilter.setValue("Toutes les catégories");
         statusFilter.setValue("Tous les statuts");
+        restaurantTable.getSortOrder().clear();
+        loadData();
     }
 }
