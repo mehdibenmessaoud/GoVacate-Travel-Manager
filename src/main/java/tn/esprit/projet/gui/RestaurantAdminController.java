@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import tn.esprit.projet.entities.Menu;
 import tn.esprit.projet.entities.Restaurant;
 import tn.esprit.projet.services.MenuService;
 import tn.esprit.projet.services.RestaurantImageService;
@@ -33,10 +34,14 @@ public class RestaurantAdminController implements Initializable {
     @FXML private ComboBox<String> statusFilter;
 
     private final RestaurantService rs = new RestaurantService();
+    private final MenuService ms = new MenuService(); // Added for the new feature
     private final ObservableList<Restaurant> masterData = FXCollections.observableArrayList();
     private FilteredList<Restaurant> filteredData;
     private SortedList<Restaurant> sortedData;
     private AdminController mainAdminController;
+
+    // Cache to hold menus for the "Deep Search" feature
+    private List<Menu> allMenusCache = new ArrayList<>();
 
     public void setMainAdminController(AdminController controller) {
         this.mainAdminController = controller;
@@ -133,13 +138,22 @@ public class RestaurantAdminController implements Initializable {
             String name = (r.getName() != null) ? r.getName().toLowerCase() : "";
             String dest = (r.getDestinationName() != null) ? r.getDestinationName().toLowerCase() : "";
 
-            return name.contains(search) || dest.contains(search) || (r.getPhone() != null && r.getPhone().contains(search));
+            // Check basic restaurant info
+            boolean basicInfoMatch = name.contains(search) || dest.contains(search) || (r.getPhone() != null && r.getPhone().contains(search));
+
+            if (basicInfoMatch) return true;
+
+            // NEW FEATURE: Check if any menu item name contains the search string
+            return allMenusCache.stream()
+                    .filter(m -> m.getRestaurantId() == r.getId())
+                    .anyMatch(m -> (m.getName() != null && m.getName().toLowerCase().contains(search)));
         });
     }
 
     private void loadData() {
         try {
             masterData.setAll(rs.getAll());
+            allMenusCache = ms.getAll(); // Cache menus whenever data is loaded
             updateCategoryFilterOptions();
         } catch (SQLException e) {
             e.printStackTrace();

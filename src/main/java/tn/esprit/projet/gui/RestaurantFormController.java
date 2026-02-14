@@ -21,22 +21,18 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.entities.Menu;
-import tn.esprit.projet.services.DestinationService;
-import tn.esprit.projet.services.MenuService;
-import tn.esprit.projet.services.RestaurantImageService;
-import tn.esprit.projet.services.RestaurantService;
+import tn.esprit.projet.services.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class RestaurantFormController implements Initializable {
 
+    // --- FXML UI Components ---
     @FXML private VBox rootPane;
     @FXML private Label lblTitle;
     @FXML private TextField txtName, txtAddress, txtEmail, txtPhone;
@@ -45,23 +41,30 @@ public class RestaurantFormController implements Initializable {
     @FXML private Spinner<Integer> spnCapacity;
     @FXML private FlowPane imageFlowPane;
 
-    // Menu Table and Filtering
     @FXML private TableView<Menu> menuTable;
     @FXML private TableColumn<Menu, String> colMenuName;
+    @FXML private TableColumn<Menu, String> colMenuDesc; // New
     @FXML private TableColumn<Menu, BigDecimal> colMenuPrice;
+    @FXML private TableColumn<Menu, String> colMenuStatus; // New
+    @FXML private TableColumn<Menu, Void> colMenuImage; // New
     @FXML private TableColumn<Menu, Void> colMenuActions;
     @FXML private TextField menuSearchField;
     @FXML private ComboBox<String> menuStatusFilter;
 
+    // --- Services ---
     private final RestaurantService rs = new RestaurantService();
     private final RestaurantImageService ris = new RestaurantImageService();
     private final MenuService ms = new MenuService();
+    private final MenuImageService mis = new MenuImageService();
     private final DestinationService ds = new DestinationService();
 
+    // --- State Management ---
     private Restaurant currentRestaurant;
     private AdminController mainController;
 
     private final ObservableList<Menu> tempMenuList = FXCollections.observableArrayList();
+    private final Map<Menu, List<MenuImage>> menuImageMap = new HashMap<>();
+
     private FilteredList<Menu> filteredMenuList;
     private final List<File> selectedFiles = new ArrayList<>();
     private final List<Integer> imagesToDelete = new ArrayList<>();
@@ -69,12 +72,16 @@ public class RestaurantFormController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Setup Combo Boxes
         cbStatus.setItems(FXCollections.observableArrayList("OPEN", "CLOSED", "SUSPENDED"));
         cbStatus.setValue("OPEN");
-        cbCategory.setItems(FXCollections.observableArrayList("Gastronomique", "Bistro", "Fast Food", "Pizzeria",
-                "Cuisine Tunisienne", "Cuisine Italienne", "Cuisine Française",
-                "Cuisine Asiatique", "Fruits de Mer", "Steakhouse",
-                "Végétarien / Vegan", "Halel", "Brunch", "Street Food"));
+        cbCategory.setItems(FXCollections.observableArrayList(
+                "Gastronomique", "Bistro", "Fast Food", "Pizzeria", "Cuisine Tunisienne",
+                "Cuisine Italienne", "Cuisine Française", "Cuisine Asiatique", "Fruits de Mer",
+                "Steakhouse", "Végétarien / Vegan", "Halel", "Brunch", "Street Food"
+        ));
+
+        // Setup Spinner
         spnCapacity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 20));
 
         setupMenuTable();
@@ -92,26 +99,66 @@ public class RestaurantFormController implements Initializable {
                 @Override
                 public Destination fromString(String s) { return null; }
             });
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupMenuTable() {
         colMenuName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colMenuPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
 
+        // ADDED NEW COLUMN MAPPINGS
+        if (colMenuDesc != null) colMenuDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+        if (colMenuStatus != null) colMenuStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // ADDED IMAGE COLUMN CELL FACTORY
+        if (colMenuImage != null) {
+            colMenuImage.setCellFactory(param -> new TableCell<>() {
+                private final ImageView iv = new ImageView();
+                {
+                    iv.setFitHeight(50);
+                    iv.setFitWidth(50);
+                    iv.setPreserveRatio(true);
+                }
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        Menu m = getTableView().getItems().get(getIndex());
+                        List<MenuImage> images = menuImageMap.get(m);
+                        if (images != null && !images.isEmpty()) {
+                            iv.setImage(new Image(images.get(0).getImageUrl(), true));
+                            setGraphic(iv);
+                        } else {
+                            setGraphic(new Label("No Img"));
+                        }
+                    }
+                }
+            });
+        }
+
         colMenuActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnDel = new Button("×");
             private final Button btnEdit = new Button("Editer");
             private final HBox container = new HBox(btnEdit, btnDel);
             {
-                container.setSpacing(5);
-                btnDel.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;");
-                btnEdit.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;");
+                container.setSpacing(8);
+                btnDel.getStyleClass().add("btn-delete");
+                btnEdit.getStyleClass().add("btn-edit");
 
                 btnDel.setOnAction(e -> {
                     Menu m = getTableView().getItems().get(getIndex());
-                    if (m.getId() != 0) menusToDelete.add(m);
-                    tempMenuList.remove(m);
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ce plat ?", ButtonType.YES, ButtonType.NO);
+                    alert.showAndWait().ifPresent(response -> {
+                        if (response == ButtonType.YES) {
+                            if (m.getId() != 0) menusToDelete.add(m);
+                            tempMenuList.remove(m);
+                            menuImageMap.remove(m);
+                        }
+                    });
                 });
 
                 btnEdit.setOnAction(e -> openMenuDetailForm(getTableView().getItems().get(getIndex())));
@@ -132,6 +179,7 @@ public class RestaurantFormController implements Initializable {
 
         filteredMenuList = new FilteredList<>(tempMenuList, p -> true);
 
+        // Listeners for Search and Filter
         if (menuSearchField != null) {
             menuSearchField.textProperty().addListener((obs, old, newVal) -> applyMenuPredicate());
         }
@@ -146,15 +194,18 @@ public class RestaurantFormController implements Initializable {
 
     private void applyMenuPredicate() {
         String search = (menuSearchField.getText() == null) ? "" : menuSearchField.getText().toLowerCase().trim();
-        String status = menuStatusFilter.getValue();
+        String status = (menuStatusFilter.getValue() == null) ? "Tous" : menuStatusFilter.getValue();
 
         filteredMenuList.setPredicate(m -> {
             boolean matchesStatus = status.equals("Tous") || (m.getStatus() != null && m.getStatus().equals(status));
-            boolean matchesSearch = search.isEmpty() || (m.getName() != null && m.getName().toLowerCase().contains(search));
+            boolean matchesSearch = search.isEmpty() ||
+                    (m.getName() != null && m.getName().toLowerCase().contains(search)) ||
+                    (m.getDescription() != null && m.getDescription().toLowerCase().contains(search));
             return matchesStatus && matchesSearch;
         });
     }
 
+    // --- Extra Sorting Methods Restored ---
     @FXML private void sortMenuByName() {
         menuTable.getSortOrder().clear();
         colMenuName.setSortType(TableColumn.SortType.ASCENDING);
@@ -165,11 +216,6 @@ public class RestaurantFormController implements Initializable {
         menuTable.getSortOrder().clear();
         colMenuPrice.setSortType(TableColumn.SortType.DESCENDING);
         menuTable.getSortOrder().add(colMenuPrice);
-    }
-
-    @FXML private void sortMenuByRecent() {
-        tempMenuList.sort((m1, m2) -> Integer.compare(m2.getId(), m1.getId()));
-        menuTable.refresh();
     }
 
     public void setMainController(AdminController controller) {
@@ -187,6 +233,7 @@ public class RestaurantFormController implements Initializable {
         cbStatus.setValue(r.getStatus());
         spnCapacity.getValueFactory().setValue(r.getCapacity());
 
+        // Match Destination in ComboBox
         for (Destination d : cbDestination.getItems()) {
             if (d.getId() == r.getDestinationId()) {
                 cbDestination.setValue(d);
@@ -198,15 +245,26 @@ public class RestaurantFormController implements Initializable {
 
     private void loadExistingData(int id) {
         try {
-            tempMenuList.setAll(ms.getAll().stream().filter(m -> m.getRestaurantId() == id).toList());
+            // Load Menus
+            List<Menu> menus = ms.getAll().stream().filter(m -> m.getRestaurantId() == id).toList();
+            tempMenuList.setAll(menus);
+
+            // CRUCIAL: Load images for each menu into memory map
+            for (Menu m : menus) {
+                List<MenuImage> images = mis.getByMenuId(m.getId());
+                if (!images.isEmpty()) {
+                    menuImageMap.put(m, images);
+                }
+            }
+
+            // Load Restaurant Images
             ris.getByRestaurantId(id).forEach(img -> addThumbnail(img.getImageUrl(), img.getId()));
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    @FXML
-    private void btnAddMenuItem() {
-        openMenuDetailForm(null);
-    }
+    @FXML private void btnAddMenuItem() { openMenuDetailForm(null); }
 
     private void openMenuDetailForm(Menu menu) {
         try {
@@ -218,21 +276,20 @@ public class RestaurantFormController implements Initializable {
             if (mainController != null) {
                 mainController.getMainBorderPane().setCenter(menuFormRoot);
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    @FXML
-    private void handleUploadImage() {
+    @FXML private void handleUploadImage() {
         FileChooser fc = new FileChooser();
         fc.setTitle("Sélectionner des images");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png"));
-        List<File> files = fc.showOpenMultipleDialog(null);
+        List<File> files = fc.showOpenMultipleDialog(txtName.getScene().getWindow());
         if (files != null) {
             files.forEach(f -> {
-                if (selectedFiles.stream().noneMatch(ef -> ef.getAbsolutePath().equals(f.getAbsolutePath()))) {
-                    selectedFiles.add(f);
-                    addThumbnail(f.toURI().toString(), null);
-                }
+                selectedFiles.add(f);
+                addThumbnail(f.toURI().toString(), null);
             });
         }
     }
@@ -240,13 +297,13 @@ public class RestaurantFormController implements Initializable {
     private void addThumbnail(String url, Integer dbId) {
         StackPane container = new StackPane();
         container.setPrefSize(100, 100);
-        container.setStyle("-fx-border-color: #ddd; -fx-background-radius: 5;");
+        container.getStyleClass().add("image-thumbnail-container");
 
         ImageView iv = new ImageView(new Image(url));
         iv.setFitWidth(90); iv.setFitHeight(90); iv.setPreserveRatio(true);
 
         Button btnDel = new Button("×");
-        btnDel.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 50%;");
+        btnDel.getStyleClass().add("btn-delete-small");
         StackPane.setAlignment(btnDel, Pos.TOP_RIGHT);
 
         btnDel.setOnAction(e -> {
@@ -263,7 +320,7 @@ public class RestaurantFormController implements Initializable {
     private void handleSave() {
         try {
             if (txtName.getText().isEmpty() || cbDestination.getValue() == null) {
-                new Alert(Alert.AlertType.WARNING, "Nom et Destination sont obligatoires.").show();
+                new Alert(Alert.AlertType.WARNING, "Veuillez remplir les champs obligatoires.").show();
                 return;
             }
 
@@ -278,6 +335,7 @@ public class RestaurantFormController implements Initializable {
             currentRestaurant.setStatus(cbStatus.getValue());
             currentRestaurant.setDestinationId(cbDestination.getValue().getId());
 
+            // 1. Save Restaurant
             if (currentRestaurant.getId() == 0) {
                 rs.create(currentRestaurant);
                 currentRestaurant = rs.getAll().stream()
@@ -290,12 +348,35 @@ public class RestaurantFormController implements Initializable {
             if (currentRestaurant == null) return;
             int restaurantId = currentRestaurant.getId();
 
+            // 2. Handle Menus
             for (Menu m : menusToDelete) ms.delete(m.getId());
             for (Menu m : tempMenuList) {
                 m.setRestaurantId(restaurantId);
-                if (m.getId() == 0) ms.create(m); else ms.update(m);
+                int menuId;
+                if (m.getId() == 0) {
+                    ms.create(m);
+                    // Fetch to get ID
+                    Menu savedMenu = ms.getAll().stream()
+                            .filter(sm -> sm.getName().equals(m.getName()) && sm.getRestaurantId() == restaurantId)
+                            .findFirst().orElse(null);
+                    menuId = (savedMenu != null) ? savedMenu.getId() : 0;
+                } else {
+                    ms.update(m);
+                    menuId = m.getId();
+                }
+
+                // SAVE THE LINKED IMAGES FOR THIS MENU
+                if (menuId != 0 && menuImageMap.containsKey(m)) {
+                    for (MenuImage mi : menuImageMap.get(m)) {
+                        if (mi.getId() == 0) { // Only save new ones
+                            mi.setMenuId(menuId);
+                            mis.create(mi);
+                        }
+                    }
+                }
             }
 
+            // 3. Handle Restaurant Images
             for (Integer imgId : imagesToDelete) ris.delete(imgId);
             for (File file : selectedFiles) {
                 RestaurantImage newImg = new RestaurantImage();
@@ -307,18 +388,15 @@ public class RestaurantFormController implements Initializable {
             handleBack();
         } catch (SQLException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Erreur BD: " + e.getMessage()).show();
+            new Alert(Alert.AlertType.ERROR, "Erreur lors de l'enregistrement : " + e.getMessage()).show();
         }
-    }
-
-    @FXML private void handleBack() {
-        if(mainController != null) mainController.loadSection("/RestaurantAdminView.fxml");
     }
 
     public void addOrUpdateMenuItem(Menu menu, List<MenuImage> images) {
         if (!tempMenuList.contains(menu)) {
             tempMenuList.add(menu);
         }
+        menuImageMap.put(menu, images);
         menuTable.refresh();
         closeMenuForm();
     }
@@ -327,5 +405,14 @@ public class RestaurantFormController implements Initializable {
         if (mainController != null) {
             mainController.getMainBorderPane().setCenter(rootPane);
         }
+    }
+
+    @FXML private void handleBack() {
+        if(mainController != null) mainController.loadSection("/RestaurantAdminView.fxml");
+    }
+
+    // ADDED METHOD TO ALLOW CHILD FORM TO CHECK MEMORY
+    public List<MenuImage> getImagesForMenu(Menu m) {
+        return menuImageMap.get(m);
     }
 }

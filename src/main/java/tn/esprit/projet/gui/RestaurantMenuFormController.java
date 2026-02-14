@@ -8,19 +8,24 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import tn.esprit.projet.entities.Menu;
 import tn.esprit.projet.entities.MenuImage;
+import tn.esprit.projet.services.MenuImageService;
+
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantMenuFormController {
 
+    @FXML private VBox mainContainer; // Linked to FXML root to resolve 'rootPane' error
     @FXML private Label lblTitle;
     @FXML private TextField txtName, txtPrice;
     @FXML private TextArea txtDescription;
     @FXML private ComboBox<String> cbStatus;
     @FXML private VBox imagePreviewContainer;
 
+    private final MenuImageService mis = new MenuImageService();
     private Menu currentMenu;
     private MenuImage singleImage;
     private RestaurantFormController parentController;
@@ -44,56 +49,87 @@ public class RestaurantMenuFormController {
             txtDescription.setText(menu.getDescription());
             txtPrice.setText(menu.getPrice() != null ? menu.getPrice().toString() : "");
             cbStatus.setValue(menu.getStatus());
+
+            // 1. Check memory first (for newly added meals)
+            if (parentController != null && parentController.getImagesForMenu(menu) != null) {
+                List<MenuImage> memoryImages = parentController.getImagesForMenu(menu);
+                if (!memoryImages.isEmpty()) {
+                    this.singleImage = memoryImages.get(0);
+                    updatePreview(singleImage.getImageUrl());
+                    return;
+                }
+            }
+
+            // 2. Check DB for existing meals
+            if (menu.getId() != 0) {
+                try {
+                    List<MenuImage> existing = mis.getByMenuId(menu.getId());
+                    if (!existing.isEmpty()) {
+                        this.singleImage = existing.get(0);
+                        updatePreview(singleImage.getImageUrl());
+                    }
+                } catch (SQLException e) { e.printStackTrace(); }
+            }
         }
     }
 
     @FXML
     private void handleUploadImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg"));
-        File file = fileChooser.showOpenDialog(txtName.getScene().getWindow());
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Sélectionner une photo du plat");
+
+        // Restriction: Only PNG, JPG, and JPEG
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
+        );
+
+        // Uses mainContainer to get the current window
+        File file = fc.showOpenDialog(mainContainer.getScene().getWindow());
 
         if (file != null) {
             singleImage = new MenuImage();
             singleImage.setImageUrl(file.toURI().toString());
+            updatePreview(singleImage.getImageUrl());
+        }
+    }
 
-            imagePreviewContainer.getChildren().clear();
-            ImageView imageView = new ImageView(new Image(file.toURI().toString()));
-            imageView.setFitWidth(150);
-            imageView.setPreserveRatio(true);
-            imagePreviewContainer.getChildren().add(imageView);
+    private void updatePreview(String url) {
+        imagePreviewContainer.getChildren().clear();
+        try {
+            ImageView iv = new ImageView(new Image(url));
+            iv.setFitWidth(180);
+            iv.setPreserveRatio(true);
+            // Apply a slight glow effect to the preview image
+            iv.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);");
+            imagePreviewContainer.getChildren().add(iv);
+        } catch (Exception e) {
+            System.out.println("Preview failed: " + url);
         }
     }
 
     @FXML
     private void handleSave() {
-        if (validateInput()) {
-            if (currentMenu == null) currentMenu = new Menu();
+        if (txtName.getText().isEmpty() || txtPrice.getText().isEmpty()) return;
 
-            currentMenu.setName(txtName.getText());
-            currentMenu.setDescription(txtDescription.getText());
-            currentMenu.setPrice(new BigDecimal(txtPrice.getText()));
-            currentMenu.setStatus(cbStatus.getValue());
+        if (currentMenu == null) currentMenu = new Menu();
+        currentMenu.setName(txtName.getText());
+        currentMenu.setDescription(txtDescription.getText());
 
-            List<MenuImage> images = new ArrayList<>();
-            if (singleImage != null) images.add(singleImage);
-
-            parentController.addOrUpdateMenuItem(currentMenu, images);
-        }
-    }
-
-    private boolean validateInput() {
         try {
-            if (txtName.getText().isEmpty()) return false;
-            new BigDecimal(txtPrice.getText());
-            return true;
-        } catch (Exception e) {
-            return false;
+            currentMenu.setPrice(new BigDecimal(txtPrice.getText()));
+        } catch (NumberFormatException e) {
+            // Optional: Add an error alert here for invalid price
+            return;
         }
+
+        currentMenu.setStatus(cbStatus.getValue());
+
+        List<MenuImage> list = new ArrayList<>();
+        if (singleImage != null) {
+            list.add(singleImage);
+        }
+        parentController.addOrUpdateMenuItem(currentMenu, list);
     }
 
-    @FXML
-    private void handleCancel() {
-        parentController.closeMenuForm();
-    }
+    @FXML private void handleCancel() { parentController.closeMenuForm(); }
 }
