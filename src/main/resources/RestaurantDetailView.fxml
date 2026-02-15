@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Line?>
 
 <ScrollPane fitToWidth="true" styleClass="root-pane" stylesheets="@/css/admin_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantDetailController">
     <content>
@@ -76,6 +77,28 @@
 
                 <FlowPane fx:id="menuFlowPane" hgap="25" prefWrapLength="1100" vgap="25">
                 </FlowPane>
+            </VBox>
+
+            <Separator opacity="0.1" />
+
+            <VBox spacing="25">
+                <HBox alignment="CENTER_LEFT" spacing="20">
+                    <VBox>
+                        <Label styleClass="text-header" text="Avis et Notes" />
+                        <Label fx:id="lblReviewStats" styleClass="text-sub" text="Note moyenne: 0.0 ★ (0 avis)" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label text="Trier par:" style="-fx-text-fill: #679AC1;" />
+                        <ComboBox fx:id="comboSortReviews" prefWidth="200" promptText="Filtrer les avis" styleClass="combo-box-glass" />
+                    </HBox>
+                </HBox>
+
+                <VBox fx:id="reviewsContainer" spacing="20">
+                    <padding>
+                        <Insets bottom="20" />
+                    </padding>
+                </VBox>
             </VBox>
         </VBox>
     </content>

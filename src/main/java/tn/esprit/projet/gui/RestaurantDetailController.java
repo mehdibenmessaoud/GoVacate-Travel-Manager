@@ -17,12 +17,9 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import tn.esprit.projet.entities.*;
 import tn.esprit.projet.entities.Menu;
-import tn.esprit.projet.entities.MenuImage;
-import tn.esprit.projet.entities.Restaurant;
-import tn.esprit.projet.services.MenuImageService;
-import tn.esprit.projet.services.MenuService;
-import tn.esprit.projet.services.RestaurantImageService;
+import tn.esprit.projet.services.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,23 +29,28 @@ import java.util.stream.Collectors;
 
 public class RestaurantDetailController {
 
-    @FXML private Label lblName, lblCategory, lblStatus, lblAddress, lblEmail, lblPhone, lblCapacity, lblImageCounter, lblMenuCount;
+    @FXML private Label lblName, lblCategory, lblStatus, lblAddress, lblEmail, lblPhone, lblCapacity, lblImageCounter, lblMenuCount, lblReviewStats;
     @FXML private ImageView mainCarouselImageView;
     @FXML private StackPane carouselContainer;
     @FXML private HBox thumbnailContainer, paginationContainer;
     @FXML private FlowPane menuFlowPane;
+    @FXML private VBox reviewsContainer;
     @FXML private Button btnToggleAutoPlay;
     @FXML private TextField txtSearchMenu;
-    @FXML private ComboBox<String> comboSort;
+    @FXML private ComboBox<String> comboSort, comboSortReviews;
 
     private final MenuService ms = new MenuService();
     private final MenuImageService mis = new MenuImageService();
     private final RestaurantImageService ris = new RestaurantImageService();
+    private final RestaurantReviewService rrs = new RestaurantReviewService();
+    private final ReviewImageService ris_review = new ReviewImageService();
 
     private AdminController mainController;
     private final List<String> imageList = new ArrayList<>();
     private List<Menu> allMenus = new ArrayList<>();
+    private List<RestaurantReview> allReviews = new ArrayList<>();
     private int currentIndex = 0;
+    private int currentRestaurantId;
     private Timeline autoPlayTimeline;
     private boolean isAutoPlaying = true;
 
@@ -59,16 +61,22 @@ public class RestaurantDetailController {
     @FXML
     public void initialize() {
         if (txtSearchMenu != null) txtSearchMenu.textProperty().addListener((obs, old, val) -> applyFilters());
+
         if (comboSort != null) {
             comboSort.setItems(FXCollections.observableArrayList("Nom: A-Z", "Prix: Croissant", "Prix: Décroissant"));
             comboSort.setOnAction(e -> applyFilters());
+        }
+
+        if (comboSortReviews != null) {
+            comboSortReviews.setItems(FXCollections.observableArrayList("Plus récents", "Plus anciens", "Meilleures notes", "Moins bonnes notes"));
+            comboSortReviews.setOnAction(e -> applyReviewSorting());
         }
     }
 
     public void setRestaurantData(Restaurant restaurant) {
         if (restaurant == null) return;
+        this.currentRestaurantId = restaurant.getId();
 
-        // Populate Labels with Null Checks to avoid NPE
         if (lblName != null) lblName.setText(restaurant.getName());
         if (lblCategory != null) lblCategory.setText(restaurant.getCategory() != null ? restaurant.getCategory().toUpperCase() : "NON CLASSÉ");
         if (lblAddress != null) lblAddress.setText(restaurant.getAddress());
@@ -76,7 +84,6 @@ public class RestaurantDetailController {
         if (lblPhone != null) lblPhone.setText(restaurant.getPhone());
         if (lblCapacity != null) lblCapacity.setText(restaurant.getCapacity() + " Places");
 
-        // Status Styling
         if (lblStatus != null) {
             String status = restaurant.getStatus() != null ? restaurant.getStatus().toUpperCase() : "OPEN";
             lblStatus.setText(status);
@@ -88,9 +95,11 @@ public class RestaurantDetailController {
 
         loadCarouselData(restaurant.getId());
         loadMenuData(restaurant.getId());
+        loadReviewData(restaurant.getId());
         setupAutoPlay();
     }
 
+    // --- CAROUSEL LOGIC ---
     private void loadCarouselData(int restaurantId) {
         try {
             imageList.clear();
@@ -106,7 +115,11 @@ public class RestaurantDetailController {
     }
 
     private void addThumbnail(String url, int index) {
-        ImageView thumb = new ImageView(new Image(url, 120, 80, true, true));
+        // Load original resolution but display it small
+        ImageView thumb = new ImageView(new Image(url, 0, 0, true, true, true));
+        thumb.setFitWidth(120);
+        thumb.setFitHeight(80);
+        thumb.setPreserveRatio(true);
         thumb.getStyleClass().add("gallery-thumb");
         thumb.setOnMouseClicked(e -> { currentIndex = index; displayImage(currentIndex); });
         thumbnailContainer.getChildren().add(thumb);
@@ -119,24 +132,21 @@ public class RestaurantDetailController {
 
     private void displayImage(int index) {
         if (imageList.isEmpty()) return;
-        mainCarouselImageView.setImage(new Image(imageList.get(index)));
+        mainCarouselImageView.setImage(new Image(imageList.get(index), 0, 0, true, true, true));
         lblImageCounter.setText((index + 1) + " / " + imageList.size());
         for (int i = 0; i < paginationContainer.getChildren().size(); i++) {
             ((Circle) paginationContainer.getChildren().get(i)).setFill(i == index ? Color.web("#FF8210") : Color.GRAY);
         }
     }
 
-    @FXML
-    private void toggleAutoPlay() {
+    @FXML private void toggleAutoPlay() {
         isAutoPlaying = !isAutoPlaying;
         if (isAutoPlaying) {
             autoPlayTimeline.play();
             btnToggleAutoPlay.setText("⏸ Auto-Play");
-            btnToggleAutoPlay.setStyle("-fx-background-color: #FF8210; -fx-text-fill: white;");
         } else {
             autoPlayTimeline.stop();
             btnToggleAutoPlay.setText("▶ Auto-Play");
-            btnToggleAutoPlay.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white;");
         }
     }
 
@@ -159,6 +169,7 @@ public class RestaurantDetailController {
         displayImage(currentIndex);
     }
 
+    // --- MENU LOGIC ---
     private void loadMenuData(int restaurantId) {
         try {
             allMenus = ms.getAll().stream().filter(m -> m.getRestaurantId() == restaurantId).collect(Collectors.toList());
@@ -183,61 +194,169 @@ public class RestaurantDetailController {
     }
 
     private VBox createMenuCard(Menu menu) {
-        VBox card = new VBox(0);
-        card.getStyleClass().add("water-card");
-        card.setPrefWidth(260);
-
-        StackPane imgContainer = new StackPane();
-        imgContainer.setPrefHeight(150);
-        ImageView iv = new ImageView();
-        iv.setFitWidth(260); iv.setFitHeight(150); iv.setPreserveRatio(true);
-
+        VBox card = new VBox(0); card.getStyleClass().add("water-card"); card.setPrefWidth(260);
+        StackPane imgContainer = new StackPane(); imgContainer.setPrefHeight(150);
+        ImageView iv = new ImageView(); iv.setFitWidth(260); iv.setFitHeight(150); iv.setPreserveRatio(true);
         try {
             List<MenuImage> mImgs = mis.getByMenuId(menu.getId());
-            if (!mImgs.isEmpty()) iv.setImage(new Image(mImgs.get(0).getImageUrl(), true));
+            if (!mImgs.isEmpty()) {
+                Image img = new Image(mImgs.get(0).getImageUrl(), 0, 0, true, true, true);
+                iv.setImage(img);
+                iv.setOnMouseClicked(e -> handleFullScreen(iv.getImage()));
+                iv.setStyle("-fx-cursor: hand;");
+            }
         } catch (SQLException e) { e.printStackTrace(); }
+        imgContainer.getChildren().add(iv);
 
-        Button btnFull = new Button("⛶");
-        btnFull.getStyleClass().add("btn-full-glass");
-        btnFull.setOnAction(e -> handleFullScreen(iv.getImage()));
-        StackPane.setAlignment(btnFull, Pos.TOP_RIGHT);
-        StackPane.setMargin(btnFull, new Insets(10));
-
-        imgContainer.getChildren().addAll(iv, btnFull);
-
-        VBox info = new VBox(8);
-        info.setPadding(new Insets(15));
-        Label name = new Label(menu.getName());
-        name.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
-        Label desc = new Label(menu.getDescription());
-        desc.setStyle("-fx-text-fill: #679AC1; -fx-font-size: 11;");
-        desc.setWrapText(true);
-        desc.setPrefHeight(35);
-
-        HBox footer = new HBox();
-        Label price = new Label(menu.getPrice() + " TND");
-        price.setStyle("-fx-text-fill: #FF8210; -fx-font-weight: bold;");
-        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
-        Label status = new Label(menu.getStatus());
-        status.setStyle("-fx-font-size: 9; -fx-padding: 2 6; -fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 5;");
-
-        footer.getChildren().addAll(price, sp, status);
-        info.getChildren().addAll(name, desc, footer);
+        VBox info = new VBox(8); info.setPadding(new Insets(15));
+        Label name = new Label(menu.getName()); name.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        Label price = new Label(menu.getPrice() + " TND"); price.setStyle("-fx-text-fill: #FF8210;");
+        info.getChildren().addAll(name, price);
         card.getChildren().addAll(imgContainer, info);
         return card;
     }
 
-    @FXML private void handleFullScreen() { if (mainCarouselImageView.getImage() != null) handleFullScreen(mainCarouselImageView.getImage()); }
+    // --- REVIEW SYSTEM LOGIC ---
+    private void loadReviewData(int restaurantId) {
+        try {
+            allReviews = rrs.getAll().stream()
+                    .filter(r -> r.getRestaurantId() == restaurantId)
+                    .collect(Collectors.toList());
+            updateReviewStats();
+            applyReviewSorting();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    private void updateReviewStats() {
+        if (allReviews.isEmpty()) {
+            lblReviewStats.setText("Aucun avis pour le moment");
+            return;
+        }
+        double avg = allReviews.stream().mapToInt(RestaurantReview::getRating).average().orElse(0.0);
+        lblReviewStats.setText(String.format("Note moyenne: %.1f ★ (%d avis)", avg, allReviews.size()));
+    }
+
+    private void applyReviewSorting() {
+        String sort = comboSortReviews.getValue();
+        if ("Plus récents".equals(sort)) allReviews.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+        else if ("Plus anciens".equals(sort)) allReviews.sort(Comparator.comparing(RestaurantReview::getCreatedAt));
+        else if ("Meilleures notes".equals(sort)) allReviews.sort((a, b) -> Integer.compare(b.getRating(), a.getRating()));
+        else if ("Moins bonnes notes".equals(sort)) allReviews.sort(Comparator.comparingInt(RestaurantReview::getRating));
+
+        displayReviews();
+    }
+
+    private void displayReviews() {
+        reviewsContainer.getChildren().clear();
+        for (RestaurantReview review : allReviews) {
+            reviewsContainer.getChildren().add(createReviewCard(review));
+        }
+    }
+
+    private VBox createReviewCard(RestaurantReview review) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("water-card");
+        card.setPadding(new Insets(15));
+
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        Label stars = new Label("★".repeat(review.getRating()) + "☆".repeat(Math.max(0, 5 - review.getRating())));
+        stars.setStyle("-fx-text-fill: #FF8210; -fx-font-size: 16;");
+
+        Label date = new Label(review.getCreatedAt() != null ? review.getCreatedAt().toString().split("T")[0] : "");
+        date.setStyle("-fx-text-fill: gray; -fx-font-size: 11;");
+
+        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+
+        Button btnDel = new Button("Supprimer");
+        btnDel.getStyleClass().add("btn-action-delete");
+        btnDel.setOnAction(e -> handleDeleteReview(review));
+        header.getChildren().addAll(stars, date, sp, btnDel);
+
+        Label comment = new Label(review.getComment());
+        comment.setWrapText(true);
+        comment.setStyle("-fx-text-fill: white;");
+
+        HBox imgBox = new HBox(10);
+        try {
+            List<ReviewImage> allReviewImages = ris_review.getAll();
+            List<ReviewImage> reviewImages = allReviewImages.stream()
+                    .filter(i -> i.getReviewId() == review.getId())
+                    .collect(Collectors.toList());
+
+            for (ReviewImage ri : reviewImages) {
+                String url = ri.getImageUrl();
+                if (url != null && !url.trim().isEmpty()) {
+                    try {
+                        // LOAD AT FULL RESOLUTION (0, 0) for crisp FullScreen
+                        Image img = new Image(url, 0, 0, true, true, true);
+                        ImageView iv = new ImageView(img);
+                        iv.setFitWidth(100);
+                        iv.setFitHeight(100);
+                        iv.setPreserveRatio(true);
+                        iv.setSmooth(true);
+                        iv.setStyle("-fx-cursor: hand; -fx-background-radius: 10;");
+
+                        iv.setOnMouseClicked(e -> {
+                            if (iv.getImage() != null && !iv.getImage().isError()) {
+                                handleFullScreen(iv.getImage());
+                            }
+                        });
+
+                        imgBox.getChildren().add(iv);
+                    } catch (Exception e) {
+                        System.err.println("Skipping invalid image URL: " + url);
+                    }
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        card.getChildren().addAll(header, comment, imgBox);
+        return card;
+    }
+
+    private void handleDeleteReview(RestaurantReview review) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cet avis ?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.YES) {
+                try {
+                    rrs.delete(review.getId());
+                    allReviews.remove(review);
+                    updateReviewStats();
+                    displayReviews();
+                } catch (SQLException e) { e.printStackTrace(); }
+            }
+        });
+    }
+
+    // --- FULL SCREEN LOGIC ---
+    @FXML private void handleFullScreen() {
+        if (mainCarouselImageView.getImage() != null) handleFullScreen(mainCarouselImageView.getImage());
+    }
 
     private void handleFullScreen(Image img) {
-        if (img == null) return;
+        if (img == null || img.isError()) return;
+
         Stage stage = new Stage(StageStyle.UNDECORATED);
-        ImageView iv = new ImageView(img); iv.setPreserveRatio(true);
-        StackPane root = new StackPane(iv); root.setStyle("-fx-background-color: black;");
-        iv.fitWidthProperty().bind(stage.widthProperty()); iv.fitHeightProperty().bind(stage.heightProperty());
+        ImageView iv = new ImageView(img);
+        iv.setPreserveRatio(true);
+        iv.setSmooth(true);
+
+        iv.fitWidthProperty().bind(stage.widthProperty());
+        iv.fitHeightProperty().bind(stage.heightProperty());
+
+        StackPane root = new StackPane(iv);
+        root.setStyle("-fx-background-color: rgba(0,0,0,0.95);");
+
         Scene scene = new Scene(root);
         scene.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ESCAPE) stage.close(); });
-        stage.setScene(scene); stage.setFullScreen(true); stage.setFullScreenExitHint(""); stage.show();
+        root.setOnMouseClicked(e -> stage.close());
+
+        stage.setScene(scene);
+        stage.setFullScreen(true);
+        // REMOVED HINT HERE
+        stage.setFullScreenExitHint("");
+        stage.show();
     }
 
     @FXML private void handleBack() {

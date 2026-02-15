@@ -447,7 +447,6 @@
     -fx-text-fill: white;
     -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-radius: 50;
-    -fx-backdrop-filter: blur(10px); /* Visual hint for modern UI */
 }
 
 .btn-nav:hover {
