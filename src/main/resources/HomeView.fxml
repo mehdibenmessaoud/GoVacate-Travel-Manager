@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane">
+    <content>
+        <VBox spacing="40.0">
+            <padding>
+                <Insets top="40.0" right="50.0" bottom="50.0" left="50.0"/>
+            </padding>
+
+            <!-- HEADER -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <VBox>
+                    <Label styleClass="text-header" text="Bonjour, Voyageur"/>
+                    <Label styleClass="text-sub" text="Prêt à surfer sur la vague ?"/>
+                </VBox>
+            </HBox>
+
+            <!-- BARRE DE RECHERCHE (GLASS PANEL) -->
+            <VBox alignment="CENTER" spacing="25.0" styleClass="glass-panel">
+                <padding>
+                    <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
+                </padding>
+                <Label styleClass="hero-title" text="Votre prochaine destination ?"/>
+                <HBox alignment="CENTER_LEFT" spacing="15.0" prefHeight="70.0" styleClass="search-bar-liquid">
+                    <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <Label styleClass="search-label" text="Destination"/>
+                        <TextField promptText="Maldives..." styleClass="search-field"/>
+                    </VBox>
+                    <Pane prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;"/>
+                    <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <Label styleClass="search-label" text="Date"/>
+                        <DatePicker promptText="Choisir une date" styleClass="search-date"/>
+                    </VBox>
+                    <Button prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Plonger"/>
+                </HBox>
+            </VBox>
+
+            <!-- SECTION CARTES -->
+            <Label styleClass="section-title" text="Destinations Populaires"/>
+            <FlowPane hgap="30.0" vgap="30.0">
+
+                <!-- CARD 1 -->
+                <StackPane prefWidth="270.0" prefHeight="320.0" styleClass="water-card">
+                    <VBox spacing="0">
+
+                        <!-- HEADER -->
+                        <Pane prefHeight="180.0" styleClass="card-header sunset"/>
+
+                        <!-- GLASS CONTENT -->
+                        <StackPane styleClass="card glass-card">
+                            <Pane styleClass="glass-reflection" />
+                            <VBox spacing="10.0" styleClass="card-content">
+                                <Label text="Sunset Beach" styleClass="card-title"/>
+                                <Label text="5 Jours • All Inclusive" styleClass="card-sub"/>
+
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="320€" styleClass="card-price"/>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <Label text="★ 4.8" styleClass="card-rate"/>
+                                </HBox>
+                            </VBox>
+                        </StackPane>
+
+                    </VBox>
+                </StackPane>
+                <StackPane prefWidth="270.0" prefHeight="320.0" styleClass="water-card">
+                    <VBox spacing="0">
+
+                        <!-- HEADER -->
+                        <Pane prefHeight="180.0" styleClass="card-header sunset"/>
+
+                        <!-- GLASS CONTENT -->
+                        <StackPane styleClass="card glass-card" >
+                            <Pane styleClass="glass-reflection" />
+                            <VBox spacing="10.0" styleClass="card-content">
+                                <Label text="Sunset Beach" styleClass="card-title"/>
+                                <Label text="5 Jours • All Inclusive" styleClass="card-sub"/>
+
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="320€" styleClass="card-price"/>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <Label text="★ 4.8" styleClass="card-rate"/>
+                                </HBox>
+                            </VBox>
+                        </StackPane>
+
+                    </VBox>
+                </StackPane>
+                <StackPane prefWidth="270.0" prefHeight="320.0" styleClass="water-card">
+                    <VBox spacing="0">
+
+                        <!-- HEADER -->
+                        <Pane prefHeight="180.0" styleClass="card-header sunset"/>
+
+                        <!-- GLASS CONTENT -->
+                        <StackPane styleClass="card glass-card">
+                            <Pane styleClass="glass-reflection" />
+                            <VBox spacing="10.0" styleClass="card-content">
+                                <Label text="Sunset Beach" styleClass="card-title"/>
+                                <Label text="5 Jours • All Inclusive" styleClass="card-sub"/>
+
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="320€" styleClass="card-price"/>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <Label text="★ 4.8" styleClass="card-rate"/>
+                                </HBox>
+                            </VBox>
+                        </StackPane>
+
+                    </VBox>
+                </StackPane>
+
+
+
+
+            </FlowPane>
+
+        </VBox>
+    </content>
+</ScrollPane>
