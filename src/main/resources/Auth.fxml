@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="rootPane" prefHeight="550.0" prefWidth="850.0" styleClass="root-container" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.Auth">
+   <children>
+      <HBox prefHeight="550.0" prefWidth="850.0">
+         <children>
+            <VBox alignment="CENTER" prefWidth="425.0" spacing="25.0">
+               <padding>
+                  <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+               </padding>
+               <children>
+                  <Text styleClass="title-dark" style="-fx-font-size: 32;" text="Bon Retour !" />
+                  <VBox spacing="10.0">
+                     <children>
+                        <TextField fx:id="loginEmail" promptText="Email" styleClass="text-field-custom" />
+                        <PasswordField fx:id="loginPass" promptText="Mot de passe" styleClass="text-field-custom" />
+                     </children>
+                  </VBox>
+                  <Button onAction="#processLogin" prefHeight="40.0" prefWidth="200.0" styleClass="btn-orange" text="CONNEXION" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="425.0" spacing="20.0">
+               <padding>
+                  <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+               </padding>
+               <children>
+                  <Text styleClass="title-dark" style="-fx-font-size: 32;" text="Créer un Compte" />
+                  <VBox spacing="10.0">
+                     <children>
+                        <TextField fx:id="signName" promptText="Nom Complet" styleClass="text-field-custom" />
+                        <TextField fx:id="signEmail" promptText="Email" styleClass="text-field-custom" />
+                        <PasswordField fx:id="signPass" promptText="Mot de passe" styleClass="text-field-custom" />
+                     </children>
+                  </VBox>
+                  <Button onAction="#processRegister" prefHeight="40.0" prefWidth="200.0" styleClass="btn-orange" text="S'INSCRIRE" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Pane fx:id="slidingPane" maxWidth="425.0" prefWidth="425.0" styleClass="side-pane" StackPane.alignment="CENTER_LEFT">
+         <children>
+            <VBox alignment="CENTER" prefHeight="550.0" prefWidth="425.0" spacing="30.0">
+               <padding>
+                  <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+               </padding>
+               <children>
+                  <Text fx:id="overlayTitle" style="-fx-font-size: 26; -fx-fill: white; -fx-font-weight: bold;" text="Nouveau Voyageur ?" />
+                  <Text fx:id="overlayText" style="-fx-fill: #C0C0C0; -fx-text-alignment: center;" text="Inscrivez-vous dès aujourd'hui et commencez à planifier vos prochaines vacances." wrappingWidth="300.0" />
+                  <Button fx:id="switchBtn" onAction="#handleSwitch" prefHeight="40.0" prefWidth="180.0" styleClass="btn-outline-white" text="CRÉER UN COMPTE" />
+               </children>
+            </VBox>
+         </children>
+      </Pane>
+   </children>
+</StackPane>
