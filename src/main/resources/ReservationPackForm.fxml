@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+<?import java.net.URL?>
+
+<AnchorPane prefWidth="500.0" styleClass="main-bg" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.projet.gui.PackBookingController">
+    <stylesheets>
+        <URL value="@/css/pack.css" />
+    </stylesheets>
+
+    <children>
+        <VBox spacing="30" layoutX="40.0" layoutY="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" AnchorPane.bottomAnchor="40.0">
+
+            <VBox spacing="8" alignment="CENTER">
+                <Label text="Reserver votre pack" styleClass="title-main"/>
+
+            </VBox>
+
+            <VBox styleClass="luxury-card">
+                <children>
+                    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="card-header">
+                        <padding><Insets bottom="20" left="25" right="25" top="25"/></padding>
+                        <StackPane styleClass="icon-bg">
+                            <Label text="✈" style="-fx-font-size: 22; -fx-text-fill: #00FFCC;"/>
+                        </StackPane>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label fx:id="lblPackName" text="EXPÉDITION SAHARA" styleClass="pack-title"/>
+                            <Label fx:id="lblCategorie" text="AVENTURE PREMIUM" styleClass="pack-category"/>
+                        </VBox>
+                    </HBox>
+
+                    <GridPane vgap="20" hgap="30">
+                        <padding><Insets bottom="30" left="30" right="30" top="10"/></padding>
+
+                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="DATE DÉPART" styleClass="info-label"/>
+                            <Label fx:id="lblDateDepart" text="15 MARS 2024" styleClass="info-value"/>
+                        </VBox>
+
+                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="DATE RETOUR" styleClass="info-label"/>
+                            <Label fx:id="lblDateArrivee" text="22 MARS 2024" styleClass="info-value"/>
+                        </VBox>
+                    </GridPane>
+
+                    <HBox alignment="CENTER_LEFT" styleClass="price-section">
+                        <padding><Insets bottom="25" left="30" right="30" top="25"/></padding>
+                        <VBox>
+                            <Label text="PRIX TOTAL" styleClass="price-label"/>
+                            <Label fx:id="lblPrix" text="1.450 DT" styleClass="price-value"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label text="PAIEMENT SÉCURISÉ" styleClass="secure-tag"/>
+                    </HBox>
+                </children>
+            </VBox>
+
+            <VBox spacing="15" alignment="CENTER">
+                <Button onAction="#handleReserve" prefHeight="60.0" prefWidth="Infinity" styleClass="btn-confirm" text="CONFIRMER LA RÉSERVATION" />
+                <Hyperlink onAction="#handleCancel" text="Annuler et revenir en arrière" styleClass="cancel-link"/>
+            </VBox>
+
+        </VBox>
+    </children>
+</AnchorPane>
