@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="280.0" spacing="0.0" styleClass="pack-card-main" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.PackCardController">
+
+    <stylesheets>
+        <URL value="@css/client_style.css" />
+    </stylesheets>
+
+    <children>
+        <StackPane minHeight="160.0" prefHeight="160.0" styleClass="pack-image-header">
+            <children>
+                <Label text="[ Image Placeholder ]" styleClass="image-placeholder" />
+                <Label fx:id="packStatus" styleClass="status-badge-pack" text="STATUT" StackPane.alignment="TOP_RIGHT" />
+            </children>
+        </StackPane>
+
+        <VBox spacing="10.0" styleClass="pack-info-body">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                    <children>
+                        <Label fx:id="packName" styleClass="pack-title-label" text="Chargement..." wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="packPrice" minWidth="80.0" styleClass="pack-price-label" text="0 DT" />
+                    </children>
+                </HBox>
+
+                <Label fx:id="packDescription" minHeight="40.0" styleClass="pack-description-text" text="Description ici..." wrapText="true" />
+
+                <HBox spacing="15.0">
+                    <children>
+                        <Label fx:id="packDuration" styleClass="pack-meta-info" text="📅 --" />
+                        <Label fx:id="packCategory" styleClass="pack-meta-info" text="⭐ --" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="10.0" styleClass="pack-action-box">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#handleDetails" styleClass="btn-details-pack" text="Détails" />
+                        <Button mnemonicParsing="false" styleClass="btn-reserve-pack" text="Réserver" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox spacing="20" styleClass="details-container-glass" stylesheets="@css/client_style.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.PackDetailsController">
+
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button fx:id="btnBack" text="← Retour" onAction="#handleBack" styleClass="btn-back-simple"/>
+        <Label fx:id="nameLabel" styleClass="details-header-title"/>
+    </HBox>
+
+    <Separator styleClass="details-separator"/>
+
+    <HBox spacing="30">
+        <VBox spacing="20" alignment="TOP_CENTER">
+            <StackPane alignment="TOP_RIGHT">
+                <ImageView fx:id="packImageView" fitWidth="420" fitHeight="260"
+                           preserveRatio="false" styleClass="image-view-details" />
+
+                <Label fx:id="statusLabel" styleClass="status-badge-details">
+                    <StackPane.margin>
+                        <Insets top="15" right="15"/>
+                    </StackPane.margin>
+                </Label>
+            </StackPane>
+
+            <VBox alignment="CENTER" styleClass="price-container-details">
+                <Label text="PRIX DU PACK" styleClass="search-label" style="-fx-text-fill: #adb5bd;"/>
+                <Label fx:id="priceLabel" styleClass="details-price-large"/>
+            </VBox>
+        </VBox>
+
+        <VBox spacing="15" HBox.hgrow="ALWAYS">
+            <VBox>
+                <Label text="CATÉGORIE" styleClass="search-label"/>
+                <Label fx:id="categoryLabel" styleClass="text-sub-blue"/>
+            </VBox>
+
+            <VBox>
+                <Label text="DESTINATION" styleClass="search-label"/>
+                <Label fx:id="destinationLabel" styleClass="details-meta-text"/>
+            </VBox>
+
+            <HBox spacing="40">
+                <VBox>
+                    <Label text="HÔTEL" styleClass="search-label"/>
+                    <Label fx:id="hotelLabel" styleClass="details-meta-text"/>
+                </VBox>
+                <VBox>
+                    <Label text="EXCURSION" styleClass="search-label"/>
+                    <Label fx:id="excursionLabel" styleClass="details-meta-text"/>
+                </VBox>
+                <VBox>
+                    <Label text="DURÉE" styleClass="search-label"/>
+                    <Label fx:id="durationLabel" styleClass="details-meta-text"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="40">
+                <VBox>
+                    <Label text="DATE DÉBUT" styleClass="search-label"/>
+                    <Label fx:id="dateDebutLabel" styleClass="details-meta-text"/>
+                </VBox>
+                <VBox>
+                    <Label text="DATE FIN" styleClass="search-label"/>
+                    <Label fx:id="dateFinLabel" styleClass="details-meta-text"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="DESCRIPTION" styleClass="search-label"/>
+                <Label fx:id="descriptionLabel" wrapText="true" maxWidth="500" styleClass="details-description-label"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="btnReserver" text="Confirmer la Réservation" styleClass="btn-orange-glow" maxWidth="Infinity" prefHeight="55"/>
+        </VBox>
+    </HBox>
+</VBox>

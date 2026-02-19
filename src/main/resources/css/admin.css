@@ -1,0 +1,398 @@
+/* =========================================================
+   BASE & BACKGROUND
+========================================================= */
+.root-pane {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-background-color: #001F3F;
+}
+
+.deep-water-bg {
+    -fx-background-color: #001F3F;
+}
+
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* =========================================================
+   SIDEBAR & ANIMATIONS
+========================================================= */
+.sidebar-liquid {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+    -fx-transition: all 0.4s ease-out;
+}
+
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 0 15 25;
+}
+
+.liquid-btn:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.12;
+    -fx-text-fill: white;
+}
+
+/* --- AJOUT POUR LA SÉLECTION ACTIVE --- */
+
+/* Classe ajoutée via Java au bouton cliqué */
+.liquid-btn-active {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+}
+
+/* Supprime le contour bleu par défaut de JavaFX lors du clic */
+.liquid-btn:focused {
+    -fx-background-color: transparent;
+}
+
+/* Style de base pour le badge de statut */
+.status-badge-details {
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Cadre vert pour Disponible */
+.status-available {
+    -fx-background-color: #2ecc71; /* Vert émeraude */
+    -fx-border-color: #27ae60;
+    -fx-border-width: 1;
+    -fx-border-radius: 15px;
+}
+
+/* Cadre rouge pour Indisponible */
+.status-unavailable {
+    -fx-background-color: #e74c3c; /* Rouge corail */
+    -fx-border-color: #c0392b;
+    -fx-border-width: 1;
+    -fx-border-radius: 15px;
+}
+
+/* =========================================================
+   HEADER & SEARCH BAR
+========================================================= */
+.text-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub {
+    -fx-font-size: 14px;
+    -fx-text-fill: #679AC1;
+}
+
+.glass-panel {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -fx-background-radius: 30px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.6), rgba(0, 255, 255, 0.4), rgba(255, 0, 255, 0.4));
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 4);
+}
+
+.search-bar-liquid {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 50px;
+    -fx-padding: 0 10 0 30;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00447B;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Style pour les labels au-dessus des champs */
+.search-label {
+    -fx-text-fill: #679AC1; /* Bleu clair pour être lisible */
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Style spécifique pour les entrées du formulaire (TextField, ComboBox, DatePicker) */
+.form-input {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+    -fx-text-fill: white; /* Texte en blanc pour le contraste */
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+}
+
+.form-input:focused {
+    -fx-border-color: #FF8210; /* Bordure orange au focus */
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Style pour la zone de texte (TextArea) */
+.form-input-area {
+    -fx-control-inner-background: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+    -fx-padding: 5px;
+}
+
+/* Correction spécifique pour les ComboBox et DatePicker pour qu'ils héritent du style */
+.form-input .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+/* Style du bouton de calendrier du DatePicker */
+.date-picker > .arrow-button {
+    -fx-background-color: #FF8210;
+    -fx-background-radius: 0 10 10 0;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+/* BOUTON ORANGE "GLOW" (Adapté au style btn-add) */
+.btn-orange-glow {
+    -fx-background-color: linear-gradient(to right, #FF8210, #FFBD59);
+    -fx-text-fill: white;
+    -fx-background-radius: 30px;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 15, 0.3, 0, 0);
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: linear-gradient(to right, #FFBD59, #FF8210);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* =========================================================
+   TABLEVIEW (Adapté du style admin-table)
+========================================================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-background-radius: 20px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px 20px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 45px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER;
+}
+
+/* Boutons d'action dans le tableau */
+.btn-edit-table {
+    -fx-background-color: rgba(103, 154, 193, 0.3);
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-font-size: 11px;
+}
+
+.btn-delete-table {
+    -fx-background-color: rgba(255, 130, 16, 0.3);
+    -fx-text-fill: #FFBD59;
+    -fx-background-radius: 20;
+    -fx-font-size: 11px;
+}
+
+
+/* Style commun pour les boutons du tableau */
+.btn-table-details, .btn-table-edit, .btn-table-delete {
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 6 15;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-border-width: 1px;
+}
+
+/* Bouton Détails : Bleu Cyan */
+.btn-table-details {
+    -fx-background-color: rgba(52, 152, 219, 0.2);
+    -fx-border-color: rgba(52, 152, 219, 0.5);
+}
+.btn-table-details:hover {
+    -fx-background-color: rgba(52, 152, 219, 0.4);
+    -fx-scale-x: 1.05;
+}
+
+/* Bouton Modifier : Vert Émeraude */
+.btn-table-edit {
+    -fx-background-color: rgba(46, 204, 113, 0.2);
+    -fx-border-color: rgba(46, 204, 113, 0.5);
+}
+.btn-table-edit:hover {
+    -fx-background-color: rgba(46, 204, 113, 0.4);
+    -fx-scale-x: 1.05;
+}
+
+/* Bouton Supprimer : Orange/Rouge (en accord avec votre thème orange) */
+.btn-table-delete {
+    -fx-background-color: rgba(255, 130, 16, 0.2);
+    -fx-border-color: rgba(255, 130, 16, 0.5);
+    -fx-text-fill: #FFBD59; /* Texte orangé clair */
+}
+.btn-table-delete:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.4);
+    -fx-text-fill: white;
+    -fx-scale-x: 1.05;
+}
+
+/* =========================================================
+   MODALS / COMBO BOX stylisés
+========================================================= */
+.combo-box {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: white;
+}
+
+.image-carousel-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+}
+
+.image-carousel-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Pour cacher la barre de défilement verticale mais garder l'horizontale */
+.image-carousel-scroll .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-padding: -5;
+}
+/* --- Page Détails du Pack --- */
+
+.details-container-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px;
+}
+
+.btn-back-simple {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 100px;
+    -fx-cursor: hand;
+}
+
+.btn-back-simple:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.details-header-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.details-separator {
+    -fx-opacity: 0.2;
+}
+
+.image-view-details {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.details-price-large {
+    -fx-font-size: 24px;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+}
+
+.details-meta-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.details-description-label {
+    -fx-text-fill: #b0c4de; /* Acier bleu clair */
+    -fx-font-size: 14px;
+}
+
+/* On réutilise le badge créé pour l'excursion */
+.status-badge-details {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-font-weight: bold;
+}
+
+
+
+
+
+
