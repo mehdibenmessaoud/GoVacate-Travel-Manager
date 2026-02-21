@@ -251,9 +251,12 @@
 }
 
 .btn-table-delete {
-    -fx-background-color: rgba(255, 130, 16, 0.2);
-    -fx-border-color: rgba(255, 130, 16, 0.5);
-    -fx-text-fill: #FFBD59;
+    -fx-background-color: rgba(231, 76, 60, 0.2);
+    -fx-border-color: #e74c3c;
+    -fx-text-fill: #e74c3c;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
 }
 
 /* =========================================================
@@ -341,3 +344,4 @@
     -fx-background-radius: 10px;
     -fx-cursor: hand;
 }
+
