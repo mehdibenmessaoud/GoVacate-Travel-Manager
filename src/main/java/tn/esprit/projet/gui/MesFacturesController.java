@@ -118,7 +118,7 @@ public class MesFacturesController {
             priceTable.addHeaderCell(new Cell().add(new Paragraph("Montant")).setBackgroundColor(orangeTheme).setFontColor(DeviceRgb.WHITE));
 
             // Ligne de données
-            priceTable.addCell(new Cell().add(new Paragraph("Réservation de voyage / excursion #" + f.getReservation_id())));
+            priceTable.addCell(new Cell().add(new Paragraph("Réservation de voyage  ")));
             priceTable.addCell(new Cell().add(new Paragraph(f.getMontant() + " DT")).setTextAlignment(TextAlignment.RIGHT));
 
             document.add(priceTable);

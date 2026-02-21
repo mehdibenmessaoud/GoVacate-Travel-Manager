@@ -18,7 +18,7 @@ import tn.esprit.projet.services.ReservationExcursionServiceImpl;
 
 import java.io.IOException;
 import java.time.LocalDate;
-
+import javafx.scene.layout.VBox;
 public class ExcursionBookingController {
 
     @FXML private DatePicker dateExc;
@@ -155,14 +155,33 @@ public class ExcursionBookingController {
 
     private void redirectToMesReservations(ActionEvent event) {
         try {
+            // 1. Charger uniquement le fragment de la liste des réservations
+            // Assure-toi que le nom du fichier est exactement "Mes Réservations.fxml"
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+
+            // 2. Accéder à la Scène actuelle
+            Scene scene = ((Node) event.getSource()).getScene();
+
+            // 3. Chercher la zone de contenu centrale du Dashboard par son ID
+            // Note: L'ID doit correspondre à celui défini dans ton ClientDashboard.fxml (ex: clientReservationView)
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+
+            if (contentArea != null) {
+                // Vider la zone centrale (qui contient le formulaire de modif actuel)
+                contentArea.getChildren().clear();
+                // Ajouter la liste des réservations
+                contentArea.getChildren().add(root);
+            } else {
+                // Fallback : Si on ne trouve pas le conteneur, on recharge tout le dashboard
+                // pour éviter de rester bloqué sur une page vide.
+                Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
+                scene.setRoot(dashboard);
+            }
         } catch (IOException e) {
+            System.err.println("Erreur de navigation : " + e.getMessage());
             e.printStackTrace();
         }
     }
-
     private void showAlert(String t, String c) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(t); a.setHeaderText(null); a.setContentText(c); a.showAndWait();

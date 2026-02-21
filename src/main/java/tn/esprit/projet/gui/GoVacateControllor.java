@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -26,24 +25,21 @@ import java.util.ResourceBundle;
 
 public class GoVacateControllor implements Initializable {
 
-    // --- ÉLÉMENTS FXML EXISTANTS ---
+    // --- ÉLÉMENTS FXML ---
     @FXML private Pane slidingPane;
     @FXML private Button btnExplorer, btnVoyages, btnMessages;
     @FXML private ScrollPane explorerView;
-    @FXML private VBox reservationView;
+    @FXML private VBox reservationView, supportView;
     @FXML private TableView<Reservation> tableMesReservations;
-    @FXML private TableColumn<Reservation, String> colUserId, colType, colDate, colStatut;
+    @FXML private TableColumn<Reservation, String> colUserId, colType, colDate;
+    @FXML private TableColumn<Reservation, Object> colStatut; // Changé en Object pour éviter le crash Enum
     @FXML private TableColumn<Reservation, Double> colPrix;
     @FXML private TableColumn<Reservation, Void> colAction;
-    @FXML private TextField txtSearch;
+    @FXML private TextField txtSearch, adminChatInput;
     @FXML private ComboBox<String> comboStatut;
-
-    // --- NOUVEAUX ÉLÉMENTS FXML (SUPPORT CHAT) ---
-    @FXML private VBox supportView;
     @FXML private TextArea adminChatDisplay;
-    @FXML private TextField adminChatInput;
 
-    // --- VARIABLES LOGIQUES ---
+    // --- LOGIQUE ---
     private Button currentActiveBtn = null;
     private final ReservationServiceImpl reservationService = new ReservationServiceImpl();
     private ChatServer chatServer;
@@ -51,13 +47,9 @@ public class GoVacateControllor implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialisation de la table et des filtres
         setupTable();
         setupFilters();
-
-        // Démarrage du serveur de chat intégré
         startChatServer();
-
         slidingPane.setMouseTransparent(true);
 
         Platform.runLater(() -> {
@@ -67,60 +59,6 @@ public class GoVacateControllor implements Initializable {
             }
         });
     }
-
-    // --- SECTION SUPPORT CHAT (SERVEUR) ---
-
-    private void startChatServer() {
-        chatServer = new ChatServer(8887) {
-            @Override
-            public void onMessage(WebSocket conn, String message) {
-                Platform.runLater(() -> {
-                    if (message.equals("[EFFACER_TOUT]")) {
-                        adminChatDisplay.clear();
-                        adminChatDisplay.appendText("[Système] L'historique a été effacé par un utilisateur.\n");
-                    } else {
-                        adminChatDisplay.appendText(message + "\n");
-                    }
-                });
-                // Diffuse le message aux autres clients
-                super.onMessage(conn, message);
-            }
-        };
-        chatServer.start();
-        loadChatHistory();
-    }
-
-    private void loadChatHistory() {
-        File file = new File(HISTORY_FILE);
-        if (file.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    adminChatDisplay.appendText(line + "\n");
-                }
-            } catch (IOException e) { e.printStackTrace(); }
-        }
-    }
-
-    @FXML
-    private void handleAdminReply() {
-        String msg = adminChatInput.getText().trim();
-        if (!msg.isEmpty()) {
-            String formattedMsg = "Admin: " + msg;
-            chatServer.broadcast(formattedMsg); // Envoie aux clients WebSockets
-            adminChatDisplay.appendText("Moi: " + msg + "\n"); // Affiche sur l'écran admin
-            saveMessageToFile(formattedMsg);
-            adminChatInput.clear();
-        }
-    }
-
-    private void saveMessageToFile(String message) {
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(HISTORY_FILE, true)))) {
-            out.println(message);
-        } catch (IOException e) { e.printStackTrace(); }
-    }
-
-    // --- SECTION GESTION RÉSERVATIONS (EXISTANTE) ---
 
     private void setupFilters() {
         if (comboStatut != null) {
@@ -136,42 +74,40 @@ public class GoVacateControllor implements Initializable {
         colPrix.setCellValueFactory(new PropertyValueFactory<>("prix_total"));
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
+        // --- DESIGN COLONNE STATUT (FIX CLASSCASTEXCEPTION) ---
+        colStatut.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    String val = item.toString();
+                    setText(val);
+                    String style = "-fx-font-weight: bold; -fx-alignment: CENTER;";
+                    if (val.equalsIgnoreCase("CONFIRMEE")) setStyle(style + "-fx-text-fill: #2ecc71;");
+                    else if (val.equalsIgnoreCase("EN_ATTENTE")) setStyle(style + "-fx-text-fill: #f1c40f;");
+                    else if (val.equalsIgnoreCase("ANNULEE")) setStyle(style + "-fx-text-fill: #e74c3c;");
+                }
+            }
+        });
+
+        // --- DESIGN BOUTON SUPPRIMER ---
         colAction.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("Supprimer");
             {
-                btn.getStyleClass().add("btn-orange-glow");
+                btn.setStyle("-fx-background-color: linear-gradient(to right, #FF8210, #ffb347); -fx-text-fill: white; -fx-background-radius: 15; -fx-font-weight: bold; -fx-cursor: hand;");
                 btn.setPrefWidth(90);
-                btn.setOnAction(event -> {
-                    Optional.ofNullable(getTableView().getItems().get(getIndex()))
-                            .ifPresent(res -> handleDelete(res));
-                });
+                btn.setOnAction(event -> handleDelete(getTableView().getItems().get(getIndex())));
             }
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : btn);
+                if (!empty) setAlignment(javafx.geometry.Pos.CENTER);
             }
         });
-    }
-
-    private void handleDelete(Reservation res) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Annuler la réservation ID: " + res.getId() + " ?", ButtonType.YES, ButtonType.NO);
-        alert.setHeaderText(null);
-        alert.showAndWait()
-                .filter(response -> response == ButtonType.YES)
-                .ifPresent(response -> {
-                    reservationService.delete(res.getId());
-                    showReservations();
-                });
-    }
-
-    // --- SECTION NAVIGATION & ANIMATION ---
-
-    @FXML
-    private void showExplorer() {
-        hideAllViews();
-        explorerView.setVisible(true);
-        moveBubble(btnExplorer);
     }
 
     @FXML
@@ -180,59 +116,70 @@ public class GoVacateControllor implements Initializable {
         reservationView.setVisible(true);
         moveBubble(btnVoyages);
 
-        ObservableList<Reservation> data = FXCollections.observableArrayList(
-                reservationService.getAllReservations().stream().toList()
-        );
-
+        ObservableList<Reservation> data = FXCollections.observableArrayList(reservationService.getAllReservations());
         FilteredList<Reservation> filteredData = new FilteredList<>(data, b -> true);
-        txtSearch.textProperty().addListener((obs, old, nv) -> applyFilter(filteredData));
-        comboStatut.valueProperty().addListener((obs, old, nv) -> applyFilter(filteredData));
+
+        if (txtSearch != null) {
+            txtSearch.textProperty().addListener((obs, old, nv) -> applyFilter(filteredData));
+            comboStatut.valueProperty().addListener((obs, old, nv) -> applyFilter(filteredData));
+        }
 
         SortedList<Reservation> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(tableMesReservations.comparatorProperty());
         tableMesReservations.setItems(sortedData);
     }
 
-    @FXML
-    public void showSupport() {
-        hideAllViews();
-        if (supportView != null) supportView.setVisible(true);
-        moveBubble(btnMessages);
-    }
-
-    private void hideAllViews() {
-        explorerView.setVisible(false);
-        reservationView.setVisible(false);
-        if (supportView != null) supportView.setVisible(false);
-    }
-
     private void applyFilter(FilteredList<Reservation> filteredData) {
         filteredData.setPredicate(res -> {
-            String text = Optional.ofNullable(txtSearch.getText()).orElse("").toLowerCase().trim();
-            String status = Optional.ofNullable(comboStatut.getValue()).orElse("Tous");
+            String text = (txtSearch == null) ? "" : txtSearch.getText().toLowerCase().trim();
+            String status = (comboStatut == null) ? "Tous" : comboStatut.getValue();
 
             boolean matchesText = text.isEmpty() ||
                     (res.getType_res() != null && res.getType_res().toLowerCase().contains(text)) ||
                     (res.getCommentaire_client() != null && res.getCommentaire_client().toLowerCase().contains(text));
 
-            boolean matchesStatus = status.equals("Tous") ||
-                    (res.getStatut() != null && res.getStatut().name().equals(status));
-
+            boolean matchesStatus = status.equals("Tous") || (res.getStatut() != null && res.getStatut().toString().equals(status));
             return matchesText && matchesStatus;
         });
     }
-    @FXML
-    private void handleClearHistory() {
-        File file = new File(HISTORY_FILE);
-        if (file.exists()) file.delete(); // Supprime le fichier texte
 
-        adminChatDisplay.clear();
-        adminChatDisplay.appendText("[Système] Historique supprimé.\n");
+    // --- LOGIQUE CHAT ---
+    private void startChatServer() {
+        chatServer = new ChatServer(8887) {
+            @Override
+            public void onMessage(WebSocket conn, String msg) {
+                Platform.runLater(() -> {
+                    if (msg.equals("[EFFACER_TOUT]")) adminChatDisplay.clear();
+                    else adminChatDisplay.appendText(msg + "\n");
+                });
+                super.onMessage(conn, msg);
+            }
+        };
+        chatServer.start();
+        loadChatHistory();
+    }
 
-        if (chatServer != null) {
-            chatServer.broadcast("[EFFACER_TOUT]"); // Envoie l'ordre au client
+    @FXML private void handleAdminReply() {
+        String msg = adminChatInput.getText().trim();
+        if (!msg.isEmpty()) {
+            chatServer.broadcast("Admin: " + msg);
+            adminChatDisplay.appendText("Moi: " + msg + "\n");
+            saveMessageToFile("Admin: " + msg);
+            adminChatInput.clear();
         }
     }
+
+    @FXML private void handleClearHistory() {
+        new File(HISTORY_FILE).delete();
+        adminChatDisplay.clear();
+        chatServer.broadcast("[EFFACER_TOUT]");
+    }
+
+    // --- NAVIGATION ---
+    @FXML public void showSupport() { hideAllViews(); supportView.setVisible(true); moveBubble(btnMessages); }
+    @FXML private void showExplorer() { hideAllViews(); explorerView.setVisible(true); moveBubble(btnExplorer); }
+    private void hideAllViews() { explorerView.setVisible(false); reservationView.setVisible(false); supportView.setVisible(false); }
+
     private void moveBubble(Button target) {
         if (currentActiveBtn == target || target == null) return;
         TranslateTransition tt = new TranslateTransition(Duration.millis(300), slidingPane);
@@ -240,5 +187,23 @@ public class GoVacateControllor implements Initializable {
         tt.setInterpolator(Interpolator.EASE_BOTH);
         tt.play();
         currentActiveBtn = target;
+    }
+
+    private void handleDelete(Reservation res) {
+        reservationService.delete(res.getId());
+        showReservations();
+    }
+
+    private void saveMessageToFile(String m) {
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(HISTORY_FILE, true)))) { out.println(m); } catch (IOException e) {}
+    }
+
+    private void loadChatHistory() {
+        File f = new File(HISTORY_FILE);
+        if (f.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                String l; while ((l = br.readLine()) != null) adminChatDisplay.appendText(l + "\n");
+            } catch (IOException e) {}
+        }
     }
 }

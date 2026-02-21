@@ -15,7 +15,7 @@ import tn.esprit.projet.entities.StatutReservation;
 import tn.esprit.projet.services.ReservationPackServiceImpl;
 import java.io.IOException;
 import java.time.LocalDate;
-
+import javafx.scene.layout.VBox;
 public class PackBookingController {
 
     @FXML private Label lblPackName, lblDateDepart, lblDateArrivee, lblPrix, lblCategorie;
@@ -71,13 +71,28 @@ public class PackBookingController {
 
     private void redirectToMesReservations(ActionEvent event) {
         try {
-
+            // 1. Charger la vue de la liste
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Mes Réservations");
+
+            // 2. Récupérer la scène actuelle
+            Scene scene = ((Node) event.getSource()).getScene();
+
+            // 3. Trouver le conteneur central (VBox) du Dashboard
+            // Le cast (VBox) fonctionne uniquement si l'import est présent
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+
+            if (contentArea != null) {
+                // Nettoyer la zone centrale et injecter la liste
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(root);
+            } else {
+                // Si on ne trouve pas le conteneur, on recharge tout le dashboard
+                Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
+                scene.setRoot(dashboard);
+            }
         } catch (IOException e) {
-            System.err.println("Erreur redirection client : " + e.getMessage());
+            System.err.println("Erreur de navigation : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

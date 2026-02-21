@@ -7,15 +7,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.ReservationRestaurantServiceImpl;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
-import javafx.event.ActionEvent;
+
 public class RestaurantBookingController {
-    @FXML private Button btnAnnuler; // Ajoute ceci ici
+    @FXML private Button btnAnnuler;
     @FXML private ComboBox<Restaurant> comboResto;
     @FXML private DatePicker dateRes;
     @FXML private TextField txtPersonnes;
@@ -27,15 +28,9 @@ public class RestaurantBookingController {
 
     @FXML
     public void initialize() {
-        // 1. Charger les restaurants
         comboResto.setItems(FXCollections.observableArrayList(serviceResto.findAllRestaurants()));
-
-        // 2. Configuration des contraintes de DATE
         setupDateConstraints();
-
-        // 3. Configuration du TIME PICKER
         setupTimePicker();
-
 
         comboResto.setCellFactory(lv -> new ListCell<Restaurant>() {
             @Override protected void updateItem(Restaurant r, boolean empty) {
@@ -59,20 +54,17 @@ public class RestaurantBookingController {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                // Désactiver si la date est avant aujourd'hui
                 setDisable(empty || date.isBefore(LocalDate.now()));
                 if (date.isBefore(LocalDate.now())) {
                     setStyle("-fx-background-color: #2a2a2a; -fx-text-fill: #555555;");
                 }
             }
         });
-
         dateRes.setEditable(false);
     }
 
     private void setupTimePicker() {
         ObservableList<String> hours = FXCollections.observableArrayList();
-
         for (int h = 12; h <= 23; h++) {
             hours.add(String.format("%02d:00", h));
             hours.add(String.format("%02d:30", h));
@@ -82,29 +74,19 @@ public class RestaurantBookingController {
 
     public void initModif(Reservation res) {
         this.reservationModif = res;
-
-        // 1. Afficher le bouton Annuler
         if (btnAnnuler != null) {
             btnAnnuler.setVisible(true);
             btnAnnuler.setManaged(true);
         }
-
-        // 2. Remplissage des champs du Parent (Reservation)
         dateRes.setValue(res.getDate_debut());
-        // On récupère le nombre de personnes du parent
         txtPersonnes.setText(String.valueOf(res.getNombre_personnes()));
 
-        // 3. Récupération des détails spécifiques au Restaurant
         ReservationRestaurant rr = serviceResto.findByReservationId(res.getId());
         if (rr != null) {
-            // RECUPERATION CRUCIALE :
             if (rr.getNombre_personnes() > 0) {
                 txtPersonnes.setText(String.valueOf(rr.getNombre_personnes()));
             }
-
             comboHeure.setValue(rr.getHeure_souhaitee());
-
-            // Sélection du bon restaurant dans la ComboBox
             for (Restaurant r : comboResto.getItems()) {
                 if (r.getId() == rr.getRestaurant_id().intValue()) {
                     comboResto.getSelectionModel().select(r);
@@ -112,44 +94,27 @@ public class RestaurantBookingController {
                 }
             }
         }
-
-        // 4. Changer le texte du bouton principal
         if (btnValider != null) btnValider.setText("METTRE À JOUR LA RÉSERVATION");
     }
+
     @FXML
     void handleCancel(ActionEvent event) {
-        // Redirection directe vers la liste
-        redirectToMesReservations();
+        // Retourne à la liste des réservations
+        navigateToReservationList(event);
     }
 
     @FXML
-    void handleReserverRestaurant() {
+    void handleReserverRestaurant(ActionEvent event) { // Ajout de ActionEvent ici
         try {
             Restaurant selected = comboResto.getSelectionModel().getSelectedItem();
-            String heure = comboHeure.getValue(); // On récupère la valeur du ComboBox
+            String heure = comboHeure.getValue();
 
-            // 1. Contrôle des champs
             if (selected == null || dateRes.getValue() == null || txtPersonnes.getText().isEmpty() || heure == null) {
-                showAlert("Champs manquants", "Veuillez remplir tous les champs, y compris l'heure.");
-                return;
-            }
-
-            if (dateRes.getValue().isBefore(LocalDate.now())) {
-                showAlert("Date invalide", "Vous ne pouvez pas réserver dans le passé.");
-                return;
-            }
-
-            String status = selected.getStatus().toUpperCase();
-            if ("CLOSED".equals(status)) {
-                showAlert("Restaurant Fermé", "Désolé, ce restaurant est fermé.");
+                showAlert("Champs manquants", "Veuillez remplir tous les champs.");
                 return;
             }
 
             int nbPersonnes = Integer.parseInt(txtPersonnes.getText());
-            if (nbPersonnes > selected.getCapacity()) {
-                showAlert("Capacité insuffisante", "Max " + selected.getCapacity() + " personnes.");
-                return;
-            }
 
             Reservation resParent = (reservationModif != null) ? reservationModif : new Reservation();
             resParent.setStatut(StatutReservation.CONFIRMEE);
@@ -173,7 +138,8 @@ public class RestaurantBookingController {
                 showAlert("Succès", "Mise à jour effectuée !");
             }
 
-            redirectToMesReservations();
+            // Retourne à la liste après succès
+            navigateToReservationList(event);
 
         } catch (NumberFormatException e) {
             showAlert("Erreur", "Le nombre de personnes doit être un chiffre.");
@@ -182,12 +148,34 @@ public class RestaurantBookingController {
         }
     }
 
-    private void redirectToMesReservations() {
+    /**
+     * Méthode centrale pour naviguer vers "Mes Réservations" à l'intérieur du Dashboard
+     */
+    private void navigateToReservationList(ActionEvent event) {
         try {
+            // 1. Charger la vue de la liste (Mes Réservations)
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-            Stage stage = (Stage) dateRes.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (IOException e) { e.printStackTrace(); }
+
+            // 2. Récupérer la scène à partir du bouton qui a déclenché l'événement
+            Scene scene = ((Node) event.getSource()).getScene();
+
+            // 3. Chercher la zone centrale du Dashboard par son ID fx:id
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+
+            if (contentArea != null) {
+                // Vider l'interface actuelle et injecter la liste
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(root);
+            } else {
+                // Si on ne trouve pas le conteneur (test ou structure différente)
+                // On recharge le Dashboard complet comme solution de secours
+                Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
+                scene.setRoot(dashboard);
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur de navigation : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void showAlert(String title, String content) {

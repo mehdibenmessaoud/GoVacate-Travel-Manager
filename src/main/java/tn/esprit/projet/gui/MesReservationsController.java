@@ -16,7 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
+import javafx.scene.layout.VBox; // <--- IMPORT MANQUANT CORRIGÉ
 import javafx.util.Duration;
 
 // Entities & Services
@@ -47,7 +47,7 @@ public class MesReservationsController {
     private final ReservationServiceImpl service = new ReservationServiceImpl();
     private final ReservationRestaurantServiceImpl serviceResto = new ReservationRestaurantServiceImpl();
     private final ReservationExcursionServiceImpl serviceExc = new ReservationExcursionServiceImpl();
-    private final FactureServiceImpl factureService = new FactureServiceImpl(); // Ajout du service Facture
+    private final FactureServiceImpl factureService = new FactureServiceImpl();
 
     private final ObservableList<Reservation> masterData = FXCollections.observableArrayList();
 
@@ -57,14 +57,12 @@ public class MesReservationsController {
 
         setupColumns();
 
-        // Initialisation des filtres
         statusFilterCombo.getItems().addAll("Tous les statuts", "CONFIRMEE", "EN_ATTENTE", "ANNULEE");
         statusFilterCombo.setValue("Tous les statuts");
 
         chargerDonnees();
         setupFilterLogic();
 
-        // Animation d'entrée
         FadeTransition ft = new FadeTransition(Duration.millis(800), tableMesReservations);
         ft.setFromValue(0); ft.setToValue(1); ft.play();
     }
@@ -72,8 +70,8 @@ public class MesReservationsController {
     private void setupColumns() {
         colType.setCellValueFactory(new PropertyValueFactory<>("type_res"));
         colPrix.setCellValueFactory(new PropertyValueFactory<>("prix_total"));
-
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
+
         colStatut.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Object item, boolean empty) {
@@ -83,26 +81,23 @@ public class MesReservationsController {
                 } else {
                     String status = item.toString().toUpperCase();
                     Label badge = new Label(status);
-
-                    // Design Professionnel : Fond semi-transparent, bordure et taille fixe
-                    badge.setMinWidth(110); // Empêche le texte d'être coupé
+                    badge.setMinWidth(110);
                     badge.setAlignment(Pos.CENTER);
-
                     String baseStyle = "-fx-padding: 6 12; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: white;";
 
                     if (status.contains("CONFIRME") || status.contains("DISPONIBLE")) {
-                        badge.setStyle(baseStyle + "-fx-background-color: #27ae60;"); // Vert émeraude
+                        badge.setStyle(baseStyle + "-fx-background-color: #27ae60;");
                     } else if (status.contains("ATTENTE") || status.contains("OCCUPE")) {
-                        badge.setStyle(baseStyle + "-fx-background-color: #e67e22;"); // Orange pro
+                        badge.setStyle(baseStyle + "-fx-background-color: #e67e22;");
                     } else {
-                        badge.setStyle(baseStyle + "-fx-background-color: #7f8c8d;"); // Gris moderne
+                        badge.setStyle(baseStyle + "-fx-background-color: #7f8c8d;");
                     }
-
                     setGraphic(badge);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
+
         colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
         colDate.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -184,9 +179,12 @@ public class MesReservationsController {
 
     private void handleModifierAction(Reservation res) {
         try {
-            String fxmlPath = res.getType_res().equalsIgnoreCase("RESTAURANT") ? "/RestaurantBookingView.fxml" : "/ExcursionBooking.fxml";
+            String fxmlPath = res.getType_res().equalsIgnoreCase("RESTAURANT")
+                    ? "/RestaurantBookingView.fxml"
+                    : "/ExcursionBooking.fxml";
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
+            Parent modifierRoot = loader.load();
 
             if (res.getType_res().equalsIgnoreCase("RESTAURANT")) {
                 RestaurantBookingController c = loader.getController();
@@ -196,10 +194,20 @@ public class MesReservationsController {
                 c.initModif(res);
             }
 
-            // Changement du Root sur la même Scene pour garder le design du stage
-            tableMesReservations.getScene().setRoot(root);
+            Scene scene = tableMesReservations.getScene();
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(modifierRoot);
+                FadeTransition ft = new FadeTransition(Duration.millis(500), modifierRoot);
+                ft.setFromValue(0); ft.setToValue(1); ft.play();
+            } else {
+                scene.setRoot(modifierRoot);
+            }
+
         } catch (Exception e) {
-            showAlert("Erreur", "Impossible de modifier : " + e.getMessage());
+            showAlert("Erreur", "Impossible d'ouvrir la modification : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -217,19 +225,17 @@ public class MesReservationsController {
     @FXML
     void handlePayerSelection() {
         Reservation selectedRes = tableMesReservations.getSelectionModel().getSelectedItem();
-
         if (selectedRes == null) {
-            showAlert("Attention", "Veuillez sélectionner une réservation dans la liste.");
+            showAlert("Attention", "Veuillez sélectionner une réservation.");
             return;
         }
-
         if ("RESTAURANT".equalsIgnoreCase(selectedRes.getType_res())) {
             showAlert("Information", "Le paiement se fait sur place pour les restaurants.");
             return;
         }
 
         try {
-            com.stripe.Stripe.apiKey = "sk_test_51T2VgCGPX5GP9df5VYefnZIoxll2P0o64MBEcOPBsuP6zkrpqeGW54VhELQ0sKnHaVFdJFfZqK4qeDBLwIcToT61000bqv7bk5";
+            Stripe.apiKey = "sk_test_51T2VgCGPX5GP9df5VYefnZIoxll2P0o64MBEcOPBsuP6zkrpqeGW54VhELQ0sKnHaVFdJFfZqK4qeDBLwIcToT61000bqv7bk5";
 
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -255,20 +261,15 @@ public class MesReservationsController {
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.initOwner(tableMesReservations.getScene().getWindow());
-            alert.setTitle("Vérification du paiement");
+            alert.setTitle("Vérification");
             alert.setHeaderText("Paiement en cours...");
-            alert.setContentText("Cliquez sur VÉRIFIER après avoir payé sur Stripe.");
-
             ButtonType btnVerifier = new ButtonType("VÉRIFIER MON PAIEMENT");
             ButtonType btnAnnuler = new ButtonType("ANNULER", ButtonBar.ButtonData.CANCEL_CLOSE);
             alert.getButtonTypes().setAll(btnVerifier, btnAnnuler);
 
             alert.showAndWait().ifPresent(response -> {
-                if (response == btnVerifier) {
-                    verifierStatusStripe(session.getId(), selectedRes);
-                }
+                if (response == btnVerifier) verifierStatusStripe(session.getId(), selectedRes);
             });
-
         } catch (Exception e) {
             showAlert("Erreur", "Erreur Stripe : " + e.getMessage());
         }
@@ -277,38 +278,40 @@ public class MesReservationsController {
     private void verifierStatusStripe(String sessionId, Reservation res) {
         try {
             Session verifiedSession = Session.retrieve(sessionId);
-
             if ("paid".equals(verifiedSession.getPaymentStatus())) {
-                // 1. Marquer comme payé en BDD et UI
                 marquerCommePayee(res);
-
-                // 2. Créer et Sauvegarder la Facture
                 Facture f = new Facture();
                 f.setMontant(res.getPrix_total());
                 f.setReservation_id((long) res.getId());
                 f.setMethode_paiement(MethodePaiement.VISA);
                 f.setStatut(StatutFacture.PAYEE);
-
                 factureService.save(f);
-
-                Platform.runLater(() -> {
-                    showAlert("Succès", "Paiement validé ! Facture #" + f.getId() + " enregistrée.");
-                    // exporterFacturePDF(res, f); // Appeler votre méthode PDF ici
-                });
+                Platform.runLater(() -> showAlert("Succès", "Paiement validé !"));
             } else {
-                showAlert("Paiement non détecté", "Le statut Stripe n'est pas encore 'paid'.");
+                showAlert("Paiement non détecté", "Le statut n'est pas encore 'paid'.");
             }
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur de vérification : " + e.getMessage());
+            showAlert("Erreur", "Erreur de vérification.");
         }
     }
 
     @FXML
-    void handleBack(ActionEvent event) {
+    void handleBack(ActionEvent event) { // Renommé de handleBackToTable à handleBack
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/RestaurantBookingView.fxml"));
-            tableMesReservations.getScene().setRoot(root);
-        } catch (IOException e) { e.printStackTrace(); }
+            // Charger la vue précédente
+            Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
+
+            // Récupérer la scène et le conteneur du Dashboard
+            Scene scene = ((Node) event.getSource()).getScene();
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(root);
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur de navigation retour: " + e.getMessage());
+        }
     }
 
     private void showAlert(String t, String c) {
