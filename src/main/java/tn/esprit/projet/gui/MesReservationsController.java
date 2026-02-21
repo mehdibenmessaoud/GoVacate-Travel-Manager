@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import javafx.application.Platform;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,12 +18,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import tn.esprit.projet.entities.Reservation;
-import tn.esprit.projet.entities.ReservationRestaurant;
-import tn.esprit.projet.entities.ReservationExcursion;
-import tn.esprit.projet.services.ReservationServiceImpl;
-import tn.esprit.projet.services.ReservationRestaurantServiceImpl;
-import tn.esprit.projet.services.ReservationExcursionServiceImpl;
+
+// Entities & Services
+import tn.esprit.projet.entities.*;
+import tn.esprit.projet.services.*;
+
+// Stripe imports
+import com.stripe.Stripe;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -43,6 +47,8 @@ public class MesReservationsController {
     private final ReservationServiceImpl service = new ReservationServiceImpl();
     private final ReservationRestaurantServiceImpl serviceResto = new ReservationRestaurantServiceImpl();
     private final ReservationExcursionServiceImpl serviceExc = new ReservationExcursionServiceImpl();
+    private final FactureServiceImpl factureService = new FactureServiceImpl(); // Ajout du service Facture
+
     private final ObservableList<Reservation> masterData = FXCollections.observableArrayList();
 
     @FXML
@@ -66,7 +72,6 @@ public class MesReservationsController {
     private void setupColumns() {
         colType.setCellValueFactory(new PropertyValueFactory<>("type_res"));
         colPrix.setCellValueFactory(new PropertyValueFactory<>("prix_total"));
-
 
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
         colStatut.setCellFactory(column -> new TableCell<>() {
@@ -92,7 +97,6 @@ public class MesReservationsController {
             }
         });
 
-        // --- DATE ET HEURE
         colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
         colDate.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -102,7 +106,6 @@ public class MesReservationsController {
                 else {
                     Reservation res = getTableView().getItems().get(getIndex());
                     String heure = "";
-
                     if ("RESTAURANT".equalsIgnoreCase(res.getType_res())) {
                         ReservationRestaurant rr = serviceResto.findByReservationId(res.getId());
                         heure = (rr != null && rr.getHeure_souhaitee() != null) ? rr.getHeure_souhaitee() : "20:00";
@@ -110,7 +113,6 @@ public class MesReservationsController {
                         ReservationExcursion re = serviceExc.findByReservationId(res.getId());
                         heure = (re != null && re.getHeure_souhaitee() != null) ? re.getHeure_souhaitee() : "09:00";
                     }
-
                     setText(date + (heure.isEmpty() ? "" : " à " + heure));
                     setStyle("-fx-text-fill: #00FFCC; -fx-font-weight: bold;");
                 }
@@ -188,9 +190,12 @@ public class MesReservationsController {
                 c.initModif(res);
             }
 
-            Stage stage = (Stage) tableMesReservations.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (Exception e) { showAlert("Erreur", "Impossible de modifier : " + e.getMessage()); }
+            // Changement du Root sur la même Scene pour garder le design du stage
+            tableMesReservations.getScene().setRoot(root);
+        } catch (Exception e) {
+            showAlert("Erreur", "Impossible de modifier : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void confirmerAnnulation(Reservation res) {
@@ -203,23 +208,113 @@ public class MesReservationsController {
         });
     }
 
-    @FXML void handlePayerSelection() {
-        if (tableMesReservations.getSelectionModel().getSelectedItem() == null) {
-            showAlert("Attention", "Veuillez sélectionner une réservation pour payer.");
-        } else {
-            showAlert("Paiement", "Redirection vers la plateforme de paiement sécurisée...");
+    @FXML
+    void handlePayerSelection() {
+        Reservation selectedRes = tableMesReservations.getSelectionModel().getSelectedItem();
+
+        if (selectedRes == null) {
+            showAlert("Attention", "Veuillez sélectionner une réservation dans la liste.");
+            return;
+        }
+
+        if ("RESTAURANT".equalsIgnoreCase(selectedRes.getType_res())) {
+            showAlert("Information", "Le paiement se fait sur place pour les restaurants.");
+            return;
+        }
+
+        try {
+            com.stripe.Stripe.apiKey = "sk_test_51T2VgCGPX5GP9df5VYefnZIoxll2P0o64MBEcOPBsuP6zkrpqeGW54VhELQ0sKnHaVFdJFfZqK4qeDBLwIcToT61000bqv7bk5";
+
+            SessionCreateParams params = SessionCreateParams.builder()
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setSuccessUrl("https://www.google.com")
+                    .setCancelUrl("https://www.google.com")
+                    .addLineItem(SessionCreateParams.LineItem.builder()
+                            .setQuantity(1L)
+                            .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                    .setCurrency("eur")
+                                    .setUnitAmount((long)(selectedRes.getPrix_total() * 100))
+                                    .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                            .setName("Réservation #" + selectedRes.getId())
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+
+            Session session = Session.create(params);
+
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI(session.getUrl()));
+            }
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.initOwner(tableMesReservations.getScene().getWindow());
+            alert.setTitle("Vérification du paiement");
+            alert.setHeaderText("Paiement en cours...");
+            alert.setContentText("Cliquez sur VÉRIFIER après avoir payé sur Stripe.");
+
+            ButtonType btnVerifier = new ButtonType("VÉRIFIER MON PAIEMENT");
+            ButtonType btnAnnuler = new ButtonType("ANNULER", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(btnVerifier, btnAnnuler);
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == btnVerifier) {
+                    verifierStatusStripe(session.getId(), selectedRes);
+                }
+            });
+
+        } catch (Exception e) {
+            showAlert("Erreur", "Erreur Stripe : " + e.getMessage());
         }
     }
 
-    @FXML void handleBack(ActionEvent event) {
+    private void verifierStatusStripe(String sessionId, Reservation res) {
+        try {
+            Session verifiedSession = Session.retrieve(sessionId);
+
+            if ("paid".equals(verifiedSession.getPaymentStatus())) {
+                // 1. Marquer comme payé en BDD et UI
+                marquerCommePayee(res);
+
+                // 2. Créer et Sauvegarder la Facture
+                Facture f = new Facture();
+                f.setMontant(res.getPrix_total());
+                f.setReservation_id((long) res.getId());
+                f.setMethode_paiement(MethodePaiement.VISA);
+                f.setStatut(StatutFacture.PAYEE);
+
+                factureService.save(f);
+
+                Platform.runLater(() -> {
+                    showAlert("Succès", "Paiement validé ! Facture #" + f.getId() + " enregistrée.");
+                    // exporterFacturePDF(res, f); // Appeler votre méthode PDF ici
+                });
+            } else {
+                showAlert("Paiement non détecté", "Le statut Stripe n'est pas encore 'paid'.");
+            }
+        } catch (Exception e) {
+            showAlert("Erreur", "Erreur de vérification : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void handleBack(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/RestaurantBookingView.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            tableMesReservations.getScene().setRoot(root);
         } catch (IOException e) { e.printStackTrace(); }
     }
 
     private void showAlert(String t, String c) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION); a.setTitle(t); a.setContentText(c); a.showAndWait();
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle(t);
+        a.setContentText(c);
+        a.showAndWait();
+    }
+
+    private void marquerCommePayee(Reservation res) {
+        service.updateStatus(res.getId(), StatutReservation.CONFIRMEE.name());
+        res.setStatut(StatutReservation.CONFIRMEE);
+        Platform.runLater(() -> tableMesReservations.refresh());
     }
 }

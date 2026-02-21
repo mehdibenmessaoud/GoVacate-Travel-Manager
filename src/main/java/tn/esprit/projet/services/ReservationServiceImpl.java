@@ -136,4 +136,15 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
         } catch (SQLException e) { e.printStackTrace(); }
         return reservations;
     }
+    public void updateStatus(long id, String newStatus) { // Change 'int' to 'long'
+        String sql = "UPDATE reservation SET statut = ? WHERE id = ?";
+        // Use the 'cnx' variable already defined at the top of your class
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
