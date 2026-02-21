@@ -10,7 +10,7 @@
         <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
     </padding>
 
-    <VBox maxWidth="800.0" spacing="15.0" styleClass="glass-card" style="-fx-padding: 30;">
+    <VBox maxWidth="800.0" spacing="15.0" styleClass="glass-card" >
         <children>
             <Text fx:id="formTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Détails de l'Excursion" />
 
@@ -25,11 +25,11 @@
                 </columnConstraints>
 
                 <children>
-                    <Label text="Nom Excursion :" textFill="WHITE" />
-                    <TextField fx:id="nameField" promptText="Ex: Safari Désert" styleClass="modern-textfield" GridPane.columnIndex="1" />
+                    <Label text="Nom Excursion :" textFill="WHITE" GridPane.rowIndex="0" />
+                    <TextField fx:id="nameField" promptText="Ex: Safari Désert" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                    <Label text="Activité :" textFill="WHITE" GridPane.columnIndex="2" />
-                    <TextField fx:id="activiteField" promptText="Ex: Quad, Randonnée" styleClass="modern-textfield" GridPane.columnIndex="3" />
+                    <Label text="Activité :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <TextField fx:id="activiteField" promptText="Ex: Quad, Randonnée" styleClass="modern-textfield" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
                     <Label text="Prix (DT) :" textFill="WHITE" GridPane.rowIndex="1" />
                     <TextField fx:id="priceField" promptText="0.0" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -40,21 +40,31 @@
                     <Label text="Participants Max :" textFill="WHITE" GridPane.rowIndex="2" />
                     <TextField fx:id="participantsField" promptText="Ex: 20" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                    <Label text="Statut :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="statusCombo" prefWidth="250.0" styleClass="modern-combo" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                    <Label text="Date Début :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="dateDebutPicker" styleClass="modern-datepicker" GridPane.columnIndex="3" GridPane.rowIndex="2" />
 
-                    <Label text="Description :" textFill="WHITE" GridPane.rowIndex="3" />
-                    <TextArea fx:id="descriptionArea" prefHeight="100.0" promptText="Décrivez l'activité..." styleClass="modern-textarea" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
-                    <Label text="Date Début :" textFill="WHITE" GridPane.rowIndex="4" />
-                    <DatePicker fx:id="dateDebutPicker" styleClass="modern-datepicker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <Label text="Date Fin :" textFill="WHITE" GridPane.rowIndex="3" />
+                    <DatePicker fx:id="dateFinPicker" styleClass="modern-datepicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <Label text="Date Fin :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                    <DatePicker fx:id="dateFinPicker" styleClass="modern-datepicker" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                    <Label text="Description :" textFill="WHITE" GridPane.rowIndex="4" />
+                    <TextArea fx:id="descriptionArea" prefHeight="80.0" promptText="Décrivez l'activité..." styleClass="modern-textarea" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4" />
 
-                    <Label text="Image :" textFill="WHITE" GridPane.rowIndex="5" />
-                    <HBox spacing="10" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5">
-                        <TextField fx:id="imagePathField" editable="false" promptText="Aucune image" styleClass="modern-textfield" HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleUploadImage" text="Choisir..." styleClass="btn-orange-glow" />
+                    <Label text="Destination :" textFill="WHITE" GridPane.rowIndex="5" />
+                    <ComboBox fx:id="destinationCombo" prefWidth="250.0" promptText="Sélectionnez..." styleClass="modern-combo" visibleRowCount="5" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                    <Label text="Statut :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                    <ComboBox fx:id="statusCombo" prefWidth="250.0" styleClass="modern-combo" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+
+                    <Label text="Image :" textFill="WHITE" GridPane.rowIndex="6" />
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
+                        <children>
+                            <TextField fx:id="imagePathField" editable="false"
+                                       prefWidth="300.0" promptText="Aucune image"
+                                       styleClass="modern-textfield" HBox.hgrow="SOMETIMES" />
+
+                            <Button onAction="#handleUploadImage" minWidth="-Infinity"
+                                    styleClass="btn-orange-glow" text="Choisir une image" />
+                        </children>
                     </HBox>
                 </children>
             </GridPane>

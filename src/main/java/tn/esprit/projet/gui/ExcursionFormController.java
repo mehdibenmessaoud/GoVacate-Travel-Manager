@@ -11,6 +11,11 @@ import tn.esprit.projet.services.ExcursionService;
 import tn.esprit.projet.utils.MyDBConnexion;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.collections.FXCollections;
+import javafx.util.StringConverter;
+import tn.esprit.projet.entities.Destination;
+import tn.esprit.projet.services.DestinationService;
+import java.util.List;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +37,7 @@ public class ExcursionFormController implements Initializable {
     @FXML private Button btnEnregistrer;
     @FXML private DatePicker dateDebutPicker, dateFinPicker;
     @FXML private TextField imagePathField;
+    @FXML private ComboBox<Destination> destinationCombo;
 
     private ExcursionService excursionService;
     private Excursion excursionAModifier;
@@ -42,6 +48,8 @@ public class ExcursionFormController implements Initializable {
         excursionService = new ExcursionService(MyDBConnexion.getInstance().getConnection());
         statusCombo.getItems().addAll("Disponible", "Complet", "Annulé");
         statusCombo.setValue("Disponible");
+
+        loadDestinations();
     }
 
     public void setUpdateMode(Excursion e) {
@@ -50,7 +58,7 @@ public class ExcursionFormController implements Initializable {
         btnEnregistrer.setText("Mettre à jour");
 
         nameField.setText(e.getName());
-        descriptionArea.setText(e.getDescription());
+
         durationField.setText(String.valueOf(e.getDuration()));
         priceField.setText(String.valueOf(e.getPrice()));
         participantsField.setText(String.valueOf(e.getMaxParticipants()));
@@ -58,8 +66,16 @@ public class ExcursionFormController implements Initializable {
         statusCombo.setValue(e.getStatus());
         dateDebutPicker.setValue(e.getDateDebut());
         dateFinPicker.setValue(e.getDateFin());
+        descriptionArea.setText(e.getDescription());
         imagePathField.setText(e.getImages()); // Affiche le nom de l'image existante
+        for (Destination d : destinationCombo.getItems()) {
+            if (d.getId() == e.getLocationId()) {
+                destinationCombo.setValue(d);
+                break;
+            }
+        }
     }
+
 
     @FXML
     private void handleSave() {
@@ -92,7 +108,9 @@ public class ExcursionFormController implements Initializable {
             e.setMaxParticipants(Integer.parseInt(participantsField.getText()));
             e.setActivite(activiteField.getText());
             e.setStatus(statusCombo.getValue());
-            e.setLocationId(1);
+            if (destinationCombo.getValue() != null) {
+                e.setLocationId(destinationCombo.getValue().getId());
+            }
             e.setDateDebut(dateDebutPicker.getValue());
             e.setDateFin(dateFinPicker.getValue());
             e.setImages(fileName); // Enregistre le nom du fichier dans l'objet
@@ -135,9 +153,14 @@ public class ExcursionFormController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ExcursionTable.fxml"));
             Parent table = loader.load();
+
+            // On cherche le BorderPane via l'ID défini dans votre AdminView.fxml
             BorderPane mainLayout = (BorderPane) nameField.getScene().lookup("#mainLayout");
+
             if (mainLayout != null) {
                 mainLayout.setCenter(table);
+                // Optionnel : Forcer le rafraîchissement du layout pour éviter les bugs visuels
+                mainLayout.requestLayout();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -187,6 +210,48 @@ public class ExcursionFormController implements Initializable {
         }
 
         return true;
+    }
+
+    private void loadDestinations() {
+        try {
+            // 1. Appel au service pour récupérer la liste des destinations
+            // Note : Assurez-vous d'avoir initialisé votre DestinationService dans initialize()
+            DestinationService destinationService = new DestinationService(MyDBConnexion.getInstance().getConnection());
+            List<Destination> destinations = destinationService.getAll();
+
+            // 2. Peupler le ComboBox avec la liste
+            destinationCombo.setItems(FXCollections.observableArrayList(destinations));
+
+            // 3. Configurer l'affichage pour montrer "Pays, Ville"
+            destinationCombo.setConverter(new StringConverter<Destination>() {
+                @Override
+                public String toString(Destination d) {
+                    return (d == null) ? "" : d.getPays() + ", " + d.getVille();
+                }
+
+                @Override
+                public Destination fromString(String string) {
+                    return null; // Pas nécessaire pour un ComboBox non éditable
+                }
+            });
+
+            // 4. Personnaliser l'affichage des cellules de la liste déroulante (Optionnel pour le style)
+            destinationCombo.setCellFactory(lv -> new ListCell<Destination>() {
+                @Override
+                protected void updateItem(Destination item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getPays() + ", " + item.getVille());
+                    }
+                }
+            });
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Erreur de chargement", "Impossible de charger les destinations depuis la base de données.");
+        }
     }
 
     private void showAlert(String title, String content) {

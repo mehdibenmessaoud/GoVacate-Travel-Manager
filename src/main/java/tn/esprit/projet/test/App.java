@@ -12,7 +12,7 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Le "/" au début indique la racine du dossier 'resources'
-        URL fxmlLocation = getClass().getResource("/ClientPackView.fxml");
+        URL fxmlLocation = getClass().getResource("/AdminView.fxml");
 
         if (fxmlLocation == null) {
             System.err.println("❌ ERREUR : Le fichier MainLayout.fxml est introuvable !");
