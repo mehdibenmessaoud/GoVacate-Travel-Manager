@@ -1,0 +1,624 @@
+/* Palette : Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
+
+/* =========================================================
+   DEEP WATER THEME - GoVacate
+========================================================= */
+
+/* Background & Sidebar */
+.main-bg { 
+    -fx-background-color: linear-gradient(to bottom right, #001F3F, #000B18); 
+}
+
+.sidebar { 
+    -fx-background-color: rgba(255, 255, 255, 0.03); 
+    -fx-border-color: transparent rgba(255, 255, 255, 0.1) transparent transparent; 
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Menu Buttons */
+.menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #679AC1;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 15;
+    -fx-font-size: 14;
+    -fx-cursor: hand;
+}
+.menu-btn:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent transparent #FF8210;
+    -fx-border-width: 0 0 0 4;
+}
+.menu-btn-active {
+    -fx-background-color: rgba(255, 130, 16, 0.2);
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent transparent #FF8210;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Red Button */
+.btn-danger {
+    -fx-background-color: rgba(231, 76, 60, 0.2);
+    -fx-text-fill: #E74C3C;
+    -fx-border-color: #E74C3C;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 10 15;
+}
+.btn-danger:hover {
+    -fx-background-color: rgba(231, 76, 60, 0.4);
+}
+
+/* Glass Panel for Search */
+.glass-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-padding: 20;
+}
+
+/* Text Header */
+.text-header {
+    -fx-fill: white;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+}
+
+.text-subheader {
+    -fx-fill: #679AC1;
+    -fx-font-size: 14;
+}
+
+/* Combo Box Glass Style */
+.glass-combo {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-color: transparent;
+}
+
+/* =========================================================
+   PROFESSIONAL FORM STYLES
+========================================================= */
+
+/* Professional Text Field */
+.text-field-pro {
+    -fx-background-color: #F5F7FA;
+    -fx-border-color: #E1E5EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 50 12 15;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #9CA3AF;
+}
+
+.text-field-pro:focused {
+    -fx-border-color: #FF8210;
+    -fx-background-color: white;
+}
+
+.text-field-pro:hover {
+    -fx-border-color: #B0B8C4;
+}
+
+/* Professional Date Picker */
+.date-picker-pro {
+    -fx-background-color: #F5F7FA;
+    -fx-border-color: #E1E5EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.date-picker-pro .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 12 15;
+    -fx-prompt-text-fill: #9CA3AF;
+}
+
+.date-picker-pro:focused {
+    -fx-border-color: #FF8210;
+}
+
+/* Professional Orange Button */
+.btn-orange-pro {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-letter-spacing: 1;
+}
+
+.btn-orange-pro:hover {
+    -fx-background-color: #FF9F3D;
+    -fx-effect: dropshadow(gaussian, #FF821040, 8, 0, 0, 2);
+}
+
+.btn-orange-pro:pressed {
+    -fx-background-color: #E67300;
+}
+
+/* Professional Outline Orange Button */
+.btn-outline-orange-pro {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF8210;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.btn-outline-orange-pro:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+/* Professional Outline White Button */
+.btn-outline-white-pro {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-outline-white-pro:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-effect: dropshadow(gaussian, #FFFFFF40, 6, 0, 0, 2);
+}
+
+/* =========================================================
+   ROOT & CONTAINERS
+========================================================= */
+.root-container {
+    -fx-background-color: #F8F9FA;
+}
+
+.side-pane {
+    -fx-background-color: linear-gradient(to bottom right, #00447B, #002d52);
+}
+
+/* Auth card clip - ensures overlay animation stays within rounded bounds */
+.auth-card-clip {
+    -fx-background-radius: 15;
+}
+
+/* =========================================================
+   TEXT FIELDS
+========================================================= */
+.text-field-custom {
+    -fx-background-color: white;
+    -fx-border-color: #C0C0C0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 14px;
+}
+
+.text-field-custom:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* =========================================================
+   BUTTONS - ORANGE (Primary)
+========================================================= */
+.btn-orange {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-orange:hover {
+    -fx-background-color: #FFBD59;
+}
+
+.btn-orange:pressed {
+    -fx-background-color: #e67300;
+}
+
+/* =========================================================
+   BUTTONS - BLUE (Secondary)
+========================================================= */
+.btn-blue {
+    -fx-background-color: #00447B;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-blue:hover {
+    -fx-background-color: #679AC1;
+}
+
+.btn-blue:pressed {
+    -fx-background-color: #003366;
+}
+
+/* =========================================================
+   BUTTONS - OUTLINE WHITE
+========================================================= */
+.btn-outline-white {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-outline-white:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: #679AC1;
+    -fx-text-fill: #679AC1;
+}
+
+.btn-outline-white:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================================
+   BUTTONS - OUTLINE ORANGE
+========================================================= */
+.btn-outline-orange {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF8210;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-outline-orange:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+.btn-outline-orange:pressed {
+    -fx-background-color: #FFBD59;
+    -fx-border-color: #FFBD59;
+}
+
+/* =========================================================
+   BUTTONS - OUTLINE BLUE
+========================================================= */
+.btn-outline-blue {
+    -fx-background-color: transparent;
+    -fx-border-color: #00447B;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: #00447B;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-outline-blue:hover {
+    -fx-background-color: #00447B;
+    -fx-text-fill: white;
+}
+
+.btn-outline-blue:pressed {
+    -fx-background-color: #679AC1;
+    -fx-border-color: #679AC1;
+}
+
+/* =========================================================
+   TITLES & TEXT
+========================================================= */
+.title-dark {
+    -fx-fill: #00447B;
+    -fx-font-weight: bold;
+}
+
+.title-orange {
+    -fx-fill: #FF8210;
+    -fx-font-weight: bold;
+}
+
+.text-gray {
+    -fx-fill: #6C6D6F;
+}
+
+.text-light-gray {
+    -fx-fill: #C0C0C0;
+}
+
+/* Auth specific titles */
+.auth-title {
+    -fx-font-size: 32px;
+    -fx-fill: #00447B;
+    -fx-font-weight: bold;
+}
+
+.auth-subtitle {
+    -fx-font-size: 14px;
+    -fx-fill: #6C6D6F;
+}
+
+.auth-section-title {
+    -fx-font-size: 18px;
+    -fx-fill: #00447B;
+    -fx-font-weight: bold;
+}
+
+/* =========================================================
+   PASSWORD STRENGTH INDICATOR
+========================================================= */
+.password-strength-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.password-strength-faible {
+    -fx-text-fill: #E74C3C;
+}
+
+.password-strength-moyenne {
+    -fx-text-fill: #F39C12;
+}
+
+.password-strength-fort {
+    -fx-text-fill: #27AE60;
+}
+
+/* Toggle Password Visibility Button */
+.toggle-pass-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-padding: 0 12 0 0;
+    -fx-alignment: center-right;
+}
+
+.toggle-pass-btn:hover {
+    -fx-text-fill: #FF8210;
+    -fx-opacity: 0.8;
+}
+
+/* =========================================================
+   LABELS
+========================================================= */
+.label-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.label-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: #6C6D6F;
+}
+
+.label-small {
+    -fx-font-size: 12px;
+    -fx-text-fill: #C0C0C0;
+}
+
+/* Form labels */
+.form-label {
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 13px;
+}
+
+.section-title-profile {
+    -fx-font-weight: bold;
+    -fx-fill: #6C6D6F;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 14px;
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
+    -fx-padding: 20;
+}
+
+.card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0, 0, 4);
+}
+
+/* =========================================================
+   TABLE VIEW
+========================================================= */
+.table-view {
+    -fx-background-color: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: #00447B;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #679AC1;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-row-cell:selected .btn-outline-orange {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #e8f4fc;
+}
+
+.table-view .table-row-cell:hover .table-cell {
+    -fx-text-fill: #00447B;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+.badge-available {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+    -fx-background-radius: 15;
+}
+
+.badge-occupied {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+    -fx-background-radius: 15;
+}
+
+.badge-maintenance {
+    -fx-background-color: #6C6D6F;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+    -fx-background-radius: 15;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+.sidebar {
+    -fx-background-color: #00447B;
+}
+
+.sidebar-item {
+    -fx-text-fill: white;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: #679AC1;
+}
+
+.sidebar-item-active {
+    -fx-background-color: #FF8210;
+}
+
+/* =========================================================
+   COMBO BOX
+========================================================= */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #C0C0C0;
+    -fx-border-radius: 5;
+}
+
+.combo-box:hover {
+    -fx-border-color: #FF8210;
+}
+
+.combo-box:focused {
+    -fx-border-color: #00447B;
+}
+
+/* =========================================================
+   SCROLL PANE
+========================================================= */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #C0C0C0;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #6C6D6F;
+}
+
+/* =========================================================
+   DATE PICKER
+========================================================= */
+.date-picker-custom .text-field {
+    -fx-background-color: white;
+    -fx-border-color: #C0C0C0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 14px;
+}
+
+.date-picker-custom .text-field:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* =========================================================
+   SCROLL PANE AUTH (PROFILE)
+========================================================= */
+.scroll-pane-auth {
+    -fx-background-color: #F8F9FA;
+    -fx-background-insets: 0;
+}
+
+.scroll-pane-auth .viewport {
+    -fx-background-color: transparent;
+}
+
+/* =========================================================
+   BUTTON BACK (Auth/Profile)
+========================================================= */
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00447B;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.btn-back:hover {
+    -fx-text-fill: #FF8210;
+}
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.admin.UserManagementController"
+      styleClass="admin-content-area" spacing="15" prefHeight="700" prefWidth="1100">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <HBox styleClass="admin-header" alignment="CENTER_LEFT" spacing="10">
+        <Button text="← Retour" onAction="#handleBack" styleClass="btn-dashboard" style="-fx-background-color: #6C6D6F; -fx-text-fill: white;"/>
+        <Label text="Gestion des utilisateurs" styleClass="admin-header-title"/>
+    </HBox>
+
+    <Separator/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Rechercher (nom, email)..." prefWidth="250" styleClass="admin-search-field"/>
+        <ComboBox fx:id="roleFilter" prefWidth="120" styleClass="form-input-dashboard"/>
+        <ComboBox fx:id="statusFilter" prefWidth="120" styleClass="form-input-dashboard"/>
+    </HBox>
+
+    <Label fx:id="loadingLabel" text="Chargement des utilisateurs..." visible="false" style="-fx-text-fill: #FF8210; -fx-font-size: 13px;"/>
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <VBox styleClass="admin-table-container" spacing="10" HBox.hgrow="ALWAYS">
+            <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
+                    <TableColumn fx:id="colRole" text="Rôle" prefWidth="80"/>
+                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="80"/>
+                    <TableColumn fx:id="colTelephone" text="Téléphone" prefWidth="120"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <VBox spacing="10" prefWidth="320" styleClass="admin-user-card">
+            <Label fx:id="formTitle" text="Nouvel Utilisateur" styleClass="admin-header-title"/>
+            <TextField fx:id="nomField" promptText="Nom" styleClass="form-input-dashboard"/>
+            <TextField fx:id="emailField" promptText="Email" styleClass="form-input-dashboard"/>
+            <TextField fx:id="telephoneField" promptText="Téléphone" styleClass="form-input-dashboard"/>
+            <DatePicker fx:id="dateNaissancePicker" promptText="Date de naissance" prefWidth="280" styleClass="form-input-dashboard"/>
+            <ComboBox fx:id="roleCombo" promptText="Rôle" prefWidth="280" styleClass="form-input-dashboard"/>
+            <ComboBox fx:id="statusCombo" promptText="Statut" prefWidth="280" styleClass="form-input-dashboard"/>
+            <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="form-input-dashboard"/>
+            <HBox spacing="10">
+                <Button fx:id="saveButton" text="CRÉER" onAction="#handleSave" styleClass="btn-dashboard" style="-fx-background-color: #FF8210; -fx-text-fill: white;" prefWidth="100"/>
+                <Button text="Annuler" onAction="#handleCancel" styleClass="admin-filter-btn" prefWidth="80"/>
+                <Button fx:id="deleteButton" text="Supprimer" onAction="#handleDelete" visible="false"
+                        styleClass="btn-dashboard" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" prefWidth="90"/>
+            </HBox>
+            <Button text="Nouveau" onAction="#handleNew" styleClass="admin-filter-btn"/>
+        </VBox>
+    </HBox>
+</VBox>

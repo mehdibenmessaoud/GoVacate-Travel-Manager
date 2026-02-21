@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.admin.UserStatisticsController"
+      styleClass="admin-content-area" spacing="20" prefHeight="750" prefWidth="1100">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <HBox styleClass="admin-header" alignment="CENTER_LEFT" spacing="10">
+        <Button text="← Retour" onAction="#handleBack" styleClass="btn-dashboard" style="-fx-background-color: #6C6D6F; -fx-text-fill: white;"/>
+        <Label text="Statistiques utilisateurs" styleClass="admin-header-title"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox styleClass="admin-stat-card" spacing="10">
+        <GridPane hgap="15" vgap="15">
+            <Label text="Total utilisateurs:" styleClass="admin-stat-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <Label fx:id="totalUsersLabel" text="0" styleClass="admin-stat-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <Label text="Administrateurs:" styleClass="admin-stat-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <Label fx:id="adminCountLabel" text="0" styleClass="admin-stat-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <Label text="Clients:" styleClass="admin-stat-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Label fx:id="clientCountLabel" text="0" styleClass="admin-stat-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Label text="Comptes actifs:" styleClass="admin-stat-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <Label fx:id="activeCountLabel" text="0" styleClass="admin-stat-value admin-stat-value-green" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <Label text="Sessions actives:" styleClass="admin-stat-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <Label fx:id="activeSessionsLabel" text="0" styleClass="admin-stat-value admin-stat-value-orange" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        </GridPane>
+    </VBox>
+
+    <HBox spacing="30" VBox.vgrow="ALWAYS">
+        <VBox spacing="5" HBox.hgrow="ALWAYS" styleClass="admin-chart-container">
+            <PieChart fx:id="roleChart"/>
+        </VBox>
+        <VBox spacing="5" HBox.hgrow="ALWAYS" styleClass="admin-chart-container">
+            <PieChart fx:id="statusChart"/>
+        </VBox>
+    </HBox>
+
+    <Label text="Derniers utilisateurs inscrits" styleClass="admin-stat-label"/>
+    <TableView fx:id="recentUsersTable" prefHeight="120" styleClass="admin-table-container">
+        <columns>
+            <TableColumn fx:id="colRecentNom" text="Nom" prefWidth="150"/>
+            <TableColumn fx:id="colRecentRole" text="Rôle" prefWidth="100"/>
+            <TableColumn fx:id="colRecentDate" text="Date" prefWidth="120"/>
+        </columns>
+    </TableView>
+
+    <Button text="Rafraîchir" onAction="#handleRefresh" styleClass="btn-dashboard" style="-fx-background-color: #FF8210; -fx-text-fill: white;" prefWidth="120"/>
+</VBox>

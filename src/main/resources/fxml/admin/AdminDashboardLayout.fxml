@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="850.0" prefWidth="1300.0" styleClass="root-pane"
+            stylesheets="@../../css/admin-style.css"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.projet.gui.admin.AdminDashboardController">
+
+    <left>
+        <VBox prefWidth="260.0" styleClass="sidebar-liquid" spacing="10">
+            <padding>
+                <Insets top="40" right="15" bottom="20" left="15"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <VBox.margin><Insets bottom="40"/></VBox.margin>
+                <Region prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #FF8210; -fx-background-radius: 8;"/>
+                <Label text="GoVacate" styleClass="logo-text" style="-fx-font-size: 22;"/>
+            </HBox>
+
+            <Label text="MENU PRINCIPAL" styleClass="stat-label" style="-fx-opacity: 0.5;">
+                <VBox.margin><Insets left="10" bottom="5"/></VBox.margin>
+            </Label>
+
+            <Button fx:id="btnDashboard" onAction="#showHome" text="Tableau de Bord" styleClass="liquid-btn active" maxWidth="Infinity"/>
+            <Button fx:id="btnUsers" onAction="#showUsers" text="Gestion Utilisateurs" styleClass="liquid-btn" maxWidth="Infinity"/>
+
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Separator style="-fx-opacity: 0.1;" />
+
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="glass-panel" style="-fx-padding: 10;">
+                <Circle fx:id="avatarCircle" radius="18" fill="#FF8210" />
+                <VBox>
+                    <Label fx:id="adminName" text="Admin Name" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;"/>
+                    <Label text="Administrateur" styleClass="stat-label"/>
+                </VBox>
+            </HBox>
+
+            <Button onAction="#handleLogout" text="Déconnexion" styleClass="liquid-btn" style="-fx-text-fill: #FF5252;" maxWidth="Infinity"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox styleClass="deep-water-bg">
+            <padding>
+                <Insets bottom="30" left="30" right="30" top="30" />
+            </padding>
+
+            <HBox fx:id="actionButtonsContainer" spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 0 0 20 0;" visible="false">
+                <Button fx:id="addButton" onAction="#handleNew" styleClass="btn-orange-glow" text="+ Ajouter" prefWidth="120" />
+                <Button fx:id="editButton" onAction="#handleSave" styleClass="btn-orange-glow"
+                        text="Modifier" prefWidth="120" style="-fx-background-color: #2D4A6E;" />
+                <Button fx:id="deleteButton" onAction="#handleDelete" styleClass="btn-orange-glow"
+                        text="Supprimer" prefWidth="120" style="-fx-background-color: #C0392B;" />
+            </HBox>
+
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </center>
+</BorderPane>

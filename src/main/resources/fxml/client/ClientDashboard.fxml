@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<VBox spacing="30" prefHeight="700" prefWidth="1000"
+      styleClass="client-main-container"
+      stylesheets="@../../css/client-dashboard-style.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.client.ClientDashboardController">
+
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox HBox.hgrow="ALWAYS" spacing="5">
+            <Label fx:id="welcomeLabel" text="Bonjour, Voyageur !" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="Où partons-nous aujourd'hui ?" style="-fx-text-fill: #679AC1; -fx-font-size: 16;"/>
+        </VBox>
+        <HBox spacing="15" alignment="CENTER" styleClass="glass-panel" style="-fx-padding: 10 20 10 20;">
+            <Circle radius="18" fill="#FF8210" stroke="WHITE" strokeWidth="1"/>
+            <Label fx:id="clientNameLabel" text="Mon Compte" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+    </HBox>
+
+    <Separator opacity="0.1"/>
+
+    <FlowPane hgap="25" vgap="25">
+        <VBox onMouseClicked="#handleReservations" styleClass="action-card-client" spacing="15" prefWidth="280" prefHeight="180">
+            <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+            <StackPane alignment="CENTER_LEFT">
+                <Circle radius="25" fill="rgba(255, 130, 16, 0.2)"/>
+                <Region style="-fx-background-color: #FF8210;" prefWidth="25" prefHeight="25" maxWidth="25" maxHeight="25">
+                    <StackPane.margin><Insets left="12"/></StackPane.margin>
+                </Region>
+            </StackPane>
+            <VBox spacing="5">
+                <Label text="Mes Voyages" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
+                <Label text="Gérer vos réservations en cours" style="-fx-text-fill: #679AC1; -fx-font-size: 12;"/>
+            </VBox>
+        </VBox>
+
+        <VBox onMouseClicked="#handleExplore" styleClass="action-card-client" spacing="15" prefWidth="280" prefHeight="180">
+            <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+            <StackPane alignment="CENTER_LEFT">
+                <Circle radius="25" fill="rgba(39, 174, 96, 0.2)"/>
+                <Region style="-fx-background-color: #27AE60;" prefWidth="25" prefHeight="25" maxWidth="25" maxHeight="25">
+                    <StackPane.margin><Insets left="12"/></StackPane.margin>
+                </Region>
+            </StackPane>
+            <VBox spacing="5">
+                <Label text="Explorer" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
+                <Label text="Vols, Hôtels et Activités" style="-fx-text-fill: #679AC1; -fx-font-size: 12;"/>
+            </VBox>
+        </VBox>
+    </FlowPane>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Modifier mon Profil" onAction="#handleProfile" styleClass="btn-secondary" prefHeight="45" prefWidth="180"/>
+        <Button text="Déconnexion" onAction="#handleLogout" styleClass="btn-danger" prefHeight="45" prefWidth="140"/>
+    </HBox>
+</VBox>
