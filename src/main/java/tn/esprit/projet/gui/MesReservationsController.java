@@ -78,25 +78,31 @@ public class MesReservationsController {
             @Override
             protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) setGraphic(null);
-                else {
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
                     String status = item.toString().toUpperCase();
                     Label badge = new Label(status);
-                    badge.getStyleClass().add("status-badge");
+
+                    // Design Professionnel : Fond semi-transparent, bordure et taille fixe
+                    badge.setMinWidth(110); // Empêche le texte d'être coupé
+                    badge.setAlignment(Pos.CENTER);
+
+                    String baseStyle = "-fx-padding: 6 12; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: white;";
 
                     if (status.contains("CONFIRME") || status.contains("DISPONIBLE")) {
-                        badge.setStyle("-fx-background-color: rgba(74, 222, 128, 0.2); -fx-text-fill: #4ADE80; -fx-padding: 5 12; -fx-background-radius: 10;");
-                    } else if (status.contains("ATTENTE") || status.contains("OCCUPÉ")) {
-                        badge.setStyle("-fx-background-color: rgba(251, 146, 60, 0.2); -fx-text-fill: #FB923C; -fx-padding: 5 12; -fx-background-radius: 10;");
+                        badge.setStyle(baseStyle + "-fx-background-color: #27ae60;"); // Vert émeraude
+                    } else if (status.contains("ATTENTE") || status.contains("OCCUPE")) {
+                        badge.setStyle(baseStyle + "-fx-background-color: #e67e22;"); // Orange pro
                     } else {
-                        badge.setStyle("-fx-background-color: rgba(148, 163, 184, 0.2); -fx-text-fill: #94A3B8; -fx-padding: 5 12; -fx-background-radius: 10;");
+                        badge.setStyle(baseStyle + "-fx-background-color: #7f8c8d;"); // Gris moderne
                     }
+
                     setGraphic(badge);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
-
         colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
         colDate.setCellFactory(column -> new TableCell<>() {
             @Override
