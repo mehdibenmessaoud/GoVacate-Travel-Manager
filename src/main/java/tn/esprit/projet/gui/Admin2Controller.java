@@ -183,20 +183,25 @@ public class Admin2Controller implements Initializable {
     @FXML
     private void onAddButtonClicked() {
         try {
+            // 1. Charger le fichier FXML du formulaire
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/PackForm.fxml"));
-            Parent formView = loader.load();
+            Parent form = loader.load();
 
-            // On accède au BorderPane qui est dans le rootPane
-            BorderPane mainLayout = (BorderPane) rootPane.getChildren().stream()
-                    .filter(node -> node instanceof BorderPane)
-                    .findFirst()
-                    .orElse(null);
+            // 2. Trouver dynamiquement le BorderPane principal (mainLayout)
+            // On utilise la table (packTable) pour remonter jusqu'à la scène actuelle
+            BorderPane layout = (BorderPane) packTable.getScene().lookup("#mainLayout");
 
-            if (mainLayout != null) {
-                mainLayout.setCenter(formView); // On remplace la table par le formulaire
+            if (layout != null) {
+                // 3. Remplacer la table des packs par le formulaire au centre
+                layout.setCenter(form);
+                System.out.println("✅ Formulaire chargé au centre du layout.");
+            } else {
+                // Si vraiment on ne trouve pas mainLayout, on affiche une alerte
+                showAlert("Erreur de Navigation", "Le conteneur principal 'mainLayout' est introuvable.");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger le formulaire : " + e.getMessage());
         }
     }
 
