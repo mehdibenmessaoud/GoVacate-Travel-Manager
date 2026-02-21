@@ -103,7 +103,7 @@ public class Admin2Controller implements Initializable {
                 // Application des styles définis dans votre admin.css
                 btnDetails.getStyleClass().add("btn-table-details"); // Style bleu translucide
                 btnEdit.getStyleClass().add("btn-table-edit");
-                btnDelete.getStyleClass().add("btn-delete-table"); // Style orange translucide
+                btnDelete.getStyleClass().add("btn-table-delete"); // Style orange translucide
 
                 // Actions
                 btnDetails.setOnAction(event -> handleViewDetails(getTableView().getItems().get(getIndex())));
