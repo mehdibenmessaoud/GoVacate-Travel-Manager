@@ -3,93 +3,77 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
 
-<ScrollPane fitToWidth="true" styleClass="scroll-pane" stylesheets="@css/admin.css"
-            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.projet.gui.PackFormController">
-    <VBox spacing="25.0" style="-fx-background-color: transparent;">
-        <padding>
-            <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
-        </padding>
+<VBox alignment="CENTER" spacing="20.0" styleClass="main-content" stylesheets="@css/admin.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.PackFormController">
+    <padding>
+        <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+    </padding>
 
-        <VBox spacing="5.0">
-            <Label styleClass="text-header" text="Gestion du Pack" />
-            <Label styleClass="text-sub" text="Remplissez les détails du voyage, choisissez la destination et les services associés." />
-        </VBox>
+    <VBox maxWidth="900.0" spacing="15.0" styleClass="glass-card">
+        <children>
+            <Text fx:id="formTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Détails du Pack Voyage" />
 
-        <VBox spacing="25.0" styleClass="glass-card">
-            <padding>
-                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-            </padding>
+            <Separator opacity="0.2" prefWidth="200.0" />
 
-            <GridPane hgap="30.0" vgap="25.0">
+            <GridPane hgap="20.0" vgap="15.0">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
                 </columnConstraints>
 
                 <children>
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label styleClass="search-label" text="Nom du Pack" />
-                        <TextField fx:id="nameField" promptText="Ex: Safari Tanzanie" styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label styleClass="search-label" text="Catégorie" />
-                        <ComboBox fx:id="categoryCombo" maxWidth="1.7976931348623157E308" promptText="Sélectionner..." styleClass="form-input" />
-                    </VBox>
+                    <Label text="Nom du Pack :" textFill="WHITE" />
+                    <TextField fx:id="nameField" promptText="Ex: Safari Tanzanie" styleClass="modern-textfield" GridPane.columnIndex="1" />
 
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                        <Label styleClass="search-label" text="Destination (Ville)" />
-                        <ComboBox fx:id="destinationCombo" maxWidth="1.7976931348623157E308" promptText="Choisir la destination..." styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label styleClass="search-label" text="Hôtel" />
-                        <ComboBox fx:id="hotelCombo" maxWidth="1.7976931348623157E308" promptText="Choisir d'abord une destination" styleClass="form-input" />
-                    </VBox>
+                    <Label text="Catégorie :" textFill="WHITE" GridPane.columnIndex="2" />
+                    <ComboBox fx:id="categoryCombo" prefWidth="250.0" promptText="Choisir..." styleClass="modern-combo" GridPane.columnIndex="3" />
 
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                        <Label styleClass="search-label" text="Excursion (Optionnel)" />
-                        <ComboBox fx:id="excursionCombo" maxWidth="1.7976931348623157E308" promptText="Excursions disponibles..." styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                        <Label styleClass="search-label" text="Prix du Pack (DT)" />
-                        <TextField fx:id="priceField" promptText="Ex: 1200.0" styleClass="form-input" />
-                    </VBox>
+                    <Label text="Destination :" textFill="WHITE" GridPane.rowIndex="1" />
+                    <ComboBox fx:id="destinationCombo" prefWidth="250.0" promptText="Sélectionnez..." styleClass="modern-combo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                        <Label styleClass="search-label" text="Date de Départ" />
-                        <DatePicker fx:id="dateDepPicker" maxWidth="1.7976931348623157E308" styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                        <Label styleClass="search-label" text="Date d'Arrivée" />
-                        <DatePicker fx:id="dateArrPicker" maxWidth="1.7976931348623157E308" styleClass="form-input" />
-                    </VBox>
+                    <Label text="Hôtel :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <ComboBox fx:id="hotelCombo" prefWidth="250.0" promptText="Choisir destination d'abord" styleClass="modern-combo" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="4">
-                        <Label styleClass="search-label" text="Durée (Nombre de jours)" />
-                        <TextField fx:id="durationField" promptText="Ex: 7" styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                        <Label styleClass="search-label" text="Statut" />
-                        <ComboBox fx:id="statusCombo" maxWidth="1.7976931348623157E308" promptText="Disponibilité..." styleClass="form-input" />
-                    </VBox>
+                    <Label text="Excursion :" textFill="WHITE" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="excursionCombo" prefWidth="250.0" promptText="Optionnel..." styleClass="modern-combo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Prix (DT) :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <TextField fx:id="priceField" promptText="0.0" styleClass="modern-textfield" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                    <Label text="Date Départ :" textFill="WHITE" GridPane.rowIndex="3" />
+                    <DatePicker fx:id="dateDepPicker" styleClass="modern-datepicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label text="Date Arrivée :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                    <DatePicker fx:id="dateArrPicker" styleClass="modern-datepicker" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+
+                    <Label text="Durée (Jours) :" textFill="WHITE" GridPane.rowIndex="4" />
+                    <TextField fx:id="durationField" promptText="Ex: 7" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                    <Label text="Statut :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                    <ComboBox fx:id="statusCombo" prefWidth="250.0" styleClass="modern-combo" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+
+                    <Label text="Description :" textFill="WHITE" GridPane.rowIndex="5" />
+                    <TextArea fx:id="descriptionArea" prefHeight="80.0" promptText="Détails du voyage..." styleClass="modern-textarea" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+
+                    <Label text="Image :" textFill="WHITE" GridPane.rowIndex="6" />
+                    <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
+                        <children>
+                            <TextField fx:id="imageField" editable="false" prefWidth="300.0" promptText="Aucune image sélectionnée" styleClass="modern-textfield" HBox.hgrow="SOMETIMES" />
+                            <Button minWidth="-Infinity" styleClass="btn-orange-glow" text="Choisir une image" />
+                        </children>
+                    </HBox>
                 </children>
             </GridPane>
 
-            <VBox spacing="8">
-                <Label styleClass="search-label" text="Description détaillée" />
-                <TextArea fx:id="descriptionArea" prefHeight="100.0" promptText="Décrivez le contenu du pack..." styleClass="form-input-area" wrapText="true" />
-            </VBox>
-
-            <VBox spacing="8">
-                <Label styleClass="search-label" text="Nom de l'image (ex: voyage.jpg)" />
-                <TextField fx:id="imageField" promptText="image_pack.jpg" styleClass="form-input" />
-            </VBox>
-        </VBox>
-
-        <HBox alignment="CENTER_RIGHT" spacing="20.0">
-            <Button onAction="#handleCancel" prefHeight="50.0" prefWidth="150.0" style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white;" styleClass="btn-orange-glow" text="Annuler" />
-            <Button onAction="#handleSave" prefHeight="50.0" prefWidth="220.0" styleClass="btn-orange-glow" text="Enregistrer le Pack" />
-        </HBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 0 0 0;">
+                <children>
+                    <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: white; -fx-border-radius: 8;" text="Annuler" />
+                    <Button onAction="#handleSave" prefHeight="40.0" prefWidth="180.0" styleClass="btn-orange-glow" text="Enregistrer le Pack" />
+                </children>
+            </HBox>
+        </children>
     </VBox>
-</ScrollPane>
+</VBox>
