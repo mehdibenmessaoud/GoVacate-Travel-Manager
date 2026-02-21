@@ -21,9 +21,9 @@
             <HBox alignment="CENTER_LEFT" spacing="15.0" prefHeight="70.0" styleClass="search-bar-liquid">
                 <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                     <Label styleClass="search-label" text="Rechercher une excursion"/>
-                    <TextField fx:id="searchField" onAction="#handleSearch" promptText="Nom ou activité..." styleClass="search-field"/>
+                    <TextField fx:id="searchField"  promptText="Nom ou activité..." styleClass="search-field"/>
                 </VBox>
-                <Button onAction="#handleSearch" prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher"/>
+                <Button  prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher"/>
                 <Button onAction="#onAddExcursion" prefHeight="50.0" prefWidth="180.0" styleClass="btn-orange-glow" text="+ Ajouter Excursion"/>
             </HBox>
         </VBox>

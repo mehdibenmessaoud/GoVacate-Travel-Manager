@@ -2,7 +2,7 @@ package tn.esprit.projet.gui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.FilteredList; // Import essentiel
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -37,39 +37,60 @@ public class AdminExcursionController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         excursionService = new ExcursionService(MyDBConnexion.getInstance().getConnection());
 
-        // Configuration des colonnes
+        // 1. Configuration des colonnes
         colNom.setCellValueFactory(new PropertyValueFactory<>("name"));
         colActivite.setCellValueFactory(new PropertyValueFactory<>("activite"));
         colPrix.setCellValueFactory(new PropertyValueFactory<>("price"));
         colDuree.setCellValueFactory(new PropertyValueFactory<>("duration"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // 2. Configuration des boutons d'actions (Modifier, Supprimer, Détails)
         setupActionsColumn();
+
+        // 3. Chargement initial des données
         loadData();
+
+        // 4. Mise en place de la recherche dynamique (Temps réel)
+        setupDynamicSearch();
     }
 
     private void loadData() {
         try {
             masterData.setAll(excursionService.getAll());
-            excursionTable.setItems(masterData);
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Erreur de chargement", "Impossible de récupérer les excursions depuis la base de données.");
+            showAlert("Erreur de chargement", "Impossible de récupérer les excursions.");
         }
     }
 
-    @FXML
-    private void handleSearch() {
-        String query = searchField.getText().toLowerCase().trim();
-        if (query.isEmpty()) {
-            excursionTable.setItems(masterData);
-            return;
-        }
+    private void setupDynamicSearch() {
+        // On crée une FilteredList basée sur masterData
+        FilteredList<Excursion> filteredData = new FilteredList<>(masterData, p -> true);
 
-        FilteredList<Excursion> filteredData = new FilteredList<>(masterData, e ->
-                e.getName().toLowerCase().contains(query) ||
-                        e.getActivite().toLowerCase().contains(query)
-        );
+        // On écoute chaque changement de texte dans le searchField
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(excursion -> {
+                // Si le texte est vide, on affiche tout
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase().trim();
+
+                // Filtrage sur le Nom ou l'Activité
+                if (excursion.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (excursion.getActivite().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (excursion.getStatus().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+
+                return false; // Aucune correspondance
+            });
+        });
+
+        // Très important : On lie la liste filtrée à la TableView
         excursionTable.setItems(filteredData);
     }
 
@@ -83,16 +104,11 @@ public class AdminExcursionController implements Initializable {
             {
                 container.setAlignment(Pos.CENTER);
 
-                btnDetails.getStyleClass().add("btn-table-details"); // Style bleu translucide
+                // Application des styles homogènes définis dans admin.css
+                btnDetails.getStyleClass().add("btn-table-details");
                 btnEdit.getStyleClass().add("btn-table-edit");
-                btnDelete.getStyleClass().add("btn-table-delete"); // Style orange translucide
+                btnDelete.getStyleClass().add("btn-table-delete");
 
-                // Style des boutons
-                /*btnDetails.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;");
-                btnEdit.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;");*/
-
-                // Actions des boutons
                 btnDetails.setOnAction(event -> handleViewDetails(getTableView().getItems().get(getIndex())));
                 btnEdit.setOnAction(event -> handleEditExcursion(getTableView().getItems().get(getIndex())));
                 btnDelete.setOnAction(event -> handleDeleteExcursion(getTableView().getItems().get(getIndex())));
@@ -101,22 +117,20 @@ public class AdminExcursionController implements Initializable {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(container);
-                }
+                setGraphic(empty ? null : container);
             }
         });
     }
 
+    // --- Méthodes de Navigation ---
+
     @FXML
     private void onAddExcursion() {
-        loadForm(null); // Mode Ajout
+        loadForm(null);
     }
 
     private void handleEditExcursion(Excursion e) {
-        loadForm(e); // Mode Modification
+        loadForm(e);
     }
 
     private void handleViewDetails(Excursion e) {
@@ -133,7 +147,7 @@ public class AdminExcursionController implements Initializable {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            showAlert("Erreur", "Impossible de charger la vue détaillée (ExcursionDetails.fxml).");
+            showAlert("Erreur", "Impossible de charger la vue détaillée.");
         }
     }
 
@@ -153,11 +167,13 @@ public class AdminExcursionController implements Initializable {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            showAlert("Erreur", "Impossible de charger le formulaire (ExcursionForm.fxml).");
+            showAlert("Erreur", "Impossible de charger le formulaire.");
         }
     }
 
     private void handleDeleteExcursion(Excursion e) {
+        if (e == null) return;
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer l'excursion : " + e.getName());
@@ -166,7 +182,7 @@ public class AdminExcursionController implements Initializable {
         if (confirm.showAndWait().get() == ButtonType.OK) {
             try {
                 excursionService.delete(e.getId());
-                masterData.remove(e); // Mise à jour dynamique de la liste
+                masterData.remove(e);
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 showAlert("Erreur SQL", "Une erreur est survenue lors de la suppression.");

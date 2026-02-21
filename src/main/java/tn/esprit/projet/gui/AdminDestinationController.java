@@ -2,6 +2,7 @@ package tn.esprit.projet.gui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList; // Pour la recherche dynamique
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.Node;
 import tn.esprit.projet.entities.Destination;
 import tn.esprit.projet.services.DestinationService;
 import tn.esprit.projet.utils.MyDBConnexion;
@@ -27,6 +27,7 @@ public class AdminDestinationController implements Initializable {
     @FXML private TableColumn<Destination, String> colNom, colPays, colVille;
     @FXML private TableColumn<Destination, Void> colActions;
     @FXML private TextField searchField;
+
     private DestinationService destService;
     private ObservableList<Destination> masterData = FXCollections.observableArrayList();
 
@@ -34,22 +35,59 @@ public class AdminDestinationController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         destService = new DestinationService(MyDBConnexion.getInstance().getConnection());
 
-        // Liaison des colonnes avec les attributs de l'entité Destination
+        // 1. Liaison des colonnes
         colNom.setCellValueFactory(new PropertyValueFactory<>("nameDestination"));
         colPays.setCellValueFactory(new PropertyValueFactory<>("pays"));
         colVille.setCellValueFactory(new PropertyValueFactory<>("ville"));
 
+        // 2. Configuration des boutons d'actions
         setupActionsColumn();
+
+        // 3. Chargement initial des données
         loadData();
+
+        // 4. Mise en place de la recherche dynamique (Temps réel)
+        setupDynamicSearch();
     }
 
     private void loadData() {
         try {
             masterData.setAll(destService.getAll());
-            destTable.setItems(masterData);
         } catch (SQLException e) {
             e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger les données : " + e.getMessage());
         }
+    }
+
+    private void setupDynamicSearch() {
+        // Créer une liste filtrée basée sur masterData
+        FilteredList<Destination> filteredData = new FilteredList<>(masterData, p -> true);
+
+        // Ajouter un écouteur sur le champ de recherche
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(destination -> {
+                // Si le champ est vide, on affiche tout
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase().trim();
+
+                // Recherche multi-critères (Nom, Pays ou Ville)
+                if (destination.getNameDestination().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (destination.getPays().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (destination.getVille().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+
+                return false; // Aucune correspondance
+            });
+        });
+
+        // Lier la liste filtrée à la TableView
+        destTable.setItems(filteredData);
     }
 
     private void setupActionsColumn() {
@@ -60,8 +98,10 @@ public class AdminDestinationController implements Initializable {
 
             {
                 container.setAlignment(Pos.CENTER);
+
+                // Style homogène avec admin.css
                 btnEdit.getStyleClass().add("btn-table-edit");
-                btnDelete.getStyleClass().add("btn-table-delete");
+                btnDelete.getStyleClass().add("btn-table-delete"); // Style orange/rouge corrigé
 
                 btnEdit.setOnAction(event -> handleEditDestination(getTableView().getItems().get(getIndex())));
                 btnDelete.setOnAction(event -> handleDeleteDestination(getTableView().getItems().get(getIndex())));
@@ -89,22 +129,22 @@ public class AdminDestinationController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/DestinationForm.fxml"));
             Parent formView = loader.load();
 
-            // Si on a un objet destination, on l'envoie au contrôleur du formulaire
             if (d != null) {
                 DestinationFormController controller = loader.getController();
                 controller.setUpdateMode(d);
             }
 
-            // On injecte le formulaire au centre du BorderPane principal
-            // On récupère le rootPane (StackPane) pour trouver le BorderPane
+            // Navigation sécurisée via lookup du mainLayout
             BorderPane mainLayout = (BorderPane) destTable.getScene().lookup("#mainLayout");
-            // Note : Assurez-vous que votre BorderPane dans adminView.fxml a l'id "mainLayout"
 
             if (mainLayout != null) {
                 mainLayout.setCenter(formView);
+            } else {
+                System.err.println("Erreur: mainLayout non trouvé dans la scène.");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            showAlert("Erreur", "Erreur lors du chargement du formulaire.");
         }
     }
 
@@ -112,43 +152,25 @@ public class AdminDestinationController implements Initializable {
         if (d == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
+        confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer la destination : " + d.getNameDestination());
-        confirm.setContentText("Attention : Supprimer cette destination pourrait affecter les Packs associés.");
+        confirm.setContentText("Voulez-vous vraiment supprimer cette destination ?");
 
         if (confirm.showAndWait().get() == ButtonType.OK) {
             try {
                 destService.delete(d.getId());
-                masterData.remove(d); // Mise à jour visuelle immédiate
-                System.out.println("✅ Destination supprimée");
+                masterData.remove(d); // Mise à jour dynamique de la liste
+                System.out.println("✅ Destination supprimée avec succès.");
             } catch (SQLException e) {
-                showAlert("Erreur", "Impossible de supprimer la destination : " + e.getMessage());
+                showAlert("Erreur", "Échec de la suppression : " + e.getMessage());
             }
         }
-    }
-
-    @FXML
-    private void handleSearch() {
-        String query = (searchField != null) ? searchField.getText().toLowerCase().trim() : "";
-
-        if (query.isEmpty()) {
-            destTable.setItems(masterData);
-            return;
-        }
-
-        // Filtrage sur le nom, le pays ou la ville
-        javafx.collections.transformation.FilteredList<Destination> filteredData = new javafx.collections.transformation.FilteredList<>(masterData, d ->
-                d.getNameDestination().toLowerCase().contains(query) ||
-                        d.getPays().toLowerCase().contains(query) ||
-                        d.getVille().toLowerCase().contains(query)
-        );
-
-        destTable.setItems(filteredData);
     }
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
+        alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }
