@@ -5,62 +5,101 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
 
-<VBox spacing="30" prefHeight="700" prefWidth="1000"
-      styleClass="client-main-container"
-      stylesheets="@../../css/client-dashboard-style.css"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="tn.esprit.projet.gui.client.ClientDashboardController">
+<StackPane prefHeight="700" prefWidth="1000"
+           xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.projet.gui.client.ClientDashboardController">
 
-    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+    <!-- Background with a subtle image or gradient -->
+    <Region style="-fx-background-color: linear-gradient(to bottom right, #34495e, #2c3e50);"/>
 
-    <HBox alignment="CENTER_LEFT" spacing="20">
-        <VBox HBox.hgrow="ALWAYS" spacing="5">
-            <Label fx:id="welcomeLabel" text="Bonjour, Voyageur !" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            <Label text="Où partons-nous aujourd'hui ?" style="-fx-text-fill: #679AC1; -fx-font-size: 16;"/>
-        </VBox>
-        <HBox spacing="15" alignment="CENTER" styleClass="glass-panel" style="-fx-padding: 10 20 10 20;">
-            <Circle radius="18" fill="#FF8210" stroke="WHITE" strokeWidth="1"/>
-            <Label fx:id="clientNameLabel" text="Mon Compte" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+    <VBox spacing="30" styleClass="client-main-container" stylesheets="@../../css/client-dashboard-style.css">
+        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+        <!-- Header Section -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <VBox HBox.hgrow="ALWAYS" spacing="5">
+                <Label fx:id="welcomeLabel" text="Bonjour, Voyageur !" style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);"/>
+                <Label text="Prêt pour une nouvelle aventure ?" style="-fx-text-fill: #bdc3c7; -fx-font-size: 16;"/>
+            </VBox>
+
+            <!-- Client Profile Badge -->
+            <HBox onMouseClicked="#handleProfile" spacing="15" alignment="CENTER" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 30; -fx-padding: 10 20; -fx-cursor: hand;">
+                <Circle radius="22" fill="#e67e22" stroke="WHITE" strokeWidth="2"/>
+                <Label fx:id="clientNameLabel" text="Mon Compte" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;"/>
+            </HBox>
         </HBox>
-    </HBox>
 
-    <Separator opacity="0.1"/>
+        <Separator opacity="0.2" style="-fx-background-color: white;"/>
 
-    <FlowPane hgap="25" vgap="25">
-        <VBox onMouseClicked="#handleReservations" styleClass="action-card-client" spacing="15" prefWidth="280" prefHeight="180">
-            <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
-            <StackPane alignment="CENTER_LEFT">
-                <Circle radius="25" fill="rgba(255, 130, 16, 0.2)"/>
-                <Region style="-fx-background-color: #FF8210;" prefWidth="25" prefHeight="25" maxWidth="25" maxHeight="25">
-                    <StackPane.margin><Insets left="12"/></StackPane.margin>
-                </Region>
-            </StackPane>
-            <VBox spacing="5">
-                <Label text="Mes Voyages" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
-                <Label text="Gérer vos réservations en cours" style="-fx-text-fill: #679AC1; -fx-font-size: 12;"/>
+        <!-- Dashboard Cards -->
+        <FlowPane hgap="30" vgap="30" prefWrapLength="900">
+
+            <!-- My Trips Card -->
+            <VBox onMouseClicked="#handleReservations" spacing="20" prefWidth="300" prefHeight="200"
+                  style="-fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 15; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 15; -fx-border-width: 1;">
+                <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+                <effect>
+                    <DropShadow color="#00000040" radius="10" offsetY="5"/>
+                </effect>
+
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <StackPane>
+                        <Circle radius="30" fill="rgba(52, 152, 219, 0.2)"/>
+                        <Label text="✈️" style="-fx-font-size: 24; -fx-text-fill: #3498db;"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="Mes Voyages" style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;"/>
+                        <Label text="Gérer vos réservations" style="-fx-text-fill: #95a5a6; -fx-font-size: 12;"/>
+                    </VBox>
+                </HBox>
+
+                <Label text="Consultez vos itinéraires, billets et informations de voyage."
+                       wrapText="true" style="-fx-text-fill: #bdc3c7; -fx-font-size: 13;"/>
+
+                <HBox alignment="BOTTOM_RIGHT" VBox.vgrow="ALWAYS">
+                    <Label text="Voir mes voyages →" style="-fx-text-fill: #3498db; -fx-font-weight: bold;"/>
+                </HBox>
             </VBox>
-        </VBox>
 
-        <VBox onMouseClicked="#handleExplore" styleClass="action-card-client" spacing="15" prefWidth="280" prefHeight="180">
-            <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
-            <StackPane alignment="CENTER_LEFT">
-                <Circle radius="25" fill="rgba(39, 174, 96, 0.2)"/>
-                <Region style="-fx-background-color: #27AE60;" prefWidth="25" prefHeight="25" maxWidth="25" maxHeight="25">
-                    <StackPane.margin><Insets left="12"/></StackPane.margin>
-                </Region>
-            </StackPane>
-            <VBox spacing="5">
-                <Label text="Explorer" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
-                <Label text="Vols, Hôtels et Activités" style="-fx-text-fill: #679AC1; -fx-font-size: 12;"/>
+            <!-- Explore Card -->
+            <VBox onMouseClicked="#handleExplore" spacing="20" prefWidth="300" prefHeight="200"
+                  style="-fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 15; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 15; -fx-border-width: 1;">
+                <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+                <effect>
+                    <DropShadow color="#00000040" radius="10" offsetY="5"/>
+                </effect>
+
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <StackPane>
+                        <Circle radius="30" fill="rgba(26, 188, 156, 0.2)"/>
+                        <Label text="🌍" style="-fx-font-size: 24; -fx-text-fill: #1abc9c;"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="Explorer" style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;"/>
+                        <Label text="Nouvelles destinations" style="-fx-text-fill: #95a5a6; -fx-font-size: 12;"/>
+                    </VBox>
+                </HBox>
+
+                <Label text="Trouvez des vols, hôtels et activités pour votre prochaine escapade."
+                       wrapText="true" style="-fx-text-fill: #bdc3c7; -fx-font-size: 13;"/>
+
+                <HBox alignment="BOTTOM_RIGHT" VBox.vgrow="ALWAYS">
+                    <Label text="Commencer l'exploration →" style="-fx-text-fill: #1abc9c; -fx-font-weight: bold;"/>
+                </HBox>
             </VBox>
-        </VBox>
-    </FlowPane>
 
-    <Region VBox.vgrow="ALWAYS"/>
+        </FlowPane>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
-        <Button text="Modifier mon Profil" onAction="#handleProfile" styleClass="btn-secondary" prefHeight="45" prefWidth="180"/>
-        <Button text="Déconnexion" onAction="#handleLogout" styleClass="btn-danger" prefHeight="45" prefWidth="140"/>
-    </HBox>
-</VBox>
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Footer Actions -->
+        <HBox spacing="20" alignment="CENTER_RIGHT">
+            <Button text="👤 Modifier mon Profil" onAction="#handleProfile"
+                    style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+            <Button text="🚪 Déconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+</StackPane>
