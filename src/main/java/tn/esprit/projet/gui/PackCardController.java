@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.projet.services.PackService;
 
 
 public class PackCardController {
@@ -24,14 +25,31 @@ public class PackCardController {
 
     // RENOMMÉ ICI
     @FXML private Label packStatus;
-
+    @FXML private Label packBadge; // Pour corriger l'erreur packBadge
+    private PackService packService = new PackService();
     private Pack currentPack;
 
     public void setData(Pack pack) {
         this.currentPack = pack;
-
+        int currentReservations = packService.getCurrentPackReservations(pack.getId());
+        double dynamicPrice = packService.calculateDynamicPackPrice(pack, currentReservations);
         if (packName != null) packName.setText(pack.getName());
-        if (packPrice != null) packPrice.setText(pack.getPrix() + " DT");
+        if (packPrice != null) packPrice.setText(dynamicPrice + " DT");
+
+        if (dynamicPrice < pack.getPrix()) {
+            packBadge.setText("🔥 PROMO");
+            packBadge.setVisible(true);
+            packPrice.setStyle("-fx-text-fill: #2ecc71;"); // Vert pour la promo
+        }
+        else if (currentReservations >= 20) {
+            packBadge.setText("⚡ POPULAIRE");
+            packBadge.setVisible(true);
+            packPrice.setStyle("-fx-text-fill: #e74c3c;"); // Rouge pour la forte demande
+        }
+        else {
+            packBadge.setVisible(false);
+            packPrice.setStyle("-fx-text-fill: #FF8210;"); // Orange par défaut
+        }
 
         // Utilisation du nouveau nom packStatus
         if (packStatus != null) {

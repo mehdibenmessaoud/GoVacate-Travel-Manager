@@ -99,9 +99,9 @@ public class ExcursionService implements IService<Excursion> {
         }
     }
 
-    public Excursion getById(int id) throws SQLException {
+    /*public Excursion getById(int id) throws SQLException {
         // Utilisation de 'locationId' pour la jointure et alias pour éviter les erreurs
-        String query = "SELECT e.*, d.ville, d.nom_pays FROM Excursion e " +
+        String query = "SELECT e.*, d.ville, d.pays, e.name, FROM Excursion e " +
                 "JOIN Destination d ON e.locationId = d.id WHERE e.id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -126,6 +126,42 @@ public class ExcursionService implements IService<Excursion> {
         }
         return null;
     }
+*/
+
+    public Excursion getById(int id) throws SQLException {
+        // 1. Correction de la requête : suppression de la virgule après e.name et correction de nom_pays -> pays
+        String query = "SELECT e.*, d.ville, d.pays, e.name AS excursion_name FROM Excursion e " +
+                "JOIN Destination d ON e.locationId = d.id WHERE e.id=?";
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // 2. Mappage des données de base (id, prix, etc.)
+                    Excursion e = mapResultSetToExcursion(rs);
+
+                    // 3. Récupération explicite du nom de l'excursion
+                    // rs.getString("name") fonctionne aussi si mapResultSetToExcursion ne le fait pas déjà
+                    e.setName(rs.getString("name"));
+
+                    // 4. Récupération sécurisée de la localisation (Correction de l'erreur Unknown Column)
+                    String ville = rs.getString("ville");
+                    String pays = rs.getString("pays"); // Changé de "nom_pays" à "pays"
+
+                    e.setVille(ville);
+                    e.setPays(pays);
+                    e.setFullLocation(ville + ", " + pays);
+
+                    // 5. Pour la météo et l'affichage dans PackDetailsController
+                    e.setDestinationName(ville);
+
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
 
     private Excursion mapResultSetToExcursion(ResultSet rs) throws SQLException {
         Excursion e = new Excursion(

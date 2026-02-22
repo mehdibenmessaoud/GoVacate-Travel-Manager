@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import java.io.File;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -7,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.*;
 import tn.esprit.projet.utils.MyDBConnexion;
@@ -25,6 +27,8 @@ public class PackFormController implements Initializable {
     @FXML private ComboBox<Hotel> hotelCombo;
     @FXML private ComboBox<Excursion> excursionCombo;
     @FXML private ComboBox<String> categoryCombo, statusCombo;
+    @FXML private TextField imagePathField;
+    private File selectedImageFile;
 
     private DestinationService destinationService;
     private HotelService hotelService;
@@ -139,6 +143,26 @@ public class PackFormController implements Initializable {
 
             // 5. Si toutes les validations passent, on prépare l'objet
             Pack p = (packAModifier != null) ? packAModifier : new Pack();
+            if (selectedImageFile != null) {
+                // Définir le dossier de destination
+                File destDir = new File("src/main/resources/images/");
+                if (!destDir.exists()) destDir.mkdirs();
+
+                // Créer le fichier de destination
+                File destFile = new File(destDir, selectedImageFile.getName());
+
+                // Copier le fichier physiquement (Nécessite import java.nio.file.Files et StandardCopyOption)
+                java.nio.file.Files.copy(
+                        selectedImageFile.toPath(),
+                        destFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+
+                p.setImageName(selectedImageFile.getName());
+            } else if (packAModifier == null) {
+                p.setImageName("default.jpg");
+            }
+
 
             p.setName(nameField.getText().trim());
             p.setDescription(descriptionArea.getText());
@@ -245,6 +269,26 @@ public class PackFormController implements Initializable {
 
         // Note: Le filtrage dynamique chargera les hôtels/excursions automatiquement
         // grâce au listener que nous avons déjà mis sur destinationCombo
+    }
+
+    @FXML
+    private void handleUploadImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir l'image du pack");
+
+        // Filtrer pour ne voir que les images
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
+        );
+
+        // Ouvrir la fenêtre de dialogue
+        File file = fileChooser.showOpenDialog(nameField.getScene().getWindow());
+
+        if (file != null) {
+            this.selectedImageFile = file;
+            // On affiche le nom du fichier dans le champ pour que l'admin voie son choix
+            imageField.setText(file.getName());
+        }
     }
 
 }

@@ -62,7 +62,8 @@
                     <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
                         <children>
                             <TextField fx:id="imageField" editable="false" prefWidth="300.0" promptText="Aucune image sélectionnée" styleClass="modern-textfield" HBox.hgrow="SOMETIMES" />
-                            <Button minWidth="-Infinity" styleClass="btn-orange-glow" text="Choisir une image" />
+
+                            <Button onAction="#handleUploadImage" minWidth="-Infinity" styleClass="btn-orange-glow" text="Choisir une image" />
                         </children>
                     </HBox>
                 </children>
