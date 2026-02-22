@@ -50,13 +50,13 @@
 
                 <VBox spacing="16" prefWidth="360" maxWidth="360" alignment="CENTER">
                     <TextField fx:id="loginEmail" promptText="Adresse email" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                    <HBox spacing="0" alignment="CENTER_LEFT" prefWidth="360" maxWidth="360">
-                        <StackPane HBox.hgrow="ALWAYS" prefWidth="360" maxWidth="360">
-                            <PasswordField fx:id="loginPass" promptText="Mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                            <TextField fx:id="loginPassVisible" promptText="Mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                        </StackPane>
-                        <Button fx:id="toggleLoginPass" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-translate-x: -40;"/>
-                    </HBox>
+                    <StackPane prefWidth="360" maxWidth="360" prefHeight="44">
+                        <PasswordField fx:id="loginPass" promptText="Mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <TextField fx:id="loginPassVisible" promptText="Mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <HBox alignment="CENTER_RIGHT" StackPane.alignment="CENTER_RIGHT" prefHeight="44" maxWidth="45" prefWidth="45" spacing="0">
+                            <Button fx:id="toggleLoginPass" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </HBox>
+                    </StackPane>
                     <Label fx:id="loginErrorLabel" visible="false" style="-fx-text-fill: #E74C3C; -fx-font-size: 12px;" wrapText="true" prefWidth="360" maxWidth="360" alignment="CENTER"/>
                 </VBox>
 
@@ -85,23 +85,23 @@
                     <TextField fx:id="signTel" promptText="Téléphone" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
                     <DatePicker fx:id="signDate" promptText="Date de naissance" styleClass="date-picker-pro" prefWidth="360" maxWidth="360"/>
 
-                    <HBox spacing="0" alignment="CENTER_LEFT" prefWidth="360" maxWidth="360">
-                        <StackPane HBox.hgrow="ALWAYS" prefWidth="360" maxWidth="360">
-                            <PasswordField fx:id="signPass" promptText="Mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                            <TextField fx:id="signPassVisible" promptText="Mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                        </StackPane>
-                        <Button fx:id="toggleSignPass" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-translate-x: -40;"/>
-                    </HBox>
+                    <StackPane prefWidth="360" maxWidth="360" prefHeight="44">
+                        <PasswordField fx:id="signPass" promptText="Mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <TextField fx:id="signPassVisible" promptText="Mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <HBox alignment="CENTER_RIGHT" StackPane.alignment="CENTER_RIGHT" prefHeight="44" maxWidth="45" prefWidth="45" spacing="0">
+                            <Button fx:id="toggleSignPass" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </HBox>
+                    </StackPane>
 
                     <Label fx:id="passwordStrengthLabel" styleClass="password-strength-label" visible="false" wrapText="true" prefWidth="360" maxWidth="360" alignment="CENTER"/>
 
-                    <HBox spacing="0" alignment="CENTER_LEFT" prefWidth="360" maxWidth="360">
-                        <StackPane HBox.hgrow="ALWAYS" prefWidth="360" maxWidth="360">
-                            <PasswordField fx:id="signPassConfirm" promptText="Confirmer le mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                            <TextField fx:id="signPassConfirmVisible" promptText="Confirmer le mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 15;"/>
-                        </StackPane>
-                        <Button fx:id="toggleSignPassConfirm" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-translate-x: -40;"/>
-                    </HBox>
+                    <StackPane prefWidth="360" maxWidth="360" prefHeight="44">
+                        <PasswordField fx:id="signPassConfirm" promptText="Confirmer le mot de passe" styleClass="text-field-pro" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <TextField fx:id="signPassConfirmVisible" promptText="Confirmer le mot de passe" styleClass="text-field-pro" visible="false" prefWidth="360" maxWidth="360" style="-fx-padding: 12 50 12 15;"/>
+                        <HBox alignment="CENTER_RIGHT" StackPane.alignment="CENTER_RIGHT" prefHeight="44" maxWidth="45" prefWidth="45" spacing="0">
+                            <Button fx:id="toggleSignPassConfirm" styleClass="toggle-pass-btn" text="👁" style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </HBox>
+                    </StackPane>
 
                     <Label fx:id="registerErrorLabel" visible="false" style="-fx-text-fill: #E74C3C; -fx-font-size: 12px;" wrapText="true" prefWidth="360" maxWidth="360" alignment="CENTER"/>
                 </VBox>
