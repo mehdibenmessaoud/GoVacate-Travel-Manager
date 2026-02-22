@@ -41,7 +41,7 @@ public class ClientTestLauncher extends Application {
 
             stage.setTitle("GoVacate - Mode Test Client");
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setResizable(true);
 
             // Sécurité : Arrêter le serveur quand on ferme la fenêtre
             stage.setOnCloseRequest(event -> {
