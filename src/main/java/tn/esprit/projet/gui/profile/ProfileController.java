@@ -252,7 +252,7 @@ public class ProfileController implements Initializable {
 
         executor.execute(() -> {
             try {
-                userService.modifierUser(currentUser);
+                userService.update(currentUser);
                 Platform.runLater(() -> {
                     showMessage("Profil mis a jour avec succes", "success");
                     SessionManager.login(currentUser);
@@ -383,4 +383,3 @@ public class ProfileController implements Initializable {
         }
     }
 }
-

@@ -31,7 +31,7 @@ public class UserService implements IService<User> {
      * Ajoute un utilisateur avec hashage du mot de passe (contrat IService).
      */
     @Override
-    public void ajouterUser(User u) throws SQLException {
+    public void create(User u) throws SQLException {
         if (emailExiste(u.getEmail())) {
             throw new SQLException("Email déjà utilisé: " + u.getEmail());
         }
@@ -39,6 +39,11 @@ public class UserService implements IService<User> {
             throw new SQLException("Échec de l'ajout de l'utilisateur");
         }
         System.out.println("✅ Utilisateur ajouté: " + u.getEmail());
+    }
+
+    // Alias pour compatibilité
+    public void ajouterUser(User u) throws SQLException {
+        create(u);
     }
 
     private boolean doInsertUser(User u) {
@@ -153,9 +158,14 @@ public class UserService implements IService<User> {
     }
 
     @Override
-    public List<User> recupererUser() throws SQLException {
+    public List<User> getAll() throws SQLException {
         return queryAllUsers("SELECT u.*, r.nom_role FROM utilisateur u LEFT JOIN role r ON u.role_id = r.id",
             "SELECT * FROM utilisateur");
+    }
+
+    // Alias pour compatibilité
+    public List<User> recupererUser() throws SQLException {
+        return getAll();
     }
 
     private List<User> queryAllUsers(String sqlWithJoin, String sqlNoJoin) throws SQLException {
@@ -174,6 +184,7 @@ public class UserService implements IService<User> {
         }
     }
 
+    @Override
     public User getById(int id) {
         return queryOneUserById(id);
     }
@@ -239,7 +250,7 @@ public class UserService implements IService<User> {
     }
 
     @Override
-    public void modifierUser(User u) throws SQLException {
+    public void update(User u) throws SQLException {
         String sql = "UPDATE utilisateur SET nom=?, email=?, telephone=?, date_naissance=?, role_id=?, status=? WHERE id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNom());
@@ -253,6 +264,11 @@ public class UserService implements IService<User> {
                 throw new SQLException("Aucune ligne mise à jour pour l'utilisateur id=" + u.getId());
             }
         }
+    }
+
+    // Alias pour compatibilité
+    public void modifierUser(User u) throws SQLException {
+        update(u);
     }
 
     /**
@@ -272,7 +288,7 @@ public class UserService implements IService<User> {
     }
 
     @Override
-    public void supprimerUser(int id) throws SQLException {
+    public void delete(int id) throws SQLException {
         String sql = "DELETE FROM utilisateur WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -280,6 +296,11 @@ public class UserService implements IService<User> {
                 throw new SQLException("Aucun utilisateur supprimé pour id=" + id);
             }
         }
+    }
+
+    // Alias pour compatibilité
+    public void supprimerUser(int id) throws SQLException {
+        delete(id);
     }
 
     // ============================================

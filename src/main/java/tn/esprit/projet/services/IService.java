@@ -3,10 +3,19 @@ package tn.esprit.projet.services;
 import java.sql.SQLException;
 import java.util.List;
 
-/** Interface générique pour les services CRUD utilisateur. */
 public interface IService<T> {
-    void ajouterUser(T t) throws SQLException;
-    void modifierUser(T t) throws SQLException;
-    void supprimerUser(int id) throws SQLException;
-    List<T> recupererUser() throws SQLException;
+    // Créer une nouvelle entrée
+    void create(T t) throws SQLException;
+
+    // Récupérer toutes les entrées
+    List<T> getAll() throws SQLException;
+
+    // Mettre à jour une entrée existante
+    void update(T t) throws SQLException;
+
+    // Supprimer une entrée par son identifiant
+    void delete(int id) throws SQLException;
+
+    // Récupérer une seule entrée par son identifiant
+    T getById(int id) throws SQLException;
 }

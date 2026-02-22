@@ -373,7 +373,7 @@ public class AuthController implements Initializable {
             }
 
             User newUser = new User(nom.trim(), email.trim(), pass, tel.trim(), dateN, 2, "actif");
-            userService.ajouterUser(newUser);
+            userService.create(newUser);
             showAlert("Succès", "Compte créé! Vous pouvez maintenant vous connecter.", Alert.AlertType.INFORMATION);
             clearRegisterFields();
             handleSwitch();
