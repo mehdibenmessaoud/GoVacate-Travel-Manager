@@ -53,17 +53,22 @@
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 </columnConstraints>
                 <children>
-                    <VBox spacing="5.0">
+                    <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                         <Label styleClass="meta-label" text="Période" />
                         <Label fx:id="datesLabel" styleClass="meta-value" text="Dates non spécifiées" />
                     </VBox>
 
-                    <VBox spacing="5.0" GridPane.columnIndex="1">
+                    <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <Label styleClass="meta-label" text="Prix par personne" />
-                        <Label fx:id="priceLabel" styleClass="meta-price" text="0.00 DT" />
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label fx:id="priceLabel" styleClass="meta-price" text="0.00 DT" />
+                            <Separator orientation="VERTICAL" prefHeight="20" opacity="0.3" />
+                            <ComboBox fx:id="currencyCombo" prefWidth="90.0" promptText="Devise" styleClass="combo-box-custom"/>
+                            <Label fx:id="convertedPriceLabel" text="" style="-fx-font-weight: bold; -fx-text-fill: #ff9800; -fx-font-size: 16px;"/>
+                        </HBox>
                     </VBox>
 
-                    <VBox spacing="5.0" GridPane.rowIndex="1">
+                    <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                         <Label styleClass="meta-label" text="Durée estimée" />
                         <Label fx:id="durationLabel" styleClass="meta-value" text="4 Heures" />
                     </VBox>

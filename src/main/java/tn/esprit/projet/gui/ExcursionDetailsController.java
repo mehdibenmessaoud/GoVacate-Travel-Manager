@@ -3,6 +3,7 @@ package tn.esprit.projet.gui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,6 +13,12 @@ import javafx.scene.text.Text;
 import tn.esprit.projet.entities.Excursion;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+import tn.esprit.projet.services.CurrencyService;
+
+import javafx.fxml.Initializable;
+import javafx.application.Platform; // Pour le thread de l'API
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -21,7 +28,7 @@ import javafx.application.Platform;
 import org.json.JSONObject; // Assure-toi d'avoir la bibliothèque JSON dans ton projet
 import tn.esprit.projet.services.WeatherService;
 
-public class ExcursionDetailsController {
+public class ExcursionDetailsController implements Initializable {
 
     @FXML private Label nameLabel;
     @FXML private Label activiteLabel;
@@ -42,8 +49,30 @@ public class ExcursionDetailsController {
     @FXML
     private Label descLabel;
 
+    @FXML private ComboBox<String> currencyCombo;
+    @FXML private Label convertedPriceLabel;
+
+    private double currentExcursionPrice; // Pour stocker le prix en DT
+
 
       //Remplit l'interface avec les données de l'excursion sélectionnée.
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        if (currencyCombo != null) {
+            currencyCombo.getItems().addAll("EUR", "USD", "GBP");
+
+            // Sélectionner EUR par défaut pour que l'utilisateur voit tout de suite l'utilité
+            currencyCombo.getSelectionModel().select("EUR");
+
+            currencyCombo.setOnAction(event -> {
+                String selected = currencyCombo.getValue();
+                if (selected != null) {
+                    updateConvertedPrice(selected);
+                }
+            });
+        }
+    }
 
     public void setExcursionData(Excursion e) {
         // 1. Remplissage des textes basiques
@@ -53,7 +82,10 @@ public class ExcursionDetailsController {
         if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
         if (statusLabel != null) statusLabel.setText(e.getStatus());
         if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
-
+        this.currentExcursionPrice = e.getPrice();
+        if (currencyCombo != null && currencyCombo.getValue() != null) {
+            updateConvertedPrice(currencyCombo.getValue());
+        }
         // 2. GESTION DE LA MÉTÉO (Dynamique grâce à la jointure SQL)
         // On vérifie que le nom de la destination est bien arrivé depuis le Service
         if (e.getDestinationName() != null && !e.getDestinationName().isEmpty()) {
@@ -224,6 +256,37 @@ public class ExcursionDetailsController {
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> descLabel.setText("Erreur météo"));
+            }
+        }).start();
+    }
+
+    private void updateConvertedPrice(String currency) {
+        // On vérifie que le prix de l'excursion n'est pas nul
+        if (currentExcursionPrice <= 0) {
+            System.out.println("Le prix actuel est invalide pour la conversion.");
+            return;
+        }
+
+        // On lance l'appel API dans un nouveau Thread pour ne pas bloquer l'interface (UI)
+        new Thread(() -> {
+            try {
+                // 1. Appel au service de change pour récupérer le taux
+                double rate = CurrencyService.getExchangeRate(currency);
+
+                // 2. Calcul du prix converti
+                double convertedValue = currentExcursionPrice * rate;
+
+                // 3. Mise à jour de l'interface graphique sur le thread principal JavaFX
+                Platform.runLater(() -> {
+                    if (rate > 0) {
+                        convertedPriceLabel.setText(String.format("≈ %.2f %s", convertedValue, currency));
+                    } else {
+                        convertedPriceLabel.setText("Erreur taux");
+                    }
+                });
+            } catch (Exception ex) {
+                System.err.println("Erreur lors de la conversion : " + ex.getMessage());
+                Platform.runLater(() -> convertedPriceLabel.setText("Indisponible"));
             }
         }).start();
     }
