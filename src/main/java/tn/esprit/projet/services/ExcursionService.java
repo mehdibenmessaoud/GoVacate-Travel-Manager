@@ -91,14 +91,28 @@ public class ExcursionService implements IService<Excursion> {
         }
     }
 
-    @Override
     public Excursion getById(int id) throws SQLException {
-        String query = "SELECT e.*, d.ville AS destination_name FROM Excursion e JOIN Destination d ON e.locationId = d.id WHERE e.id=?";
+        // Utilisation de 'locationId' pour la jointure et alias pour éviter les erreurs
+        String query = "SELECT e.*, d.ville, d.nom_pays FROM Excursion e " +
+                "JOIN Destination d ON e.locationId = d.id WHERE e.id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToExcursion(rs);
+                    // On mappe les données de base
+                    Excursion e = mapResultSetToExcursion(rs);
+
+                    // On récupère spécifiquement ville et pays pour le label
+                    String ville = rs.getString("ville");
+                    String pays = rs.getString("nom_pays");
+
+                    e.setVille(ville);
+                    e.setFullLocation(ville + ", " + pays);
+
+                    // On s'assure que destinationName est aussi rempli pour la météo
+                    e.setDestinationName(ville);
+
+                    return e;
                 }
             }
         }
@@ -121,8 +135,17 @@ public class ExcursionService implements IService<Excursion> {
                 rs.getString("images")
         );
 
-        // Indispensable pour ton contrôleur météo
-        e.setDestinationName(rs.getString("destination_name"));
+        // Protection : on ne lit destination_name que si la colonne existe dans le ResultSet
+        try {
+            e.setDestinationName(rs.getString("ville"));
+        } catch (SQLException ex) {
+            // Si on vient d'une méthode qui utilise l'alias AS destination_name
+            try {
+                e.setDestinationName(rs.getString("destination_name"));
+            } catch (SQLException ex2) {
+                e.setDestinationName(null);
+            }
+        }
         return e;
     }
 }

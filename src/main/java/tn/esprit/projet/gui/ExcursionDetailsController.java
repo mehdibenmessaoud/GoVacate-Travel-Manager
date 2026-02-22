@@ -39,6 +39,7 @@ public class ExcursionDetailsController implements Initializable {
     @FXML private Label maxParticipantsLabel;
     @FXML private Text descriptionLabel;
     @FXML private HBox imageContainer;
+    @FXML private Label locationLabel; // Pour afficher "Ville, Pays"
 
     @FXML
     private ImageView weatherIcon;
@@ -75,6 +76,9 @@ public class ExcursionDetailsController implements Initializable {
     }
 
     public void setExcursionData(Excursion e) {
+        // 0. Stockage du prix pour la conversion monétaire
+        this.currentExcursionPrice = e.getPrice();
+
         // 1. Remplissage des textes basiques
         if (nameLabel != null) nameLabel.setText(e.getName());
         if (activiteLabel != null) activiteLabel.setText(e.getActivite());
@@ -82,26 +86,40 @@ public class ExcursionDetailsController implements Initializable {
         if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
         if (statusLabel != null) statusLabel.setText(e.getStatus());
         if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
-        this.currentExcursionPrice = e.getPrice();
+
+        // 2. Gestion unifiée de la Localisation et de la Météo
+        // On priorise 'fullLocation' (Ville, Pays) pour le texte et 'ville' pour l'API Météo
+        String villePourMeteo = null;
+
+        if (e.getFullLocation() != null && !e.getFullLocation().trim().isEmpty()) {
+            locationLabel.setText(e.getFullLocation());
+            villePourMeteo = e.getVille();
+        } else if (e.getDestinationName() != null && !e.getDestinationName().trim().isEmpty()) {
+            // Fallback si fullLocation est vide mais destinationName existe
+            locationLabel.setText(e.getDestinationName());
+            villePourMeteo = e.getDestinationName();
+        } else {
+            locationLabel.setText("Destination inconnue");
+        }
+
+        // Un SEUL appel à la météo pour éviter les conflits de threads
+        if (villePourMeteo != null) {
+            System.out.println("Chargement météo pour : " + villePourMeteo);
+            afficherMeteo(villePourMeteo);
+        } else if (descLabel != null) {
+            descLabel.setText("Lieu non défini");
+        }
+
+        // 3. Conversion de prix (si la devise est déjà sélectionnée)
         if (currencyCombo != null && currencyCombo.getValue() != null) {
             updateConvertedPrice(currencyCombo.getValue());
         }
-        // 2. GESTION DE LA MÉTÉO (Dynamique grâce à la jointure SQL)
-        // On vérifie que le nom de la destination est bien arrivé depuis le Service
-        if (e.getDestinationName() != null && !e.getDestinationName().isEmpty()) {
-            System.out.println("Chargement météo pour : " + e.getDestinationName());
-            afficherMeteo(e.getDestinationName());
-        } else {
-            System.out.println("Avertissement : Nom de destination vide pour l'excursion " + e.getName());
-            if (descLabel != null) descLabel.setText("Lieu non défini");
-        }
 
-        // 3. Affichage du nombre maximum de participants
+        // 4. Participants et Dates
         if (maxParticipantsLabel != null) {
             maxParticipantsLabel.setText(e.getMaxParticipants() + " personnes");
         }
 
-        // 4. Gestion de l'affichage des dates (Période)
         if (datesLabel != null) {
             if (e.getDateDebut() != null && e.getDateFin() != null) {
                 datesLabel.setText("Du " + e.getDateDebut() + " au " + e.getDateFin());
@@ -110,31 +128,32 @@ public class ExcursionDetailsController implements Initializable {
             }
         }
 
-        // 5. Gestion de la galerie d'images (Carousel)
-        if (imageContainer != null) {
-            imageContainer.getChildren().clear();
+        // 5. Galerie d'images (Carousel)
+        chargerGalerie(e.getImages());
+    }
 
-            if (e.getImages() != null && !e.getImages().isEmpty()) {
-                String[] imagePaths = e.getImages().split(",");
+    /**
+     * Méthode extraite pour garder le code propre
+     */
+    private void chargerGalerie(String imagesStr) {
+        if (imageContainer == null) return;
 
-                for (String path : imagePaths) {
-                    try {
-                        File file = new File("src/main/resources/imageEx/" + path.trim());
-
-                        if (file.exists()) {
-                            Image img = new Image(file.toURI().toString());
-                            ImageView iv = new ImageView(img);
-
-                            iv.setFitHeight(220);
-                            iv.setPreserveRatio(true);
-                            // Effet visuel pour le style Glassmorphism
-                            iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
-
-                            imageContainer.getChildren().add(iv);
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("Erreur chargement image : " + path);
+        imageContainer.getChildren().clear();
+        if (imagesStr != null && !imagesStr.isEmpty()) {
+            String[] imagePaths = imagesStr.split(",");
+            for (String path : imagePaths) {
+                try {
+                    File file = new File("src/main/resources/imageEx/" + path.trim());
+                    if (file.exists()) {
+                        Image img = new Image(file.toURI().toString());
+                        ImageView iv = new ImageView(img);
+                        iv.setFitHeight(220);
+                        iv.setPreserveRatio(true);
+                        iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
+                        imageContainer.getChildren().add(iv);
                     }
+                } catch (Exception ex) {
+                    System.err.println("Erreur image : " + path);
                 }
             }
         }
@@ -227,35 +246,31 @@ public class ExcursionDetailsController implements Initializable {
     }
 
     public void afficherMeteo(String nomVille) {
-        // 1. On vérifie si le nom de la ville est valide
-        if (nomVille == null || nomVille.isEmpty()) {
-            descLabel.setText("Ville non spécifiée");
-            return;
-        }
+        if (nomVille == null || nomVille.trim().isEmpty()) return;
 
-        // 2. On lance la requête dans un nouveau Thread pour ne pas bloquer l'interface (UI)
         new Thread(() -> {
             try {
-                // Appel à ton service avec ta clé API
                 JSONObject data = WeatherService.getWeatherByCity(nomVille);
-
-                if (data != null) {
-                    // Extraction des données du JSON
+                if (data != null && data.has("main")) {
                     double temp = data.getJSONObject("main").getDouble("temp");
                     String desc = data.getJSONArray("weather").getJSONObject(0).getString("description");
                     String iconCode = data.getJSONArray("weather").getJSONObject(0).getString("icon");
                     String iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
 
-                    // 3. Mise à jour de l'interface graphique sur le Thread principal de JavaFX
                     Platform.runLater(() -> {
-                        tempLabel.setText(String.format("%.1f°C", temp));
-                        descLabel.setText(desc.substring(0, 1).toUpperCase() + desc.substring(1));
-                        weatherIcon.setImage(new Image(iconUrl));
+                        if (tempLabel != null) tempLabel.setText(String.format("%.1f°C", temp));
+                        if (descLabel != null) {
+                            String formattedDesc = desc.substring(0, 1).toUpperCase() + desc.substring(1);
+                            descLabel.setText(formattedDesc);
+                        }
+                        if (weatherIcon != null) weatherIcon.setImage(new Image(iconUrl));
                     });
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(() -> descLabel.setText("Erreur météo"));
+                System.err.println("Météo introuvable pour : " + nomVille);
+                Platform.runLater(() -> {
+                    if (descLabel != null) descLabel.setText("Météo indisponible");
+                });
             }
         }).start();
     }

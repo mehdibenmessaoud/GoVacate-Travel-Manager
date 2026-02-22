@@ -19,7 +19,10 @@ public class Pack {
     private int destinationId;
     private int hotelId;
     private int excursionId;
+    private String destinationName;
 
+    public String getDestinationName() { return destinationName; }
+    public void setDestinationName(String destinationName) { this.destinationName = destinationName; }
     // Constructeur par défaut
     public Pack() {}
 

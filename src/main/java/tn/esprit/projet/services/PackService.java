@@ -35,14 +35,12 @@ public class PackService implements IService<Pack> {
             ps.setString(9, p.getImageName());
             ps.setInt(10, p.getDestinationId());
 
-            // GESTION DU NULL POUR L'HÔTEL (Indispensable pour corriger l'erreur)
             if (p.getHotelId() == -1) {
                 ps.setNull(11, java.sql.Types.INTEGER);
             } else {
                 ps.setInt(11, p.getHotelId());
             }
 
-            // GESTION DU NULL POUR L'EXCURSION (Indispensable pour corriger l'erreur)
             if (p.getExcursionId() == -1) {
                 ps.setNull(12, java.sql.Types.INTEGER);
             } else {
@@ -56,7 +54,9 @@ public class PackService implements IService<Pack> {
     @Override
     public List<Pack> getAll() throws SQLException {
         List<Pack> packs = new ArrayList<>();
-        String query = "SELECT * FROM pack";
+        // MODIFICATION : Ajout de la jointure pour récupérer la ville
+        String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
+                "JOIN destination d ON p.destination_id = d.id";
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
@@ -86,7 +86,6 @@ public class PackService implements IService<Pack> {
                 ps.setInt(11, p.getHotelId());
             }
 
-            // GESTION DU NULL POUR L'EXCURSION
             if (p.getExcursionId() == -1) {
                 ps.setNull(12, java.sql.Types.INTEGER);
             } else {
@@ -106,9 +105,11 @@ public class PackService implements IService<Pack> {
         }
     }
 
-
+    @Override
     public Pack getById(int id) throws SQLException {
-        String query = "SELECT * FROM pack WHERE id=?";
+        // MODIFICATION : Ajout de la jointure ici aussi
+        String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
+                "JOIN destination d ON p.destination_id = d.id WHERE p.id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -121,7 +122,7 @@ public class PackService implements IService<Pack> {
     }
 
     private Pack mapResultSetToPack(ResultSet rs) throws SQLException {
-        return new Pack(
+        Pack p = new Pack(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("description"),
@@ -136,5 +137,10 @@ public class PackService implements IService<Pack> {
                 rs.getInt("hotel_id"),
                 rs.getInt("excursion_id")
         );
+
+        // AJOUT : On récupère le nom de la ville pour la météo
+        p.setDestinationName(rs.getString("destination_name"));
+
+        return p;
     }
 }

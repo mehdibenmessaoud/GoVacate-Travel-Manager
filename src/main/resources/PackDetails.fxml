@@ -14,7 +14,21 @@
 
     <HBox alignment="CENTER_LEFT" spacing="20">
         <Button fx:id="btnBack" text="← Retour" onAction="#handleBack" styleClass="btn-back-simple"/>
-        <Label fx:id="nameLabel" styleClass="details-header-title"/>
+        <VBox>
+            <Label fx:id="nameLabel" styleClass="details-header-title"/>
+            <Label fx:id="categoryLabel" styleClass="text-sub-blue"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+
+        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-padding: 10;">
+            <HBox alignment="CENTER" spacing="10">
+                <ImageView fx:id="weatherIcon" fitHeight="40" fitWidth="40" preserveRatio="true" />
+                <Label fx:id="tempLabel" style="-fx-font-size: 18; -fx-text-fill: #FF8210; -fx-font-weight: bold;" text="--°C" />
+            </HBox>
+            <Label fx:id="descLabel" style="-fx-text-fill: white; -fx-font-size: 11;" text="Chargement..." />
+        </VBox>
+
+        <Label fx:id="statusLabel" styleClass="status-badge-details" />
     </HBox>
 
     <Separator styleClass="details-separator"/>
@@ -24,26 +38,22 @@
             <StackPane alignment="TOP_RIGHT">
                 <ImageView fx:id="packImageView" fitWidth="420" fitHeight="260"
                            preserveRatio="false" styleClass="image-view-details" />
-
-                <Label fx:id="statusLabel" styleClass="status-badge-details">
-                    <StackPane.margin>
-                        <Insets top="15" right="15"/>
-                    </StackPane.margin>
-                </Label>
             </StackPane>
 
-            <VBox alignment="CENTER" styleClass="price-container-details">
+            <VBox alignment="CENTER" spacing="10" styleClass="price-container-details">
                 <Label text="PRIX DU PACK" styleClass="search-label" style="-fx-text-fill: #adb5bd;"/>
-                <Label fx:id="priceLabel" styleClass="details-price-large"/>
+                <HBox alignment="CENTER" spacing="15">
+                    <Label fx:id="priceLabel" styleClass="details-price-large"/>
+                    <Separator orientation="VERTICAL" prefHeight="30" opacity="0.2"/>
+                    <VBox alignment="CENTER_LEFT" spacing="2">
+                        <ComboBox fx:id="currencyCombo" prefWidth="90.0" styleClass="combo-box-custom"/>
+                        <Label fx:id="convertedPriceLabel" style="-fx-text-fill: #ff9800; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    </VBox>
+                </HBox>
             </VBox>
         </VBox>
 
         <VBox spacing="15" HBox.hgrow="ALWAYS">
-            <VBox>
-                <Label text="CATÉGORIE" styleClass="search-label"/>
-                <Label fx:id="categoryLabel" styleClass="text-sub-blue"/>
-            </VBox>
-
             <VBox>
                 <Label text="DESTINATION" styleClass="search-label"/>
                 <Label fx:id="destinationLabel" styleClass="details-meta-text"/>

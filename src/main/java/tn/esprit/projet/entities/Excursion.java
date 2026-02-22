@@ -17,7 +17,9 @@ public class Excursion {
     private LocalDate dateFin;
     private String images; //// Stockera le chemin ou le nom du fichier
     private String destinationName;
-
+    private String ville;
+    private String pays;
+    private String fullLocation;
 
     public Excursion() {
     }
@@ -37,6 +39,15 @@ public class Excursion {
         this.images = images;
 
     }
+
+    public String getVille() { return ville; }
+    public void setVille(String ville) { this.ville = ville; }
+
+    public String getPays() { return pays; }
+    public void setPays(String pays) { this.pays = pays; }
+
+    public String getFullLocation() { return fullLocation; }
+    public void setFullLocation(String fullLocation) { this.fullLocation = fullLocation; }
 
     public String getDestinationName() {
         return destinationName;
