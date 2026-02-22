@@ -13,6 +13,14 @@ import tn.esprit.projet.entities.Excursion;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.application.Platform;
+import org.json.JSONObject; // Assure-toi d'avoir la bibliothèque JSON dans ton projet
+import tn.esprit.projet.services.WeatherService;
+
 public class ExcursionDetailsController {
 
     @FXML private Label nameLabel;
@@ -25,10 +33,81 @@ public class ExcursionDetailsController {
     @FXML private Text descriptionLabel;
     @FXML private HBox imageContainer;
 
+    @FXML
+    private ImageView weatherIcon;
+
+    @FXML
+    private Label tempLabel;
+
+    @FXML
+    private Label descLabel;
+
 
       //Remplit l'interface avec les données de l'excursion sélectionnée.
 
     public void setExcursionData(Excursion e) {
+        // 1. Remplissage des textes basiques
+        if (nameLabel != null) nameLabel.setText(e.getName());
+        if (activiteLabel != null) activiteLabel.setText(e.getActivite());
+        if (priceLabel != null) priceLabel.setText(e.getPrice() + " DT");
+        if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
+        if (statusLabel != null) statusLabel.setText(e.getStatus());
+        if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
+
+        // 2. GESTION DE LA MÉTÉO (Dynamique grâce à la jointure SQL)
+        // On vérifie que le nom de la destination est bien arrivé depuis le Service
+        if (e.getDestinationName() != null && !e.getDestinationName().isEmpty()) {
+            System.out.println("Chargement météo pour : " + e.getDestinationName());
+            afficherMeteo(e.getDestinationName());
+        } else {
+            System.out.println("Avertissement : Nom de destination vide pour l'excursion " + e.getName());
+            if (descLabel != null) descLabel.setText("Lieu non défini");
+        }
+
+        // 3. Affichage du nombre maximum de participants
+        if (maxParticipantsLabel != null) {
+            maxParticipantsLabel.setText(e.getMaxParticipants() + " personnes");
+        }
+
+        // 4. Gestion de l'affichage des dates (Période)
+        if (datesLabel != null) {
+            if (e.getDateDebut() != null && e.getDateFin() != null) {
+                datesLabel.setText("Du " + e.getDateDebut() + " au " + e.getDateFin());
+            } else {
+                datesLabel.setText("Période non spécifiée");
+            }
+        }
+
+        // 5. Gestion de la galerie d'images (Carousel)
+        if (imageContainer != null) {
+            imageContainer.getChildren().clear();
+
+            if (e.getImages() != null && !e.getImages().isEmpty()) {
+                String[] imagePaths = e.getImages().split(",");
+
+                for (String path : imagePaths) {
+                    try {
+                        File file = new File("src/main/resources/imageEx/" + path.trim());
+
+                        if (file.exists()) {
+                            Image img = new Image(file.toURI().toString());
+                            ImageView iv = new ImageView(img);
+
+                            iv.setFitHeight(220);
+                            iv.setPreserveRatio(true);
+                            // Effet visuel pour le style Glassmorphism
+                            iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
+
+                            imageContainer.getChildren().add(iv);
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Erreur chargement image : " + path);
+                    }
+                }
+            }
+        }
+    }
+    /*public void setExcursionData(Excursion e) {
         // Remplissage des textes basiques
         if (nameLabel != null) nameLabel.setText(e.getName());
         if (activiteLabel != null) activiteLabel.setText(e.getActivite());
@@ -36,6 +115,7 @@ public class ExcursionDetailsController {
         if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
         if (statusLabel != null) statusLabel.setText(e.getStatus());
         if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
+        // On récupère le nom de la destination liée à l'excursion
 
         // Affichage du nombre maximum de participants
         if (maxParticipantsLabel != null) {
@@ -92,7 +172,7 @@ public class ExcursionDetailsController {
                 System.out.println("Aucune image trouvée pour cette excursion (Champ vide).");
             }
         }
-    }
+    }*/
     /**
      * Retourne à la table de gestion des excursions.
      */
@@ -112,5 +192,39 @@ public class ExcursionDetailsController {
         } catch (IOException e) {
             System.err.println("Erreur lors du retour à la table : " + e.getMessage());
         }
+    }
+
+    public void afficherMeteo(String nomVille) {
+        // 1. On vérifie si le nom de la ville est valide
+        if (nomVille == null || nomVille.isEmpty()) {
+            descLabel.setText("Ville non spécifiée");
+            return;
+        }
+
+        // 2. On lance la requête dans un nouveau Thread pour ne pas bloquer l'interface (UI)
+        new Thread(() -> {
+            try {
+                // Appel à ton service avec ta clé API
+                JSONObject data = WeatherService.getWeatherByCity(nomVille);
+
+                if (data != null) {
+                    // Extraction des données du JSON
+                    double temp = data.getJSONObject("main").getDouble("temp");
+                    String desc = data.getJSONArray("weather").getJSONObject(0).getString("description");
+                    String iconCode = data.getJSONArray("weather").getJSONObject(0).getString("icon");
+                    String iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+
+                    // 3. Mise à jour de l'interface graphique sur le Thread principal de JavaFX
+                    Platform.runLater(() -> {
+                        tempLabel.setText(String.format("%.1f°C", temp));
+                        descLabel.setText(desc.substring(0, 1).toUpperCase() + desc.substring(1));
+                        weatherIcon.setImage(new Image(iconUrl));
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> descLabel.setText("Erreur météo"));
+            }
+        }).start();
     }
 }

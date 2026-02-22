@@ -16,6 +16,8 @@ import tn.esprit.projet.entities.Destination;
 import tn.esprit.projet.services.DestinationService;
 import tn.esprit.projet.utils.MyDBConnexion;
 
+
+
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -166,6 +168,8 @@ public class AdminDestinationController implements Initializable {
             }
         }
     }
+
+
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

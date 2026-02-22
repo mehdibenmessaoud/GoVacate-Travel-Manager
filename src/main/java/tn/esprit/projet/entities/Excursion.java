@@ -15,8 +15,8 @@ public class Excursion {
     private String activite;
     private LocalDate dateDebut;
     private LocalDate dateFin;
-    private String images; // Stockera le chemin ou le nom du fichier
-
+    private String images; //// Stockera le chemin ou le nom du fichier
+    private String destinationName;
 
 
     public Excursion() {
@@ -38,6 +38,14 @@ public class Excursion {
 
     }
 
+    public String getDestinationName() {
+        return destinationName;
+    }
+
+    // 3. Ajoute le Setter (C'est lui qui réglera ton erreur actuelle)
+    public void setDestinationName(String destinationName) {
+        this.destinationName = destinationName;
+    }
 
     // Getters et Setters
     public int getId() {

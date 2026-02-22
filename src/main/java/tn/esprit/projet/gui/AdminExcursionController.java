@@ -10,11 +10,19 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
+import org.json.JSONObject;
 import tn.esprit.projet.entities.Excursion;
 import tn.esprit.projet.services.ExcursionService;
+import tn.esprit.projet.services.WeatherService;
 import tn.esprit.projet.utils.MyDBConnexion;
+
+import javafx.application.Platform;
+import javafx.scene.image.Image;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,6 +37,10 @@ public class AdminExcursionController implements Initializable {
     @FXML private TableColumn<Excursion, Integer> colDuree;
     @FXML private TableColumn<Excursion, Void> colActions;
     @FXML private TextField searchField;
+
+    @FXML private Label tempLabel;
+    @FXML private Label descLabel;
+    @FXML private ImageView weatherIcon;
 
     private ExcursionService excursionService;
     private ObservableList<Excursion> masterData = FXCollections.observableArrayList();
@@ -188,6 +200,31 @@ public class AdminExcursionController implements Initializable {
                 showAlert("Erreur SQL", "Une erreur est survenue lors de la suppression.");
             }
         }
+    }
+    public void afficherMeteo(String nomVille) {
+        if (nomVille == null || nomVille.isEmpty()) return;
+
+        new Thread(() -> {
+            try {
+                // Appel au service (utilise ta clé : c4f8cae49ccd9bd1619c99287b054b9e)
+                JSONObject data = WeatherService.getWeatherByCity(nomVille);
+
+                if (data != null) {
+                    double temp = data.getJSONObject("main").getDouble("temp");
+                    String desc = data.getJSONArray("weather").getJSONObject(0).getString("description");
+                    String iconCode = data.getJSONArray("weather").getJSONObject(0).getString("icon");
+                    String iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+
+                    Platform.runLater(() -> {
+                        if (tempLabel != null) tempLabel.setText(String.format("%.1f°C", temp));
+                        if (descLabel != null) descLabel.setText(desc.substring(0, 1).toUpperCase() + desc.substring(1));
+                        if (weatherIcon != null) weatherIcon.setImage(new Image(iconUrl));
+                    });
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors de la récupération météo : " + e.getMessage());
+            }
+        }).start();
     }
 
     private void showAlert(String title, String content) {

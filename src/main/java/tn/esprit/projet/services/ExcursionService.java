@@ -14,7 +14,6 @@ public class ExcursionService implements IService<Excursion> {
 
     @Override
     public void create(Excursion e) throws SQLException {
-        // Ajout des colonnes dateDebut, dateFin et images dans la requête
         String query = "INSERT INTO Excursion (name, description, duration, price, maxParticipants, status, locationId, activite, dateDebut, dateFin, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, e.getName());
@@ -28,7 +27,6 @@ public class ExcursionService implements IService<Excursion> {
             ps.setDate(9, e.getDateDebut() != null ? java.sql.Date.valueOf(e.getDateDebut()) : null);
             ps.setDate(10, e.getDateFin() != null ? java.sql.Date.valueOf(e.getDateFin()) : null);
             ps.setString(11, e.getImages());
-
             ps.executeUpdate();
         }
     }
@@ -36,7 +34,7 @@ public class ExcursionService implements IService<Excursion> {
     @Override
     public List<Excursion> getAll() throws SQLException {
         List<Excursion> excursions = new ArrayList<>();
-        String query = "SELECT * FROM Excursion";
+        String query = "SELECT e.*, d.ville AS destination_name FROM Excursion e JOIN Destination d ON e.locationId = d.id";
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
@@ -46,9 +44,26 @@ public class ExcursionService implements IService<Excursion> {
         return excursions;
     }
 
+    // --- LA MÉTHODE QUE J'AVAIS OUBLIÉE (Réintégrée et corrigée) ---
+    public List<Excursion> getByLocation(int locationId) throws SQLException {
+        List<Excursion> excursions = new ArrayList<>();
+        // On ajoute la jointure ici aussi pour que destination_name soit disponible
+        String query = "SELECT e.*, d.ville AS destination_name FROM Excursion e " +
+                "JOIN Destination d ON e.locationId = d.id " +
+                "WHERE e.locationId = ? AND e.status = 'Disponible'";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, locationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    excursions.add(mapResultSetToExcursion(rs));
+                }
+            }
+        }
+        return excursions;
+    }
+
     @Override
     public void update(Excursion e) throws SQLException {
-        // Mise à jour de la requête pour inclure les nouveaux champs et l'ID à la fin (12ème paramètre)
         String query = "UPDATE Excursion SET name=?, description=?, duration=?, price=?, maxParticipants=?, status=?, locationId=?, activite=?, dateDebut=?, dateFin=?, images=? WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, e.getName());
@@ -62,8 +77,7 @@ public class ExcursionService implements IService<Excursion> {
             ps.setDate(9, e.getDateDebut() != null ? java.sql.Date.valueOf(e.getDateDebut()) : null);
             ps.setDate(10, e.getDateFin() != null ? java.sql.Date.valueOf(e.getDateFin()) : null);
             ps.setString(11, e.getImages());
-            ps.setInt(12, e.getId()); // Correction : l'ID est le 12ème paramètre
-
+            ps.setInt(12, e.getId());
             ps.executeUpdate();
         }
     }
@@ -77,23 +91,9 @@ public class ExcursionService implements IService<Excursion> {
         }
     }
 
-    public List<Excursion> getByLocation(int locationId) throws SQLException {
-        List<Excursion> excursions = new ArrayList<>();
-        String query = "SELECT * FROM Excursion WHERE locationId = ? AND status = 'Disponible'";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, locationId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    excursions.add(mapResultSetToExcursion(rs));
-                }
-            }
-        }
-        return excursions;
-    }
-
     @Override
     public Excursion getById(int id) throws SQLException {
-        String query = "SELECT * FROM Excursion WHERE id=?";
+        String query = "SELECT e.*, d.ville AS destination_name FROM Excursion e JOIN Destination d ON e.locationId = d.id WHERE e.id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -106,7 +106,7 @@ public class ExcursionService implements IService<Excursion> {
     }
 
     private Excursion mapResultSetToExcursion(ResultSet rs) throws SQLException {
-        return new Excursion(
+        Excursion e = new Excursion(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("description"),
@@ -120,5 +120,9 @@ public class ExcursionService implements IService<Excursion> {
                 rs.getDate("dateFin") != null ? rs.getDate("dateFin").toLocalDate() : null,
                 rs.getString("images")
         );
+
+        // Indispensable pour ton contrôleur météo
+        e.setDestinationName(rs.getString("destination_name"));
+        return e;
     }
 }
