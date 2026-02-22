@@ -26,7 +26,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.application.Platform;
 import org.json.JSONObject; // Assure-toi d'avoir la bibliothèque JSON dans ton projet
+import tn.esprit.projet.services.ExcursionService;
 import tn.esprit.projet.services.WeatherService;
+
 
 public class ExcursionDetailsController implements Initializable {
 
@@ -52,8 +54,11 @@ public class ExcursionDetailsController implements Initializable {
 
     @FXML private ComboBox<String> currencyCombo;
     @FXML private Label convertedPriceLabel;
-
+    @FXML private Label promoBadge;
     private double currentExcursionPrice; // Pour stocker le prix en DT
+    private final ExcursionService excursionService = new ExcursionService();
+    // AJOUTE CETTE LIGNE ICI :
+
 
 
       //Remplit l'interface avec les données de l'excursion sélectionnée.
@@ -75,7 +80,7 @@ public class ExcursionDetailsController implements Initializable {
         }
     }
 
-    public void setExcursionData(Excursion e) {
+    /*public void setExcursionData(Excursion e) {
         // 0. Stockage du prix pour la conversion monétaire
         this.currentExcursionPrice = e.getPrice();
 
@@ -86,6 +91,35 @@ public class ExcursionDetailsController implements Initializable {
         if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
         if (statusLabel != null) statusLabel.setText(e.getStatus());
         if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
+
+        int currentReservations = excursionService.getCurrentReservations(e.getId());
+        double dynamicPrice = excursionService.calculateDynamicPrice(e, currentReservations);
+        this.currentExcursionPrice = dynamicPrice;
+
+        if (dynamicPrice < e.getPrice()) {
+            // Cas PROMO : on affiche le nouveau prix et on change de style
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;"); // Vert
+
+            // Optionnel : Ajouter un texte "Offre Spéciale"
+            if (statusLabel != null) {
+                statusLabel.setText("OFFRE FLASH");
+                statusLabel.setStyle("-fx-background-color: #FF8210;");
+            }
+        } else if (dynamicPrice > e.getPrice()) {
+            // Cas FORTE DEMANDE
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #e74c3c;"); // Rouge
+        } else {
+            priceLabel.setText(e.getPrice() + " DT");
+        }
+
+        // Mise à jour de la conversion monétaire avec le nouveau prix
+        if (currencyCombo != null && currencyCombo.getValue() != null) {
+            updateConvertedPrice(currencyCombo.getValue());
+        }
+
+
 
         // 2. Gestion unifiée de la Localisation et de la Météo
         // On priorise 'fullLocation' (Ville, Pays) pour le texte et 'ville' pour l'API Météo
@@ -130,7 +164,89 @@ public class ExcursionDetailsController implements Initializable {
 
         // 5. Galerie d'images (Carousel)
         chargerGalerie(e.getImages());
+    }*/
+
+
+    public void setExcursionData(Excursion e) {
+        // 0. Récupération des données dynamiques via le Service
+        int currentReservations = excursionService.getCurrentReservations(e.getId());
+        double dynamicPrice = excursionService.calculateDynamicPrice(e, currentReservations);
+        this.currentExcursionPrice = dynamicPrice;
+
+        // 1. Remplissage des textes basiques
+        if (nameLabel != null) nameLabel.setText(e.getName());
+        if (activiteLabel != null) activiteLabel.setText(e.getActivite());
+        if (durationLabel != null) durationLabel.setText(e.getDuration() + " h");
+        if (statusLabel != null) statusLabel.setText(e.getStatus());
+        if (descriptionLabel != null) descriptionLabel.setText(e.getDescription());
+
+        // --- LOGIQUE VISUELLE DU PRIX ET DU BADGE ---
+        if (dynamicPrice < e.getPrice()) {
+            // Cas PROMO
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #ff9800; -fx-font-weight: bold; -fx-font-size: 20;"); // Vert
+
+            if (promoBadge != null) {
+                promoBadge.setText("🔥 OFFRE DERNIÈRE MINUTE : -20%");
+                promoBadge.setVisible(true);
+            }
+        } else if (dynamicPrice > e.getPrice()) {
+            // Cas FORTE DEMANDE
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 32;"); // Rouge
+
+            if (promoBadge != null) {
+                promoBadge.setText("⚡ TRÈS DEMANDÉ");
+                promoBadge.setVisible(true);
+            }
+        } else {
+            // Cas NORMAL
+            priceLabel.setText(e.getPrice() + " DT");
+            priceLabel.setStyle("-fx-text-fill: #FF8210;"); // Orange normal
+            if (promoBadge != null) promoBadge.setVisible(false);
+        }
+
+        // 2. Gestion unifiée de la Localisation et de la Météo
+        String villePourMeteo = null;
+        if (e.getFullLocation() != null && !e.getFullLocation().trim().isEmpty()) {
+            locationLabel.setText(e.getFullLocation());
+            villePourMeteo = e.getVille();
+        } else if (e.getDestinationName() != null && !e.getDestinationName().trim().isEmpty()) {
+            locationLabel.setText(e.getDestinationName());
+            villePourMeteo = e.getDestinationName();
+        } else {
+            locationLabel.setText("Destination inconnue");
+        }
+
+        if (villePourMeteo != null) {
+            afficherMeteo(villePourMeteo);
+        } else if (descLabel != null) {
+            descLabel.setText("Lieu non défini");
+        }
+
+        // 3. Mise à jour de la conversion monétaire
+        if (currencyCombo != null && currencyCombo.getValue() != null) {
+            updateConvertedPrice(currencyCombo.getValue());
+        }
+
+        // 4. Participants et Dates
+        if (maxParticipantsLabel != null) {
+            maxParticipantsLabel.setText(e.getMaxParticipants() + " personnes");
+        }
+
+        if (datesLabel != null) {
+            if (e.getDateDebut() != null && e.getDateFin() != null) {
+                datesLabel.setText("Du " + e.getDateDebut() + " au " + e.getDateFin());
+            } else {
+                datesLabel.setText("Période non spécifiée");
+            }
+        }
+
+        // 5. Galerie d'images
+        chargerGalerie(e.getImages());
     }
+
+
 
     /**
      * Méthode extraite pour garder le code propre

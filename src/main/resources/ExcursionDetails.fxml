@@ -44,11 +44,17 @@
         <HBox spacing="30.0">
             <VBox spacing="15.0" prefWidth="450.0">
                 <Label styleClass="section-label" text="Galerie Photos" />
-                <ScrollPane fitToHeight="true" minHeight="250.0" prefHeight="250.0" styleClass="image-carousel-scroll" vbarPolicy="NEVER">
-                    <content>
-                        <HBox fx:id="imageContainer" alignment="CENTER_LEFT" spacing="15.0" styleClass="image-hbox-padding" />
-                    </content>
-                </ScrollPane>
+
+                <StackPane alignment="TOP_RIGHT">
+                    <ScrollPane fitToHeight="true" minHeight="250.0" prefHeight="250.0" styleClass="image-carousel-scroll" vbarPolicy="NEVER">
+                        <content>
+                            <HBox fx:id="imageContainer" alignment="CENTER_LEFT" spacing="15.0" styleClass="image-hbox-padding" />
+                        </content>
+                    </ScrollPane>
+                    <Label fx:id="promoBadge" visible="false"
+                           style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-weight: bold; -fx-background-radius: 0 15 0 15; -fx-font-size: 13;"
+                           text="PROMO" />
+                </StackPane>
 
                 <VBox alignment="CENTER" spacing="5" styleClass="price-container-details" style="-fx-padding: 15;">
                     <Label text="PRIX PAR PERSONNE" styleClass="meta-label" style="-fx-text-fill: #adb5bd;"/>
@@ -57,7 +63,7 @@
                         <Separator orientation="VERTICAL" prefHeight="30" opacity="0.2"/>
                         <VBox alignment="CENTER_LEFT" spacing="2">
                             <ComboBox fx:id="currencyCombo" prefWidth="90.0" styleClass="combo-box-custom"/>
-                            <Label fx:id="convertedPriceLabel" style="-fx-text-fill: #ff9800; -fx-font-weight: bold; -fx-font-size: 14px;" text="≈ 0.00" />
+                            <Label fx:id="convertedPriceLabel" style="-fx-text-fill: #FF8210; -fx-font-weight: bold; -fx-font-size: 20px;" text="≈ 0.00" />
                         </VBox>
                     </HBox>
                 </VBox>

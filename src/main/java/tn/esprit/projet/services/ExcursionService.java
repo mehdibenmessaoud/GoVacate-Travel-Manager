@@ -1,6 +1,8 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.Excursion;
+import tn.esprit.projet.utils.MyDBConnexion;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,10 @@ public class ExcursionService implements IService<Excursion> {
 
     public ExcursionService(Connection connection) {
         this.connection = connection;
+    }
+    // Dans ExcursionService.java
+    public ExcursionService() {
+        this.connection = MyDBConnexion.getInstance().getConnection(); // Adaptez selon votre code
     }
 
     @Override
@@ -161,14 +167,33 @@ public class ExcursionService implements IService<Excursion> {
         long daysUntilDeparture = ChronoUnit.DAYS.between(LocalDate.now(), e.getDateDebut());
 
         // Règle 1 : Last Minute - Moins de 48h et beaucoup de places libres -> -20%
-        if (daysUntilDeparture <= 2 && (e.getMaxParticipants() - currentReservations) >= 10) {
+        if (daysUntilDeparture <= 2 && (e.getMaxParticipants() - currentReservations) >= (e.getMaxParticipants()/2)) {
             finalPrice = finalPrice * 0.8;
         }
         // Règle 2 : High Demand - 90% des places vendues -> +10%
-        else if (currentReservations >= (e.getMaxParticipants() * 0.9)) {
+        else if (currentReservations >= (e.getMaxParticipants() * 0.8)) {
             finalPrice = finalPrice * 1.1;
         }
 
         return finalPrice;
+    }
+
+    // Dans ExcursionService.java
+    public int getCurrentReservations(int excursionId) {
+        int totalParticipants = 0;
+        // On utilise SUM pour additionner tous les participants de l'excursion ID 9
+        String query = "SELECT SUM(nombre_personnes) FROM reservation_excursion WHERE excursion_id = ?";
+
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, excursionId);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                totalParticipants = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Erreur SQL lors du calcul des places : " + ex.getMessage());
+        }
+        return totalParticipants;
     }
 }
