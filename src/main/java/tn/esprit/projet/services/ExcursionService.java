@@ -4,6 +4,8 @@ import tn.esprit.projet.entities.Excursion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class ExcursionService implements IService<Excursion> {
     private Connection connection;
@@ -147,5 +149,26 @@ public class ExcursionService implements IService<Excursion> {
             }
         }
         return e;
+    }
+
+    public double calculateDynamicPrice(Excursion e, int currentReservations) {
+        if (e == null || e.getDateDebut() == null) {
+            return 0.0;
+        }
+
+        double finalPrice = e.getPrice();
+        // Calcul de la différence en jours entre aujourd'hui et le départ
+        long daysUntilDeparture = ChronoUnit.DAYS.between(LocalDate.now(), e.getDateDebut());
+
+        // Règle 1 : Last Minute - Moins de 48h et beaucoup de places libres -> -20%
+        if (daysUntilDeparture <= 2 && (e.getMaxParticipants() - currentReservations) >= 10) {
+            finalPrice = finalPrice * 0.8;
+        }
+        // Règle 2 : High Demand - 90% des places vendues -> +10%
+        else if (currentReservations >= (e.getMaxParticipants() * 0.9)) {
+            finalPrice = finalPrice * 1.1;
+        }
+
+        return finalPrice;
     }
 }
