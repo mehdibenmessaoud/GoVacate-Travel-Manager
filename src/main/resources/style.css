@@ -1,0 +1,360 @@
+/* =============================================================================
+   1. VARIABLES & FOND
+============================================================================= */
+.root-pane {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    /* Dégradé Mesh pour tester la transparence */
+    -fx-background-color: linear-gradient(to bottom right, #000428, #004e92, #00d2ff, #FF8210);
+}
+
+.scroll-pane, .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* =============================================================================
+   2. CORE GLASSMORPHISM (CARTES & PANNEAUX)
+============================================================================= */
+
+/* Conteneur principal de la carte (Transparent) */
+.water-card {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    -fx-transition: all 0.4s ease-out;
+}
+
+/* Couche : Fond du verre (Overlay) */
+.glass-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 25;
+}
+
+/* Couche : Reflets internes (Specular) */
+.glass-specular {
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-width: 1.5;
+    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), transparent);
+    /* Lueur interne simulant l'épaisseur */
+    -fx-effect: innershadow(gaussian, rgba(255, 255, 255, 0.4), 10, 0, 0, 0);
+}
+
+/* Panneau standard (Utilisé pour les formulaires) */
+.glass-panel {
+    -fx-background-color: rgba(0, 30, 60, 0.4); /* Fond bleu profond semi-transparent */
+    -fx-background-radius: 35;
+    -fx-border-radius: 35;
+    /* Bordure "bord de verre" très fine */
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+    /* Lueur extérieure pour détacher du fond */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 30, 0, 0, 0);
+}
+
+/* Effets de Survol (Hover) */
+.water-card:hover {
+    -fx-translate-y: -10;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.water-card:hover .glass-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* =============================================================================
+   3. ÉLÉMENTS D'INTERFACE (INPUTS & BOUTONS)
+============================================================================= */
+
+/* Champs style "Goutte d'eau" */
+.search-field, .text-area.search-field {
+    -fx-background-color: rgba(0, 0, 0, 0.2); /* Plus sombre pour le contraste */
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.4);
+    /* Effet d'enfoncement (InnerShadow) */
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 1, 1);
+}
+
+.search-field:focused {
+    -fx-border-color: rgba(255, 255, 255, 0.5); /* Bordure s'illumine au focus */
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+.search-field:focused {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-border-color: #89CFF0;
+    -fx-effect: innershadow(gaussian, rgba(255, 255, 255, 0.8), 12, 0, 3, 3);
+}
+
+/* Boutons Lumineux */
+.btn-orange-glow {
+    -fx-background-color: linear-gradient(to bottom, #FF8C20, #F37021);
+    -fx-background-radius: 30;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12 35;
+    /* Lueur orange intense */
+    -fx-effect: dropshadow(gaussian, rgba(243, 112, 33, 0.6), 20, 0, 0, 0);
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: #FFB040;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* =============================================================================
+   4. NAVIGATION (SIDEBAR)
+============================================================================= */
+.sidebar-liquid {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1 0 0;
+}
+
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-weight: bold;
+    -fx-padding: 15 25;
+}
+
+.liquid-btn:hover, .liquid-btn.active {
+    -fx-text-fill: white;
+}
+
+.sliding-highlight {
+    -fx-background-radius: 30;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: linear-gradient(to right, #00ffff, #ff00ff);
+    -fx-border-radius: 30;
+}
+/* =============================================================================
+   1. TYPOGRAPHIE (LISIBILITÉ & CONTRASTE)
+============================================================================= */
+.text-header {
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 5, 0, 0, 2);
+}
+
+.search-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 5;
+}
+
+/* Pour les titres et labels */
+.hero-title, .text-header {
+    -fx-text-fill: white;
+    /* Ombre portée plus diffuse pour "décoller" le texte du fond */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.9), 10, 0.5, 0, 1);
+}
+
+.text-sub {
+    -fx-text-fill: rgba(255, 255, 255, 0.85); /* Un blanc plus opaque */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 5, 0, 0, 1);
+}
+
+/* Pour les zones de saisie (Inputs / TextArea) */
+/* =============================================================================
+   INPUTS & TEXTAREA : LISIBILITÉ AMÉLIORÉE
+============================================================================= */
+.search-field, .text-area.search-field {
+    /* 1. Un fond légèrement plus sombre (Bleu Nuit Profond) pour le contraste */
+    -fx-background-color: rgba(0, 15, 35, 0.6);
+
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+
+    /* 2. Bordure plus nette pour définir la zone */
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1.5px;
+
+    /* 3. Texte pur (sans transparence) pour lire facilement */
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.5);
+
+    /* 4. Ombre interne pour l'effet de profondeur sans flouter le texte */
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 1, 1);
+
+    -fx-padding: 12 20;
+    -fx-font-size: 14px;
+}
+
+/* État Focus : On illumine la bordure quand on tape */
+.search-field:focused {
+    -fx-background-color: rgba(0, 25, 50, 0.7);
+    -fx-border-color: #89CFF0; /* Cyan clair pour le focus */
+    -fx-effect: innershadow(gaussian, rgba(137, 207, 240, 0.3), 10, 0, 0, 0);
+}
+
+/* Cas spécifique du TextArea pour éviter les bugs d'affichage internes */
+.text-area.search-field .content {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.text-area.search-field .scroll-pane {
+    -fx-background-color: transparent;
+}
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 2px;
+}
+
+/* Labels au-dessus des inputs */
+.search-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #ADB5BD;
+    -fx-font-weight: 700;
+    -fx-text-transform: uppercase;
+    -fx-padding: 0 0 5 10;
+}
+
+.water-card .glass-specular {
+    -fx-background-color: rgba(255, 255, 255, 0.03); /* Presque invisible au repos */
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.water-card:hover .glass-specular {
+    -fx-border-color: linear-gradient(to bottom right, white, rgba(0, 255, 255, 0.5));
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Couche de base (Overlay) */
+.glass-overlay {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+    -fx-background-radius: 25;
+}
+
+/* Couche de reflet (Specular) */
+.glass-specular {
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-width: 1.5;
+    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.6), transparent);
+
+    /* Ombre portée externe (DropShadow) */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 20, 0, 0, 10);
+}
+
+/* Contenu de la carte */
+.card-content-box {
+    -fx-padding: 20;
+}
+
+/* Animation de lévitation au survol */
+.water-card:hover {
+    -fx-translate-y: -10;
+    -fx-cursor: hand;
+}
+
+.water-card:hover .glass-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =============================================================================
+   4. SIDEBAR & NAVIGATION (VERRE GIVRÉ & LIQUIDE)
+============================================================================= */
+
+.sidebar-liquid {
+    /* Fond : Dégradé vertical très léger pour simuler la profondeur de l'eau */
+    -fx-background-color: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.03) 100%
+    );
+    /* Bordure fine à droite pour séparer du contenu principal */
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1.5px 0 0;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    /* Lueur orange rappelant les bulles de ton fond */
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.6), 15, 0, 0, 0);
+}
+
+/* --- LA BULLE MAGIQUE (Sliding Highlight) --- */
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+
+    /* Fond "Verre Pur" */
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+
+    /* Bordure avec un éclat Prismatique (Cyan vers Violet) */
+    -fx-border-color: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.8),
+            rgba(0, 255, 255, 0.5),
+            rgba(255, 0, 255, 0.5)
+    );
+    -fx-border-width: 1.5px;
+
+    /* Lueur de la bulle */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.2), 10, 0, 0, 0);
+}
+
+/* --- BOUTONS DE NAVIGATION --- */
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 0 15 30;
+}
+
+.liquid-btn:hover {
+    -fx-text-fill: white;
+    /* On utilise l'échelle pour l'effet "pop" */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* État actif (Bouton sélectionné) */
+.liquid-btn.active {
+    -fx-text-fill: white;
+    /* Ombre de texte pour la visibilité */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.5), 5, 0, 0, 0);
+}
+
+/* Espaceur transparent entre les groupes de boutons */
+.menu-spacer {
+    -fx-pref-height: 40px;
+    -fx-mouse-transparent: true;
+}
+.water-card .image-view {
+    -fx-opacity: 1.0; /* Force l'opacité à fond */
+    /* Petite ombre portée pour que l'image ne semble pas collée au verre */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
+}
+
+/* Optionnel : assombrir le bas de l'image pour lire le titre par-dessus */
+.card-image-overlay {
+    -fx-background-color: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.7));
+    -fx-background-radius: 0 0 25 25;
+}
+/* Le conteneur "Liquid Glass" */
+.glass-preview-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-border-width: 0.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
