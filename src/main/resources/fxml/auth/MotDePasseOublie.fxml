@@ -65,6 +65,8 @@
                 <Text text="Un code de sécurité a été envoyé à :"
                       style="-fx-font-size: 13; -fx-fill: #6C6D6F; -fx-text-alignment: center;" wrappingWidth="380" textAlignment="CENTER"/>
                 <Label fx:id="emailDisplayLabel" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-font-size: 14; -fx-padding: 5 0 0 0;"/>
+                <Label fx:id="devCodeLabel" visible="false" managed="false" wrapText="true" prefWidth="380" maxWidth="380"
+                       style="-fx-font-size: 13; -fx-text-fill: #27AE60; -fx-font-weight: bold; -fx-padding: 10; -fx-background-color: #E8F5E9;"/>
             </VBox>
             <TextField fx:id="codeField" promptText="Entrez le code à 6 chiffres"
                        styleClass="text-field-pro" prefWidth="400" maxWidth="400"/>

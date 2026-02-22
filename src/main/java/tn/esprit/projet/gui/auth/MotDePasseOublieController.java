@@ -20,6 +20,7 @@ public class MotDePasseOublieController {
 
     @FXML private TextField emailField;
     @FXML private Label emailDisplayLabel;
+    @FXML private Label devCodeLabel;
     @FXML private TextField codeField;
 
     @FXML private PasswordField newPasswordField;
@@ -127,8 +128,9 @@ public class MotDePasseOublieController {
             if (codeField != null) {
                 codeField.clear();
             }
-            
+
             showStep(2);
+            updateDevCodeLabel();
             
         } catch (Exception e) {
             showError("Erreur: " + e.getMessage());
@@ -156,7 +158,12 @@ public class MotDePasseOublieController {
                 if (codeField != null) {
                     codeField.clear();
                 }
-                showAlert("Code renvoyé", "Un nouveau code a été envoyé à " + email, Alert.AlertType.INFORMATION);
+                updateDevCodeLabel();
+                if (emailVerificationService.isLastSendFallback()) {
+                    showAlert("Code renvoyé (mode développement)", "Un nouveau code a été généré. Consultez l'affichage ci-dessous.", Alert.AlertType.INFORMATION);
+                } else {
+                    showAlert("Code renvoyé", "Un nouveau code a été envoyé à " + email, Alert.AlertType.INFORMATION);
+                }
             } else {
                 showError("Impossible de renvoyer le code. Réessayez.");
             }
@@ -319,6 +326,19 @@ public class MotDePasseOublieController {
         if (errorLabel != null) {
             errorLabel.setText("");
             errorLabel.setVisible(false);
+        }
+    }
+
+    private void updateDevCodeLabel() {
+        if (devCodeLabel == null || emailVerificationService == null) return;
+        if (emailVerificationService.isLastSendFallback()) {
+            String code = emailVerificationService.getLastSentCodeForDev();
+            devCodeLabel.setText("Mode développement – Votre code : " + (code != null ? code : ""));
+            devCodeLabel.setVisible(true);
+            devCodeLabel.setManaged(true);
+        } else {
+            devCodeLabel.setVisible(false);
+            devCodeLabel.setManaged(false);
         }
     }
 
