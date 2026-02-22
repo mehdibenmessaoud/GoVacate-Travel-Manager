@@ -12,6 +12,7 @@ public class User {
     private String telephone;
     private LocalDate dateNaissance;
     private String status;  // "actif", "inactif", "en_attente"
+    private String imageUrl;  // URL ou chemin vers la photo de profil (colonne image_url en BDD)
     private LocalDateTime lastLogin;  // Dernière connexion
     private LocalDateTime createdAt;  // Date création
 
@@ -76,6 +77,9 @@ public class User {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public LocalDateTime getLastLogin() { return lastLogin; }
     public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }

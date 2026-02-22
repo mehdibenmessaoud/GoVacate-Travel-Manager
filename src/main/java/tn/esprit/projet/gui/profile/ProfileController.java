@@ -4,14 +4,24 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
 import tn.esprit.projet.entities.User;
 import tn.esprit.projet.services.UserService;
 import tn.esprit.projet.utils.SceneManager;
 import tn.esprit.projet.utils.SessionManager;
 import tn.esprit.projet.utils.ValidationUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +41,7 @@ public class ProfileController implements Initializable {
     @FXML private TextField fieldFullName;
     @FXML private HBox hboxEditName;
     @FXML private Label avatarInitials;
+    @FXML private ImageView avatarImage;
 
     // === Autres elements ===
     @FXML private Label lblEmail;
@@ -110,10 +121,29 @@ public class ProfileController implements Initializable {
         String prenom = nameParts.length > 0 ? nameParts[0] : "";
         String nom = nameParts.length > 1 ? nameParts[1] : "";
 
-        if (avatarInitials != null) {
-            String initials = (prenom.isEmpty() ? "" : prenom.substring(0, 1)) +
-                             (nom.isEmpty() ? "" : nom.substring(0, 1));
-            avatarInitials.setText(initials.toUpperCase().isEmpty() ? "?" : initials.toUpperCase());
+        String imageUrl = currentUser.getImageUrl();
+        if (avatarImage != null && avatarInitials != null) {
+            if (imageUrl != null && !imageUrl.isEmpty() && !"default.png".equals(imageUrl)) {
+                File f = new File(imageUrl);
+                if (f.exists()) {
+                    try {
+                        Image img = new Image(f.toURI().toString());
+                        avatarImage.setImage(img);
+                        Circle clip = new Circle(60, 60, 60);
+                        avatarImage.setClip(clip);
+                        avatarImage.setVisible(true);
+                        avatarImage.setManaged(true);
+                        avatarInitials.setVisible(false);
+                        avatarInitials.setManaged(false);
+                    } catch (Exception e) {
+                        showInitialsOnly(prenom, nom);
+                    }
+                } else {
+                    showInitialsOnly(prenom, nom);
+                }
+            } else {
+                showInitialsOnly(prenom, nom);
+            }
         }
 
         if (lblFullName != null) {
@@ -270,8 +300,79 @@ public class ProfileController implements Initializable {
         });
     }
 
+    private void showInitialsOnly(String prenom, String nom) {
+        if (avatarInitials != null) {
+            String initials = (prenom.isEmpty() ? "" : prenom.substring(0, 1)) +
+                             (nom.isEmpty() ? "" : nom.substring(0, 1));
+            avatarInitials.setText(initials.toUpperCase().isEmpty() ? "?" : initials.toUpperCase());
+            avatarInitials.setVisible(true);
+            avatarInitials.setManaged(true);
+        }
+        if (avatarImage != null) {
+            avatarImage.setImage(null);
+            avatarImage.setVisible(false);
+            avatarImage.setManaged(false);
+        }
+    }
+
     @FXML
     private void handleChangeAvatar() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Choisir une photo de profil");
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif")
+        );
+        File selected = fc.showOpenDialog(avatarImage != null ? avatarImage.getScene().getWindow() : null);
+        if (selected == null) return;
+
+        long fileSize = selected.length();
+        long maxSize = 20 * 1024 * 1024; // 20 MB
+        if (fileSize > maxSize) {
+            showMessage("L'image est trop volumineuse (max 20 Mo)", "error");
+            return;
+        }
+
+        Path uploadsDir = Paths.get(System.getProperty("user.dir"), "uploads", "profiles");
+        try {
+            Files.createDirectories(uploadsDir);
+        } catch (IOException e) {
+            showMessage("Impossible de creer le dossier: " + e.getMessage(), "error");
+            return;
+        }
+
+        String ext = "";
+        String name = selected.getName();
+        int i = name.lastIndexOf('.');
+        if (i > 0) ext = name.substring(i);
+
+        String destFileName = "user_" + currentUser.getId() + ext;
+        Path dest = uploadsDir.resolve(destFileName);
+        try {
+            Files.copy(selected.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            showMessage("Erreur lors de la copie: " + e.getMessage(), "error");
+            return;
+        }
+
+        String absPath = dest.toAbsolutePath().toString();
+        currentUser.setImageUrl(absPath);
+
+        executor.execute(() -> {
+            try {
+                boolean ok = userService.updateImageUrl(currentUser.getId(), absPath);
+                Platform.runLater(() -> {
+                    if (ok) {
+                        SessionManager.login(currentUser);
+                        displayUserData();
+                        showMessage("Photo de profil mise a jour", "success");
+                    } else {
+                        showMessage("Impossible de sauvegarder la photo en base", "error");
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> showMessage("Erreur: " + e.getMessage(), "error"));
+            }
+        });
     }
 
     @FXML

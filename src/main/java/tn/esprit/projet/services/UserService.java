@@ -251,8 +251,22 @@ public class UserService implements IService<User> {
 
     @Override
     public void update(User u) throws SQLException {
-        String sql = "UPDATE utilisateur SET nom=?, email=?, telephone=?, date_naissance=?, role_id=?, status=? WHERE id=?";
+        String sql = "UPDATE utilisateur SET nom=?, email=?, telephone=?, date_naissance=?, role_id=?, status=?, image_url=? WHERE id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, u.getNom());
+            ps.setString(2, u.getEmail());
+            ps.setString(3, u.getTelephone());
+            ps.setDate(4, u.getDateNaissance() != null ? Date.valueOf(u.getDateNaissance()) : null);
+            ps.setInt(5, u.getRoleId());
+            ps.setString(6, u.getStatus() != null ? u.getStatus() : "actif");
+            ps.setString(7, u.getImageUrl() != null ? u.getImageUrl() : "default.png");
+            ps.setInt(8, u.getId());
+            if (ps.executeUpdate() > 0) return;
+        } catch (SQLException e) {
+            LOG.log(Level.FINE, "Update with image_url failed, trying without", e);
+        }
+        String sqlFallback = "UPDATE utilisateur SET nom=?, email=?, telephone=?, date_naissance=?, role_id=?, status=? WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlFallback)) {
             ps.setString(1, u.getNom());
             ps.setString(2, u.getEmail());
             ps.setString(3, u.getTelephone());
@@ -269,6 +283,23 @@ public class UserService implements IService<User> {
     // Alias pour compatibilité
     public void modifierUser(User u) throws SQLException {
         update(u);
+    }
+
+    /**
+     * Met à jour uniquement la photo de profil (image_url).
+     */
+    public boolean updateImageUrl(int userId, String imageUrl) {
+        try {
+            String sql = "UPDATE utilisateur SET image_url = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, imageUrl);
+                ps.setInt(2, userId);
+                return ps.executeUpdate() > 0;
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "Erreur updateImageUrl", e);
+        }
+        return false;
     }
 
     /**
@@ -424,6 +455,11 @@ public class UserService implements IService<User> {
         if (dateN != null) user.setDateNaissance(dateN);
         user.setStatus(status);
         try {
+            String imageUrl = rs.getString("image_url");
+            if (imageUrl != null && !imageUrl.isEmpty() && !"default.png".equals(imageUrl))
+                user.setImageUrl(imageUrl);
+        } catch (SQLException ignored) {}
+        try {
             Timestamp t = rs.getTimestamp("last_login");
             if (t != null) user.setLastLogin(t.toLocalDateTime());
         } catch (SQLException ignored) {}
@@ -456,6 +492,11 @@ public class UserService implements IService<User> {
         user.setTelephone(tel);
         if (dateN != null) user.setDateNaissance(dateN);
         user.setStatus(status);
+        try {
+            String imageUrl = rs.getString("image_url");
+            if (imageUrl != null && !imageUrl.isEmpty() && !"default.png".equals(imageUrl))
+                user.setImageUrl(imageUrl);
+        } catch (SQLException ignored) {}
         try {
             Timestamp t = rs.getTimestamp("last_login");
             if (t != null) user.setLastLogin(t.toLocalDateTime());

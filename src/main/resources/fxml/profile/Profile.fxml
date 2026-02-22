@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
 
@@ -31,9 +32,11 @@
                 <StackPane>
                     <VBox alignment="CENTER" spacing="10" styleClass="profile-header-info">
 
-                        <!-- Avatar avec initiales -->
+                        <!-- Avatar avec photo ou initiales -->
                         <StackPane styleClass="profile-avatar-container">
                             <Circle radius="60" styleClass="profile-avatar"/>
+                            <ImageView fx:id="avatarImage" fitWidth="120" fitHeight="120" preserveRatio="true"
+                                       visible="false" managed="false" pickOnBounds="false"/>
                             <Label fx:id="avatarInitials" text="ML" styleClass="profile-avatar-initials"/>
                             <Button text="📷" styleClass="profile-avatar-edit-btn"
                                     onAction="#handleChangeAvatar"/>
