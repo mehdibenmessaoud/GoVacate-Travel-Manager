@@ -38,6 +38,9 @@
             <StackPane alignment="TOP_RIGHT">
                 <ImageView fx:id="packImageView" fitWidth="420" fitHeight="260"
                            preserveRatio="false" styleClass="image-view-details" />
+                <Label fx:id="promoBadge" visible="false" text="OFFRE FLASH"
+                       style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 15;
+                  -fx-font-weight: bold; -fx-background-radius: 0 0 0 15; -fx-font-size: 13px;"/>
             </StackPane>
 
             <VBox alignment="CENTER" spacing="10" styleClass="price-container-details">

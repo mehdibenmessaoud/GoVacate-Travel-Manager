@@ -11,11 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import tn.esprit.projet.entities.Pack;
-import tn.esprit.projet.services.CurrencyService;
-import tn.esprit.projet.services.DestinationService;
-import tn.esprit.projet.services.HotelService;
-import tn.esprit.projet.services.ExcursionService;
-import tn.esprit.projet.services.WeatherService;
+import tn.esprit.projet.services.*;
 import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.io.IOException;
@@ -42,6 +38,7 @@ public class PackDetailsController implements Initializable {
     @FXML private ImageView packImageView;
     @FXML private Button btnBack;
     @FXML private Button btnReserver;
+    @FXML private Label promoBadge;
 
     // --- ÉLÉMENTS MÉTÉO ---
     @FXML private ImageView weatherIcon;
@@ -52,6 +49,7 @@ public class PackDetailsController implements Initializable {
     @FXML private Label convertedPriceLabel;
     @FXML private ComboBox<String> currencyCombo;
 
+    private PackService packService = new PackService();
     private final Connection connection = MyDBConnexion.getInstance().getConnection();
     private final DestinationService destinationService = new DestinationService(connection);
     private final HotelService hotelService = new HotelService(connection);
@@ -76,14 +74,41 @@ public class PackDetailsController implements Initializable {
     }
 
     public void setPackData(Pack pack) {
+        // --- MODIFICATION : LOGIQUE DE PRIX DYNAMIQUE ---
+        // Récupération des données depuis le service
+        int currentReservations = packService.getCurrentPackReservations(pack.getId());
+        double dynamicPrice = packService.calculateDynamicPackPrice(pack, currentReservations);
+        this.currentPackPrice = dynamicPrice; // On stocke le prix calculé (promo ou hausse)
+
+        // Gestion visuelle du Badge et de la couleur du prix
+        if (dynamicPrice < pack.getPrix()) {
+            // Cas PROMO
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;"); // Vert
+            if (promoBadge != null) {
+                promoBadge.setText("🔥 OFFRE FLASH : -20%");
+                promoBadge.setVisible(true);
+            }
+        } else if (currentReservations >= 20) {
+            // Cas FORTE DEMANDE (Seuil de 20 comme demandé)
+            priceLabel.setText(String.format("%.1f DT", dynamicPrice));
+            priceLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;"); // Rouge
+            if (promoBadge != null) {
+                promoBadge.setText("⚡ PACK TRÈS DEMANDÉ");
+                promoBadge.setVisible(true);
+            }
+        } else {
+            // Cas NORMAL
+            priceLabel.setText(pack.getPrix() + " DT");
+            priceLabel.setStyle("-fx-text-fill: #FF8210;");
+            if (promoBadge != null) promoBadge.setVisible(false);
+        }
+        // ------------------------------------------------
+
         // 1. Informations de base
         nameLabel.setText(pack.getName());
         categoryLabel.setText(pack.getCategorie());
         descriptionLabel.setText(pack.getDescription());
-
-        // Stockage et affichage du prix
-        this.currentPackPrice = pack.getPrix();
-        priceLabel.setText(pack.getPrix() + " DT");
 
         durationLabel.setText(pack.getDuree() + " Jours");
 
@@ -118,12 +143,12 @@ public class PackDetailsController implements Initializable {
             System.err.println("Erreur image : " + e.getMessage());
         }
 
-        // 3. MÉTÉO DYNAMIQUE (Utilise le nom récupéré par la jointure PackService)
+        // 3. MÉTÉO DYNAMIQUE
         if (pack.getDestinationName() != null && !pack.getDestinationName().isEmpty()) {
-            afficherMeteo(pack.getDestinationName()); //
+            afficherMeteo(pack.getDestinationName());
         }
 
-        // 4. CONVERSION AUTOMATIQUE AU CHARGEMENT
+        // 4. CONVERSION AUTOMATIQUE AU CHARGEMENT (Utilise maintenant currentPackPrice mis à jour)
         if (currencyCombo != null && currencyCombo.getValue() != null) {
             updateConvertedPrice(currencyCombo.getValue());
         }

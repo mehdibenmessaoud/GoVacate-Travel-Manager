@@ -3,6 +3,8 @@ package tn.esprit.projet.services;
 import tn.esprit.projet.entities.Pack;
 import tn.esprit.projet.utils.MyDBConnexion;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,5 +144,41 @@ public class PackService implements IService<Pack> {
         p.setDestinationName(rs.getString("destination_name"));
 
         return p;
+    }
+
+    public int getCurrentPackReservations(int packId) {
+        int total = 0;
+        String query = "SELECT COUNT(*) FROM reservation_pack WHERE pack_id = ?";
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, packId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Erreur comptage packs : " + ex.getMessage());
+        }
+        return total;
+    }
+
+    public double calculateDynamicPackPrice(Pack p, int currentReservations) {
+        double finalPrice = p.getPrix();
+
+        // Calcul du temps restant avant la date de fin (date_arriver)
+        if (p.getDateArriver() != null) {
+            long hoursUntilEnd = ChronoUnit.HOURS.between(LocalDateTime.now(), p.getDateArriver().atStartOfDay());
+
+            // CONTRAINTE 1 : Promo si < 15 réservations ET reste moins de 48h
+            if (currentReservations < 15 && hoursUntilEnd <= 48 && hoursUntilEnd > 0) {
+                finalPrice = finalPrice * 0.8; // -20%
+            }
+        }
+
+        // CONTRAINTE 2 : Augmentation si le pack est réservé par 20 personnes
+        if (currentReservations >= 20) {
+            finalPrice = finalPrice * 1.15; // +15% par exemple
+        }
+
+        return finalPrice;
     }
 }
