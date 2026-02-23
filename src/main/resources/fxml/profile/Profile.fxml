@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.projet.gui.profile.ProfileController"
+            styleClass="profile-scroll"
+            fitToWidth="true"
+            stylesheets="@../../css/profile-style.css"
+            prefHeight="700" prefWidth="800">
+
+    <VBox styleClass="profile-container" alignment="TOP_CENTER">
+        <VBox styleClass="profile-content-wrapper" spacing="25">
+
+            <!-- ==================== BOUTON RETOUR ==================== -->
+            <HBox alignment="CENTER_LEFT">
+                <Button text="← Retour" onAction="#handleBack" styleClass="btn-back"/>
+            </HBox>
+
+            <!-- ==================== HEADER CARD ==================== -->
+            <VBox styleClass="profile-header-card" spacing="0">
+
+                <!-- Cover -->
+                <Region styleClass="profile-cover-area"/>
+
+                <!-- Avatar & Info -->
+                <StackPane>
+                    <VBox alignment="CENTER" spacing="10" styleClass="profile-header-info">
+
+                        <!-- Avatar avec initiales -->
+                        <StackPane styleClass="profile-avatar-container">
+                            <Circle radius="60" styleClass="profile-avatar"/>
+                            <Label fx:id="avatarInitials" text="ML" styleClass="profile-avatar-initials"/>
+                            <Button text="📷" styleClass="profile-avatar-edit-btn"
+                                    onAction="#handleChangeAvatar"/>
+                        </StackPane>
+
+                        <!-- NOM COMPLET (Affichage) -->
+                        <VBox alignment="CENTER" spacing="5">
+
+                            <!-- Mode Affichage : Nom Complet -->
+                            <Label fx:id="lblFullName" text="Nom Utilisateur"
+                                   styleClass="profile-fullname"/>
+
+                            <!-- Mode Édition : Champs séparés (caché par défaut) -->
+                            <HBox fx:id="hboxEditName" visible="false" managed="false"
+                                  spacing="10" alignment="CENTER">
+                                <VBox alignment="CENTER_LEFT">
+                                    <TextField fx:id="txtPrenom" promptText="Prénom"
+                                               styleClass="profile-name-edit-field"
+                                               prefWidth="150"/>
+                                    <Label text="Prénom" styleClass="profile-name-hint"/>
+                                </VBox>
+                                <Label text="/" styleClass="profile-name-separator"/>
+                                <VBox alignment="CENTER_LEFT">
+                                    <TextField fx:id="txtNom" promptText="Nom"
+                                               styleClass="profile-name-edit-field"
+                                               prefWidth="150"/>
+                                    <Label text="Nom" styleClass="profile-name-hint"/>
+                                </VBox>
+                            </HBox>
+
+                            <!-- OU : Champ unique nom complet -->
+                            <TextField fx:id="txtFullName" text=""
+                                       visible="false" managed="false"
+                                       styleClass="profile-fullname-field"
+                                       maxWidth="300"/>
+
+                            <!-- Rôle -->
+                            <HBox alignment="CENTER" spacing="10">
+                                <Label fx:id="lblRole" text="ADMINISTRATEUR"
+                                       styleClass="profile-role-badge profile-role-badge-admin"/>
+                            </HBox>
+
+                            <!-- Email -->
+                            <Label fx:id="lblEmail" text="email@example.com"
+                                   styleClass="profile-email"/>
+
+                            <!-- Membre depuis -->
+                            <Label fx:id="lblMemberSince" text="Membre depuis"
+                                   styleClass="profile-member-since"/>
+                        </VBox>
+
+                        <!-- Stats -->
+                        <HBox styleClass="profile-header-stats">
+                            <VBox styleClass="profile-stat-item">
+                                <Label fx:id="statReservations" text="0" styleClass="profile-stat-value"/>
+                                <Label text="Réservations" styleClass="profile-stat-label"/>
+                            </VBox>
+                            <VBox styleClass="profile-stat-item">
+                                <Label fx:id="statFavoris" text="0" styleClass="profile-stat-value"/>
+                                <Label text="Favoris" styleClass="profile-stat-label"/>
+                            </VBox>
+                            <VBox styleClass="profile-stat-item">
+                                <Label fx:id="statAvis" text="0" styleClass="profile-stat-value"/>
+                                <Label text="Avis" styleClass="profile-stat-label"/>
+                            </VBox>
+                        </HBox>
+
+                    </VBox>
+                </StackPane>
+            </VBox>
+
+            <!-- ==================== TABS ==================== -->
+            <HBox styleClass="profile-tabs-container">
+                <HBox styleClass="profile-tabs" spacing="5">
+                    <Button fx:id="tabInformations" text="Informations" styleClass="profile-tab-btn profile-tab-btn-active"
+                            onAction="#showInformations"/>
+                    <Button fx:id="tabSecurite" text="Sécurité" styleClass="profile-tab-btn"
+                            onAction="#showSecurite"/>
+                </HBox>
+            </HBox>
+
+            <!-- ==================== CARD INFO PERSONNELLES ==================== -->
+            <VBox fx:id="cardInformations" styleClass="profile-card" spacing="15">
+
+                <HBox styleClass="profile-card-header" alignment="CENTER_LEFT">
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label text="Informations Personnelles" styleClass="profile-card-title"/>
+                        <Label text="Vos informations de profil" styleClass="profile-card-subtitle"/>
+                    </VBox>
+                    <Button fx:id="btnEdit" text="Modifier" styleClass="profile-card-edit-btn"
+                            onAction="#toggleEditMode"/>
+                </HBox>
+
+                <!-- Formulaire -->
+                <GridPane styleClass="profile-form-grid" vgap="15" hgap="20">
+
+                    <!-- Ligne 1: Nom Complet (affichage unique) -->
+                    <VBox styleClass="profile-form-group"
+                          GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+                        <Label text="Nom complet *" styleClass="profile-form-label"/>
+
+                        <!-- Affichage -->
+                        <Label fx:id="lblDisplayFullName" text="Nom Utilisateur"
+                               styleClass="profile-form-field"
+                               style="-fx-background-color: #f0f0f0; -fx-padding: 12; -fx-background-radius: 8;"/>
+
+                        <!-- Édition (champ unique) -->
+                        <TextField fx:id="fieldFullName" text=""
+                                   visible="false" managed="false"
+                                   styleClass="profile-form-field"/>
+                    </VBox>
+
+                    <!-- Ligne 2: Email (readonly) -->
+                    <VBox styleClass="profile-form-group"
+                          GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="Email *" styleClass="profile-form-label"/>
+                        <TextField fx:id="fieldEmail" text=""
+                                   styleClass="profile-form-field profile-form-field-readonly"
+                                   editable="false"/>
+                    </VBox>
+
+                    <!-- Ligne 2: Téléphone -->
+                    <VBox styleClass="profile-form-group"
+                          GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Téléphone" styleClass="profile-form-label"/>
+                        <TextField fx:id="fieldTelephone" promptText="Votre numéro"
+                                   styleClass="profile-form-field"/>
+                    </VBox>
+
+                    <!-- Ligne 3: Date de naissance -->
+                    <VBox styleClass="profile-form-group"
+                          GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="Date de naissance" styleClass="profile-form-label"/>
+                        <DatePicker fx:id="dpDateNaissance"
+                                    styleClass="profile-form-field"
+                                    promptText="JJ/MM/AAAA"/>
+                    </VBox>
+
+                    <!-- Ligne 3: Statut -->
+                    <VBox styleClass="profile-form-group"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="Statut du compte" styleClass="profile-form-label"/>
+                        <HBox fx:id="statusBox" spacing="10" alignment="CENTER_LEFT"
+                              style="-fx-background-color: #d4edda; -fx-padding: 10; -fx-background-radius: 8;">
+                            <Label text="🟢" style="-fx-font-size: 12px;"/>
+                            <Label fx:id="lblStatus" text="Actif" style="-fx-text-fill: #155724; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+
+                </GridPane>
+
+                <!-- Boutons Action -->
+                <HBox fx:id="hboxActions" spacing="10" alignment="CENTER_RIGHT"
+                      visible="false" managed="false" style="-fx-padding: 20 0 0 0;">
+                    <Button text="Annuler" styleClass="profile-btn-cancel"
+                            onAction="#cancelEdit"/>
+                    <Button text="Enregistrer" styleClass="profile-btn-save"
+                            onAction="#saveProfile"/>
+                </HBox>
+
+            </VBox>
+
+            <!-- ==================== CARD MOT DE PASSE ==================== -->
+            <VBox fx:id="cardSecurite" styleClass="profile-card" spacing="15" visible="false" managed="false">
+                <VBox styleClass="profile-card-header">
+                    <Label text="Sécurité" styleClass="profile-card-title"/>
+                    <Label text="Changez votre mot de passe" styleClass="profile-card-subtitle"/>
+                </VBox>
+
+                <VBox styleClass="profile-password-section" spacing="15">
+                    <VBox styleClass="profile-form-group">
+                        <Label text="Mot de passe actuel" styleClass="profile-form-label"/>
+                        <PasswordField fx:id="currentPasswordField" styleClass="profile-form-field" promptText="••••••••"/>
+                    </VBox>
+
+                    <VBox styleClass="profile-form-group">
+                        <Label text="Nouveau mot de passe" styleClass="profile-form-label"/>
+                        <PasswordField fx:id="newPasswordField" styleClass="profile-form-field" promptText="••••••••"/>
+                        <Region styleClass="profile-password-strength profile-password-strength-medium"
+                                prefHeight="4" maxWidth="200"/>
+                    </VBox>
+
+                    <VBox styleClass="profile-form-group">
+                        <Label text="Confirmer" styleClass="profile-form-label"/>
+                        <PasswordField fx:id="confirmPasswordField" styleClass="profile-form-field" promptText="••••••••"/>
+                    </VBox>
+                </VBox>
+
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="Mettre à jour" styleClass="profile-btn-save"
+                            onAction="#updatePassword"/>
+                </HBox>
+            </VBox>
+
+            <!-- Message -->
+            <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #27AE60; -fx-font-size: 13px;"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

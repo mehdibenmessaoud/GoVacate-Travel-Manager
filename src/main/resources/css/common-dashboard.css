@@ -1,0 +1,172 @@
+/* Common Dashboard Styles - Shared between Admin & Client */
+/* Palette: Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
+
+/* =========================================================
+   COMMON LAYOUT UTILITIES
+========================================================= */
+.dashboard-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.dashboard-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.dashboard-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 12;
+}
+
+.dashboard-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #C0C0C0;
+    -fx-background-radius: 6;
+}
+
+.dashboard-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #6C6D6F;
+}
+
+/* =========================================================
+   COMMON BUTTONS (Dashboard variants)
+========================================================= */
+.btn-dashboard {
+    -fx-background-radius: 8;
+    -fx-padding: 12 24;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-dashboard-sm {
+    -fx-padding: 8 16;
+    -fx-font-size: 13px;
+}
+
+.btn-dashboard-lg {
+    -fx-padding: 15 30;
+    -fx-font-size: 16px;
+}
+
+/* Icon buttons */
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-background-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-background-color: rgba(0, 68, 123, 0.1);
+}
+
+.btn-icon-orange:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+}
+
+/* =========================================================
+   COMMON CARDS
+========================================================= */
+.card-dashboard {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 4);
+}
+
+.card-dashboard-hover {
+    -fx-cursor: hand;
+}
+
+.card-dashboard-hover:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 20, 0, 0, 6);
+    -fx-translate-y: -3;
+}
+
+/* =========================================================
+   COMMON FORMS (Dashboard)
+========================================================= */
+.form-group {
+    -fx-spacing: 8;
+}
+
+.form-label-dashboard {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.form-input-dashboard {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-font-size: 14px;
+}
+
+.form-input-dashboard:focused {
+    -fx-border-color: #FF8210;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.2), 4, 0, 0, 0);
+}
+
+/* =========================================================
+   COMMON MODALS/DIALOGS
+========================================================= */
+.modal-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-container {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 30, 0, 0, 10);
+}
+
+.modal-header {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+    -fx-padding: 0 0 20 0;
+}
+
+/* =========================================================
+   COMMON LOADING STATES
+========================================================= */
+.loading-spinner {
+    -fx-progress-color: #FF8210;
+}
+
+.loading-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* =========================================================
+   COMMON EMPTY STATES
+========================================================= */
+.empty-state {
+    -fx-alignment: CENTER;
+    -fx-spacing: 20;
+}
+
+.empty-state-icon {
+    -fx-fill: #C0C0C0;
+    -fx-font-size: 48px;
+}
+
+.empty-state-text {
+    -fx-font-size: 16px;
+    -fx-text-fill: #6C6D6F;
+}
+
+/* =========================================================
+   COMMON TOOLTIPS
+========================================================= */
+.tooltip-dashboard {
+    -fx-background-color: #00447B;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8 12;
+    -fx-background-radius: 6;
+}

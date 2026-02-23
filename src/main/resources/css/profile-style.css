@@ -1,0 +1,338 @@
+/* Profile Styles - GoVacate */
+/* Palette: Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
+
+/* =========================================================
+   PROFILE ROOT & CONTAINERS
+========================================================= */
+.profile-scroll {
+    -fx-background-color: #F8F9FA;
+    -fx-background-insets: 0;
+}
+
+.profile-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.profile-container {
+    -fx-background-color: #F8F9FA;
+    -fx-padding: 20;
+}
+
+.profile-content-wrapper {
+    -fx-max-width: 800;
+    -fx-pref-width: 800;
+}
+
+/* =========================================================
+   PROFILE HEADER CARD
+========================================================= */
+.profile-header-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 4);
+}
+
+.profile-cover-area {
+    -fx-background-color: linear-gradient(to right, #00447B, #679AC1);
+    -fx-pref-height: 120;
+    -fx-min-height: 120;
+}
+
+.profile-header-info {
+    -fx-padding: 20;
+}
+
+/* =========================================================
+   PROFILE AVATAR
+========================================================= */
+.profile-avatar-container {
+    -fx-alignment: CENTER;
+}
+
+.profile-avatar {
+    -fx-fill: #e8f4fc;
+}
+
+.profile-avatar-edit-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+/* =========================================================
+   PROFILE NOM COMPLET (Prénom + Nom fusionnés)
+========================================================= */
+
+/* Avatar avec initiales basées sur le nom complet */
+.profile-avatar-initials {
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+/* Nom complet dans l'en-tête */
+.profile-fullname {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+    -fx-alignment: CENTER;
+}
+
+/* Sous-titre avec prénom séparé si besoin */
+.profile-firstname {
+    -fx-font-size: 16px;
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: normal;
+}
+
+/* Champ nom complet éditable */
+.profile-fullname-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 15;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+    -fx-alignment: CENTER;
+}
+
+.profile-fullname-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #FF8210;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.2), 4, 0, 0, 0);
+}
+
+/* Séparateur visuel prénom/nom */
+.profile-name-separator {
+    -fx-text-fill: #C0C0C0;
+    -fx-font-size: 20px;
+    -fx-padding: 0 10;
+}
+
+/* Mode édition : champs séparés mais stylisés ensemble */
+.profile-name-edit-container {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-padding: 5;
+}
+
+.profile-name-edit-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.profile-name-edit-field:focused {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+}
+
+/* Label indicatif prénom/nom */
+.profile-name-hint {
+    -fx-font-size: 10px;
+    -fx-text-fill: #6C6D6F;
+    -fx-padding: 0 0 0 5;
+}
+
+/* =========================================================
+   PROFILE ROLE & EMAIL
+========================================================= */
+.profile-role-badge {
+    -fx-padding: 5 15;
+    -fx-background-radius: 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.profile-role-badge-admin {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+.profile-role-badge-client {
+    -fx-background-color: #00447B;
+    -fx-text-fill: white;
+}
+
+.profile-email {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6C6D6F;
+}
+
+.profile-member-since {
+    -fx-font-size: 12px;
+    -fx-text-fill: #679AC1;
+}
+
+/* =========================================================
+   PROFILE STATS
+========================================================= */
+.profile-header-stats {
+    -fx-spacing: 30;
+    -fx-alignment: CENTER;
+    -fx-padding: 15 0 0 0;
+}
+
+.profile-stat-item {
+    -fx-alignment: CENTER;
+    -fx-spacing: 5;
+}
+
+.profile-stat-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.profile-stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6C6D6F;
+}
+
+/* =========================================================
+   PROFILE TABS
+========================================================= */
+.profile-tabs-container {
+    -fx-padding: 10 0;
+}
+
+.profile-tabs {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.profile-tab-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.profile-tab-btn:hover {
+    -fx-text-fill: #00447B;
+}
+
+.profile-tab-btn-active {
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+}
+
+/* =========================================================
+   PROFILE CARDS
+========================================================= */
+.profile-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 25;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 2);
+}
+
+.profile-card-header {
+    -fx-padding: 0 0 15 0;
+}
+
+.profile-card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.profile-card-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6C6D6F;
+}
+
+.profile-card-edit-btn {
+    -fx-background-color: #00447B;
+    -fx-text-fill: white;
+    -fx-padding: 8 16;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.profile-card-edit-btn:hover {
+    -fx-background-color: #679AC1;
+}
+
+/* =========================================================
+   PROFILE FORM
+========================================================= */
+.profile-form-grid {
+    -fx-padding: 10 0;
+}
+
+.profile-form-group {
+    -fx-spacing: 5;
+}
+
+.profile-form-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.profile-form-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+}
+
+.profile-form-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #FF8210;
+}
+
+.profile-form-field-readonly {
+    -fx-background-color: #e9ecef;
+}
+
+/* =========================================================
+   PROFILE BUTTONS
+========================================================= */
+.profile-btn-save {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.profile-btn-save:hover {
+    -fx-background-color: #FFBD59;
+}
+
+.profile-btn-cancel {
+    -fx-background-color: #6C6D6F;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.profile-btn-cancel:hover {
+    -fx-background-color: #5a5b5d;
+}
+
+/* =========================================================
+   PROFILE PASSWORD
+========================================================= */
+.profile-password-section {
+    -fx-padding: 10 0;
+}
+
+.profile-password-strength {
+    -fx-background-radius: 2;
+    -fx-background-color: #e0e0e0;
+}
+
+.profile-password-strength-medium {
+    -fx-background-color: #FF8210;
+}
