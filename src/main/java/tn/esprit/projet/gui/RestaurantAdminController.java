@@ -30,6 +30,8 @@ public class RestaurantAdminController implements Initializable {
     @FXML private TableColumn<Restaurant, Integer> colCapacity;
     @FXML private TableColumn<Restaurant, Void> colActions;
     @FXML private TextField searchField;
+
+
     @FXML private ComboBox<String> categoryFilter;
     @FXML private ComboBox<String> statusFilter;
 

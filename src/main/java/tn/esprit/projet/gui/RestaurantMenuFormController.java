@@ -18,7 +18,7 @@ import java.util.List;
 
 public class RestaurantMenuFormController {
 
-    @FXML private VBox mainContainer; // Linked to FXML root to resolve 'rootPane' error
+    @FXML private VBox mainContainer;
     @FXML private Label lblTitle;
     @FXML private TextField txtName, txtPrice;
     @FXML private TextArea txtDescription;
@@ -35,6 +35,13 @@ public class RestaurantMenuFormController {
         cbStatus.getItems().addAll("AVAILABLE", "UNAVAILABLE");
         cbStatus.setValue("AVAILABLE");
         txtDescription.setWrapText(true);
+
+        // Real-time numeric validation for Price (allows digits and one decimal point)
+        txtPrice.textProperty().addListener((obs, old, newVal) -> {
+            if (!newVal.matches("\\d*(\\.\\d*)?")) {
+                txtPrice.setText(old);
+            }
+        });
     }
 
     public void setParentController(RestaurantFormController parent) {
@@ -50,7 +57,6 @@ public class RestaurantMenuFormController {
             txtPrice.setText(menu.getPrice() != null ? menu.getPrice().toString() : "");
             cbStatus.setValue(menu.getStatus());
 
-            // 1. Check memory first (for newly added meals)
             if (parentController != null && parentController.getImagesForMenu(menu) != null) {
                 List<MenuImage> memoryImages = parentController.getImagesForMenu(menu);
                 if (!memoryImages.isEmpty()) {
@@ -60,7 +66,6 @@ public class RestaurantMenuFormController {
                 }
             }
 
-            // 2. Check DB for existing meals
             if (menu.getId() != 0) {
                 try {
                     List<MenuImage> existing = mis.getByMenuId(menu.getId());
@@ -77,15 +82,11 @@ public class RestaurantMenuFormController {
     private void handleUploadImage() {
         FileChooser fc = new FileChooser();
         fc.setTitle("Sélectionner une photo du plat");
-
-        // Restriction: Only PNG, JPG, and JPEG
         fc.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
         );
 
-        // Uses mainContainer to get the current window
         File file = fc.showOpenDialog(mainContainer.getScene().getWindow());
-
         if (file != null) {
             singleImage = new MenuImage();
             singleImage.setImageUrl(file.toURI().toString());
@@ -99,7 +100,6 @@ public class RestaurantMenuFormController {
             ImageView iv = new ImageView(new Image(url));
             iv.setFitWidth(180);
             iv.setPreserveRatio(true);
-            // Apply a slight glow effect to the preview image
             iv.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);");
             imagePreviewContainer.getChildren().add(iv);
         } catch (Exception e) {
@@ -109,26 +109,61 @@ public class RestaurantMenuFormController {
 
     @FXML
     private void handleSave() {
-        if (txtName.getText().isEmpty() || txtPrice.getText().isEmpty()) return;
+        if (!isInputValid()) return;
 
         if (currentMenu == null) currentMenu = new Menu();
-        currentMenu.setName(txtName.getText());
-        currentMenu.setDescription(txtDescription.getText());
-
-        try {
-            currentMenu.setPrice(new BigDecimal(txtPrice.getText()));
-        } catch (NumberFormatException e) {
-            // Optional: Add an error alert here for invalid price
-            return;
-        }
-
+        currentMenu.setName(txtName.getText().trim());
+        currentMenu.setDescription(txtDescription.getText().trim());
+        currentMenu.setPrice(new BigDecimal(txtPrice.getText().trim()));
         currentMenu.setStatus(cbStatus.getValue());
 
         List<MenuImage> list = new ArrayList<>();
         if (singleImage != null) {
             list.add(singleImage);
         }
+
         parentController.addOrUpdateMenuItem(currentMenu, list);
+    }
+
+    // --- VALIDATION LOGIC ---
+    private boolean isInputValid() {
+        String errorMessage = "";
+
+        if (txtName.getText() == null || txtName.getText().trim().isEmpty()) {
+            errorMessage += "- Le nom du plat est obligatoire.\n";
+        }
+
+        if (txtPrice.getText() == null || txtPrice.getText().trim().isEmpty()) {
+            errorMessage += "- Le prix est obligatoire.\n";
+        } else {
+            try {
+                BigDecimal price = new BigDecimal(txtPrice.getText().trim());
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    errorMessage += "- Le prix doit être supérieur à 0.\n";
+                }
+            } catch (NumberFormatException e) {
+                errorMessage += "- Le prix doit être un nombre valide.\n";
+            }
+        }
+
+        if (singleImage == null) {
+            errorMessage += "- Une image du plat est obligatoire.\n";
+        }
+
+        if (errorMessage.isEmpty()) {
+            return true;
+        } else {
+            showAlert(Alert.AlertType.WARNING, "Validation Échouée", errorMessage);
+            return false;
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML private void handleCancel() { parentController.closeMenuForm(); }

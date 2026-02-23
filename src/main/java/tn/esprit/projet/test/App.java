@@ -6,42 +6,51 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class App extends Application {
+    private static Stage primaryStage;
+
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
+        primaryStage = stage;
+        // Start with the Client view by default for now
+        showClientView();
+    }
+
+    public static void showClientView() {
+        loadView("/ClientMainView.fxml", "GoVacate - Client Portal", "/css/client_style.css");
+    }
+
+    public static void showAdminView() {
+        loadView("/AdminDashboard.fxml", "GoVacate - Admin Panel", "/css/admin_style.css");
+    }
+
+    private static void loadView(String fxmlPath, String title, String cssPath) {
         try {
-            System.out.println("Loading FXML...");
-            Parent root = FXMLLoader.load(getClass().getResource("/AdminDashboard.fxml"));
-            
-            System.out.println("Creating scene...");
-            Scene scene = new Scene(root);
+            FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
+            Parent root = loader.load();
 
-            // Load initial light theme
-            String cssResource = getClass().getResource("/css/admin_style.css").toExternalForm();
-            scene.getStylesheets().add(cssResource);
-            System.out.println("✓ CSS loaded: admin_light.css");
+            Scene scene = (primaryStage.getScene() == null)
+                    ? new Scene(root)
+                    : primaryStage.getScene();
 
-            stage.setTitle("GoVacate Admin Panel");
-            stage.setWidth(1400);
-            stage.setHeight(800);
-            stage.setScene(scene);
-            stage.show();
-            
-            System.out.println("✓ Application started successfully");
-            
-        } catch (NullPointerException e) {
-            System.err.println("✗ FXML Resource not found: " + e.getMessage());
+            scene.setRoot(root);
+            scene.getStylesheets().clear();
+            scene.getStylesheets().add(App.class.getResource(cssPath).toExternalForm());
+
+            primaryStage.setTitle(title);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+            System.out.println("✓ Loaded: " + fxmlPath);
+        } catch (IOException e) {
+            System.err.println("✗ Error loading " + fxmlPath);
             e.printStackTrace();
-            System.exit(1);
-        } catch (Exception e) {
-            System.err.println("✗ Error starting application: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
         }
     }
 
     public static void main(String[] args) {
-        System.out.println("GoVacate Application Starting...");
         launch(args);
     }
 }

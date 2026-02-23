@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane fx:id="mainBorderPane" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #0b0f14;" stylesheets="@/css/admin_light.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientController">
+    <left>
+        <AnchorPane prefWidth="250.0" style="-fx-background-color: #0d1117; -fx-border-color: #1a1e23; -fx-border-width: 0 1 0 0;">
+            <children>
+                <Pane fx:id="slidingPane" layoutX="10.0" prefHeight="50.0" prefWidth="230.0" styleClass="sliding-bubble" />
+
+                <VBox fx:id="menuContainer" layoutY="100.0" prefWidth="250.0" spacing="10.0">
+                    <children>
+                        <Button fx:id="btnHome" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button" text="  🏠  Accueil">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                        <Button fx:id="btnRestaurantClient" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button" text="  🍴  Restaurants">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                        <Button fx:id="btnMyBookings" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button" text="  📅  Mes Réservations">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                        <Button fx:id="btnFavorites" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button" text="  ❤️  Favoris">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                        <Region VBox.vgrow="ALWAYS" />
+                        <Button fx:id="btnProfile" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button" text="  👤  Mon Profil">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                        <Button fx:id="btnLogout" alignment="BASELINE_LEFT" prefHeight="50.0" prefWidth="250.0" styleClass="nav-button-logout" text="  🚪  Déconnexion">
+                            <padding><Insets left="30.0" /></padding>
+                        </Button>
+                    </children>
+                </VBox>
+
+                <VBox alignment="CENTER" layoutY="20.0" prefWidth="250.0">
+                    <Label style="-fx-text-fill: #FF8210; -fx-font-size: 24; -fx-font-weight: bold;" text="GoVacate" />
+                </VBox>
+            </children>
+        </AnchorPane>
+    </left>
+    <center>
+        <StackPane fx:id="contentArea">
+            <Label style="-fx-text-fill: white;" text="Chargement..." />
+        </StackPane>
+    </center>
+</BorderPane>

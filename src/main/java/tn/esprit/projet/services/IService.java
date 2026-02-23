@@ -18,4 +18,6 @@ public interface IService<T> {
 
     // Récupérer une seule entrée par son identifiant
     T getById(int id) throws SQLException;
+
+
 }

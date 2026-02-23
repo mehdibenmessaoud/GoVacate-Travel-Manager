@@ -19,16 +19,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AdminController implements Initializable {
+public class ClientController implements Initializable {
 
     @FXML private Pane slidingPane;
     @FXML private VBox menuContainer;
-    @FXML private StackPane glassLayer;
-    @FXML private GaussianBlur glassBlur;
     @FXML private BorderPane mainBorderPane;
 
-    // Navigation Buttons
-    @FXML private Button btnExplorer, btnVoyages, btnFavoris, btnMessages, btnRestaurant, btnClientHome, btnParametres, btnLogout;
+    // Client-Specific Navigation Buttons
+    @FXML private Button btnHome, btnMyBookings, btnFavorites, btnRestaurantClient, btnProfile, btnLogout;
 
     private Button currentActiveBtn = null;
 
@@ -39,22 +37,25 @@ public class AdminController implements Initializable {
         slidingPane.setCache(true);
         slidingPane.setCacheHint(CacheHint.SPEED);
 
-        // Include btnClientHome in the interaction array
-        Button[] buttons = {btnExplorer, btnVoyages, btnFavoris, btnMessages, btnClientHome, btnRestaurant, btnParametres, btnLogout};
+        Button[] buttons = {btnHome, btnMyBookings, btnFavorites, btnRestaurantClient, btnProfile, btnLogout};
 
         for (Button btn : buttons) {
             btn.setOnMouseEntered(e -> handleHover(btn));
         }
 
+        // Initialize position
         Platform.runLater(() -> {
-            if (btnExplorer != null) {
-                slidingPane.setTranslateY(btnExplorer.getLayoutY());
-                currentActiveBtn = btnExplorer;
-                animateText(btnExplorer, true);
+            if (btnHome != null) {
+                slidingPane.setTranslateY(btnHome.getLayoutY());
+                currentActiveBtn = btnHome;
+                animateText(btnHome, true);
+                // Load default section on startup
+                loadSection("/ClientRestaurantView.fxml");
             }
             slidingPane.toBack();
         });
 
+        // Hover tracking
         menuContainer.setOnMouseMoved(event -> {
             double mouseY = event.getY();
             for (Button btn : buttons) {
@@ -67,20 +68,8 @@ public class AdminController implements Initializable {
             }
         });
 
-        if (glassLayer != null) {
-            glassLayer.setCache(true);
-            glassLayer.setCacheHint(CacheHint.SPEED);
-            glassBlur = new GaussianBlur(14);
-            glassLayer.setEffect(glassBlur);
-        }
-
-        // Action Handlers
-        btnRestaurant.setOnAction(event -> loadSection("/RestaurantAdminView.fxml"));
-        btnClientHome.setOnAction(event -> loadSection("/ClientRestaurantView.fxml"));
-    }
-
-    public BorderPane getMainBorderPane() {
-        return mainBorderPane;
+        // Client Action Handlers
+        btnRestaurantClient.setOnAction(event -> loadSection("/ClientRestaurantView.fxml"));
     }
 
     private void handleHover(Button targetBtn) {
@@ -124,7 +113,6 @@ public class AdminController implements Initializable {
 
         double oldY = currentActiveBtn.getLayoutY();
         double newY = target.getLayoutY();
-
         target.getStyleClass().add(newY > oldY ? "liquid-from-top" : "liquid-from-bottom");
     }
 
@@ -133,15 +121,23 @@ public class AdminController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            // Setup controllers if needed
+            // Get the controller AFTER loading
             Object controller = loader.getController();
-            if (controller instanceof RestaurantAdminController) {
-                ((RestaurantAdminController) controller).setMainAdminController(this);
+
+            if (controller instanceof ClientRestaurantController) {
+                ((ClientRestaurantController) controller).setMainClientController(this);
+            } else if (controller instanceof ClientRestaurantDetailController) {
+                ((ClientRestaurantDetailController) controller).setMainClientController(this);
             }
 
             mainBorderPane.setCenter(root);
         } catch (IOException e) {
+            System.err.println("Error loading FXML: " + fxmlPath);
             e.printStackTrace();
         }
+    }
+
+    public BorderPane getMainBorderPane() {
+        return mainBorderPane;
     }
 }
