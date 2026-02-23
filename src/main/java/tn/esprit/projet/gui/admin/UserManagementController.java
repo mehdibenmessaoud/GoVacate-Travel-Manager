@@ -65,7 +65,6 @@ public class UserManagementController implements Initializable {
         loadUsers();
         setupFilters();
         
-        // Listen for selection changes
         userTable.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldSelection, newSelection) -> {
                 if (newSelection != null) {
@@ -76,7 +75,6 @@ public class UserManagementController implements Initializable {
     }
 
     private void setupTableColumns() {
-        // Configure index column to show row number (1-based)
         colIndex.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(userTable.getItems().indexOf(column.getValue()) + 1));
         colIndex.setSortable(false);
 
@@ -103,8 +101,6 @@ public class UserManagementController implements Initializable {
                     setText(item);
                     if ("actif".equalsIgnoreCase(item)) {
                         setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-                    } else if ("banni".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
                     } else {
                         setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
                     }
@@ -118,7 +114,6 @@ public class UserManagementController implements Initializable {
             List<Role> roles = roleService.getAll();
             roleCombo.setItems(FXCollections.observableArrayList(roles));
             
-            // Pour le filtre
             ObservableList<String> roleNames = FXCollections.observableArrayList("Tous");
             roles.forEach(r -> roleNames.add(r.getNomRole()));
             roleFilter.setItems(roleNames);
@@ -155,9 +150,9 @@ public class UserManagementController implements Initializable {
     }
 
     private void setupFilters() {
-        statusFilter.setItems(FXCollections.observableArrayList("Tous", "actif", "inactif", "banni"));
+        statusFilter.setItems(FXCollections.observableArrayList("Tous", "actif", "inactif"));
         statusFilter.setValue("Tous");
-        statusCombo.setItems(FXCollections.observableArrayList("actif", "inactif", "banni"));
+        statusCombo.setItems(FXCollections.observableArrayList("actif", "inactif"));
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> updateFilters());
         roleFilter.valueProperty().addListener((observable, oldValue, newValue) -> updateFilters());
@@ -194,13 +189,12 @@ public class UserManagementController implements Initializable {
         
         nomField.setText(user.getNom());
         emailField.setText(user.getEmail());
-        passwordField.setText(""); // On ne montre pas le mot de passe hashé
+        passwordField.setText("");
         passwordField.setPromptText("Laisser vide pour ne pas changer");
         telephoneField.setText(user.getTelephone());
         dateNaissancePicker.setValue(user.getDateNaissance());
         statusCombo.setValue(user.getStatus());
         
-        // Sélectionner le bon rôle dans la ComboBox
         if (user.getRole() != null) {
             for (Role r : roleCombo.getItems()) {
                 if (r.getId() == user.getRoleId()) {
@@ -213,7 +207,7 @@ public class UserManagementController implements Initializable {
 
     @FXML
     private void handleNew() {
-        handleCancel(); // Clears the form
+        handleCancel();
     }
 
     @FXML
@@ -240,7 +234,6 @@ public class UserManagementController implements Initializable {
 
         try {
             if (selectedUser == null) {
-                // Création
                 Role selectedRole = roleCombo.getValue();
                 String status = statusCombo.getValue() != null ? statusCombo.getValue() : "actif";
                 User newUser = new User(
@@ -256,7 +249,6 @@ public class UserManagementController implements Initializable {
                 userService.create(newUser);
                 showAlert("Succès", "Utilisateur ajouté avec succès.", Alert.AlertType.INFORMATION);
             } else {
-                // Modification
                 selectedUser.setNom(nomField.getText());
                 selectedUser.setEmail(emailField.getText());
                 if (!passwordField.getText().isEmpty()) {

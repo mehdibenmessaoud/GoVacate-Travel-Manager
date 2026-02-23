@@ -11,7 +11,7 @@ public class User {
     private Role role;
     private String telephone;
     private LocalDate dateNaissance;
-    private String status;  // "actif", "inactif", "en_attente"
+    private String status;  // "actif", "inactif"
     private String imageUrl;  // URL ou chemin vers la photo de profil (colonne image_url en BDD)
     private LocalDateTime lastLogin;  // Dernière connexion
     private LocalDateTime createdAt;  // Date création

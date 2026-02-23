@@ -6,7 +6,12 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -19,9 +24,6 @@ import tn.esprit.projet.utils.ValidationUtils;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
-
-import javafx.event.EventHandler;
-import javafx.scene.input.KeyEvent;
 
 public class AuthController implements Initializable {
 
@@ -55,7 +57,6 @@ public class AuthController implements Initializable {
     private boolean isLoginView = true;
     private UserService userService;
 
-    // Track password visibility state
     private boolean isLoginPassVisible = false;
     private boolean isSignPassVisible = false;
     private boolean isSignPassConfirmVisible = false;
@@ -68,12 +69,15 @@ public class AuthController implements Initializable {
             System.err.println("Erreur initialisation UserService: " + e.getMessage());
         }
         
-        if (loginErrorLabel != null) loginErrorLabel.setText("");
-        if (loginErrorLabel != null) loginErrorLabel.setVisible(false);
-        if (registerErrorLabel != null) registerErrorLabel.setText("");
-        if (registerErrorLabel != null) registerErrorLabel.setVisible(false);
+        if (loginErrorLabel != null) {
+            loginErrorLabel.setText("");
+            loginErrorLabel.setVisible(false);
+        }
+        if (registerErrorLabel != null) {
+            registerErrorLabel.setText("");
+            registerErrorLabel.setVisible(false);
+        }
         
-        // Initialize password visibility toggle buttons
         if (toggleLoginPass != null) {
             toggleLoginPass.setOnAction(e -> togglePasswordVisibility("login"));
             toggleLoginPass.setText("👁");
@@ -89,7 +93,6 @@ public class AuthController implements Initializable {
             toggleSignPassConfirm.setText("👁");
         }
         
-        // Listen to password field
         if (signPass != null) {
             signPass.setOnKeyReleased(event -> updatePasswordStrength(signPass.getText()));
         }
@@ -203,17 +206,14 @@ public class AuthController implements Initializable {
         fadeIn.setFromValue(0.2);
         fadeIn.setToValue(1.0);
 
-        // Determine target state based on current state
         boolean targetIsLogin = !isLoginView;
 
         fadeOut.setOnFinished(e -> {
             if (targetIsLogin) {
-                // We are moving TO Login View (Overlay moves Right, covers Register)
                 overlayTitle.setText("Nouveau Voyageur ?");
                 overlayText.setText("Inscrivez-vous dès aujourd'hui et commencez à planifier vos prochaines vacances.");
                 switchBtn.setText("CRÉER UN COMPTE");
             } else {
-                // We are moving TO Register View (Overlay moves Left, covers Login)
                 overlayTitle.setText("Déjà Inscrit ?");
                 overlayText.setText("Connectez-vous pour accéder à vos réservations et offres personnalisées.");
                 switchBtn.setText("SE CONNECTER");
@@ -221,11 +221,9 @@ public class AuthController implements Initializable {
         });
 
         if (isLoginView) {
-            // Currently Login View (Overlay at Right). Move to Left (-500).
             translate.setToX(-500);
             isLoginView = false;
         } else {
-            // Currently Register View (Overlay at Left). Move to Right (0).
             translate.setToX(0);
             isLoginView = true;
         }
@@ -279,7 +277,7 @@ public class AuthController implements Initializable {
 
             if (user != null) {
                 if (!user.isActive()) {
-                    showLoginError("Votre compte est désactivé");
+                    showLoginError("Compte verrouillé. Veuillez contacter l'administrateur.");
                     return;
                 }
                 SessionManager.login(user);
@@ -409,7 +407,6 @@ public class AuthController implements Initializable {
             passwordStrengthLabel.setVisible(false);
         }
         
-        // Reset visibility states
         isSignPassVisible = false;
         isSignPassConfirmVisible = false;
     }
