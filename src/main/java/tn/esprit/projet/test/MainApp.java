@@ -11,17 +11,24 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // VERIFIE BIEN CE CHEMIN : il doit correspondre à l'endroit où est ton FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/RestaurantBookingView.fxml"));
             Parent root = loader.load();
-            primaryStage.setScene(new Scene(root));
-            primaryStage.setTitle("Test Réservation");
+
+            // 1. Force a large resolution to give the UI room to breathe
+            Scene scene = new Scene(root, 1280, 800);
+
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("GoVacate - Gastronomie Luxe");
+
+            // 2. Make sure it's centered on your monitor
+            primaryStage.setResizable(true);
+            primaryStage.centerOnScreen();
+
             primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     // ASTUCE : On crée un deuxième main qui n'hérite pas de Application
     public static void main(String[] args) {
         launch(args);

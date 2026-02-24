@@ -2,66 +2,72 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.shape.Circle?>
 <?import java.net.URL?>
 
-<AnchorPane prefWidth="500.0" styleClass="main-bg" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.projet.gui.PackBookingController">
+<StackPane prefHeight="800.0" prefWidth="1200.0" styleClass="main-bg" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.projet.gui.PackBookingController">
     <stylesheets>
         <URL value="@/css/pack.css" />
     </stylesheets>
 
     <children>
-        <VBox spacing="30" layoutX="40.0" layoutY="40.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" AnchorPane.bottomAnchor="40.0">
+        <VBox spacing="30" alignment="CENTER" maxWidth="550.0" fillWidth="true">
+            <padding>
+                <Insets top="40" bottom="40" left="40" right="40"/>
+            </padding>
 
-            <VBox spacing="8" alignment="CENTER">
-                <Label text="Reserver votre pack" styleClass="title-main"/>
+            <children>
+                <VBox spacing="8" alignment="CENTER">
+                    <Label text="Réserver votre pack" styleClass="title-main" style="-fx-font-size: 32; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                </VBox>
 
-            </VBox>
+                <VBox styleClass="luxury-card" style="-fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 20; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 20;">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="card-header">
+                            <padding><Insets bottom="20" left="25" right="25" top="25"/></padding>
+                            <StackPane styleClass="icon-bg" style="-fx-background-color: rgba(0,255,204,0.1); -fx-background-radius: 50; -fx-min-width: 50; -fx-min-height: 50;">
+                                <Label text="✈" style="-fx-font-size: 24; -fx-text-fill: #00FFCC;"/>
+                            </StackPane>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label fx:id="lblPackName" text="EXPÉDITION SAHARA" styleClass="pack-title" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                                <Label fx:id="lblCategorie" text="AVENTURE PREMIUM" styleClass="pack-category" style="-fx-text-fill: #00FFCC;"/>
+                            </VBox>
+                        </HBox>
 
-            <VBox styleClass="luxury-card">
-                <children>
-                    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="card-header">
-                        <padding><Insets bottom="20" left="25" right="25" top="25"/></padding>
-                        <StackPane styleClass="icon-bg">
-                            <Label text="✈" style="-fx-font-size: 22; -fx-text-fill: #00FFCC;"/>
-                        </StackPane>
-                        <VBox HBox.hgrow="ALWAYS">
-                            <Label fx:id="lblPackName" text="EXPÉDITION SAHARA" styleClass="pack-title"/>
-                            <Label fx:id="lblCategorie" text="AVENTURE PREMIUM" styleClass="pack-category"/>
-                        </VBox>
-                    </HBox>
+                        <GridPane vgap="20" hgap="30">
+                            <padding><Insets bottom="30" left="30" right="30" top="10"/></padding>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <children>
+                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label text="DATE DÉPART" styleClass="info-label" style="-fx-text-fill: #679AC1; -fx-font-size: 11;"/>
+                                    <Label fx:id="lblDateDepart" text="15 MARS 2024" styleClass="info-value" style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;"/>
+                                </VBox>
+                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label text="DATE RETOUR" styleClass="info-label" style="-fx-text-fill: #679AC1; -fx-font-size: 11;"/>
+                                    <Label fx:id="lblDateArrivee" text="22 MARS 2024" styleClass="info-value" style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;"/>
+                                </VBox>
+                            </children>
+                        </GridPane>
 
-                    <GridPane vgap="20" hgap="30">
-                        <padding><Insets bottom="30" left="30" right="30" top="10"/></padding>
+                        <HBox alignment="CENTER_LEFT" styleClass="price-section" style="-fx-background-color: rgba(0,0,0,0.2); -fx-background-radius: 0 0 20 20;">
+                            <padding><Insets bottom="25" left="30" right="30" top="25"/></padding>
+                            <VBox>
+                                <Label text="PRIX TOTAL" styleClass="price-label" style="-fx-text-fill: #679AC1;"/>
+                                <Label fx:id="lblPrix" text="1.450 DT" styleClass="price-value" style="-fx-text-fill: #00FFCC; -fx-font-size: 24; -fx-font-weight: bold;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="PAIEMENT SÉCURISÉ" styleClass="secure-tag" style="-fx-border-color: #00FFCC; -fx-text-fill: #00FFCC; -fx-padding: 5 10; -fx-border-radius: 5;"/>
+                        </HBox>
+                    </children>
+                </VBox>
 
-                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="DATE DÉPART" styleClass="info-label"/>
-                            <Label fx:id="lblDateDepart" text="15 MARS 2024" styleClass="info-value"/>
-                        </VBox>
-
-                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label text="DATE RETOUR" styleClass="info-label"/>
-                            <Label fx:id="lblDateArrivee" text="22 MARS 2024" styleClass="info-value"/>
-                        </VBox>
-                    </GridPane>
-
-                    <HBox alignment="CENTER_LEFT" styleClass="price-section">
-                        <padding><Insets bottom="25" left="30" right="30" top="25"/></padding>
-                        <VBox>
-                            <Label text="PRIX TOTAL" styleClass="price-label"/>
-                            <Label fx:id="lblPrix" text="1.450 DT" styleClass="price-value"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label text="PAIEMENT SÉCURISÉ" styleClass="secure-tag"/>
-                    </HBox>
-                </children>
-            </VBox>
-
-            <VBox spacing="15" alignment="CENTER">
-                <Button onAction="#handleReserve" prefHeight="60.0" prefWidth="Infinity" styleClass="btn-confirm" text="CONFIRMER LA RÉSERVATION" />
-                <Hyperlink onAction="#handleCancel" text="Annuler et revenir en arrière" styleClass="cancel-link"/>
-            </VBox>
-
+                <VBox spacing="15" alignment="CENTER">
+                    <Button onAction="#handleReserve" prefHeight="60.0" prefWidth="400.0" styleClass="btn-confirm" text="CONFIRMER LA RÉSERVATION" style="-fx-background-color: #FFBD59; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;"/>
+                    <Hyperlink onAction="#handleCancel" text="Annuler et revenir en arrière" styleClass="cancel-link" style="-fx-text-fill: rgba(255,255,255,0.6);"/>
+                </VBox>
+            </children>
         </VBox>
     </children>
-</AnchorPane>
+</StackPane>

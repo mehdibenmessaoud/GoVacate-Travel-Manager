@@ -6,28 +6,40 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import tn.esprit.projet.utils.ChatServer; // <--- ADD THIS IMPORT
 
 public class TestExcursionLauncher extends Application {
+
+    private ChatServer chatServer; // <--- ADD THIS FIELD
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Utilisation d'un chemin relatif robuste
+            // --- FIX: START THE CHAT SERVER HERE TOO ---
+            chatServer = new ChatServer(8887);
+            chatServer.start();
+            System.out.println("🚀 [Serveur] WebSocket Server démarré pour le test Excursion");
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ExcursionBooking.fxml"));
             Parent root = loader.load();
 
-            // Taille adaptée à ton design (Excursion est souvent plus étroit que la liste)
-            Scene scene = new Scene(root);
-
-            // On active la transparence si ton CSS utilise des bordures arrondies (border-radius)
+            Scene scene = new Scene(root, 1200, 800);
             scene.setFill(Color.TRANSPARENT);
-            // primaryStage.initStyle(StageStyle.TRANSPARENT); // Décommenter si tu as un fond personnalisé
 
-            primaryStage.setTitle("Travel Agency - Test Réservation");
+            primaryStage.setTitle("Travel Agency - Test Réservation Excursion");
             primaryStage.setScene(scene);
 
-            // Empêcher le redimensionnement pour garder l'aspect "App Mobile"
-            primaryStage.setResizable(false);
+            primaryStage.setResizable(true);
+            primaryStage.centerOnScreen();
+
+            // --- SAFETY: Stop server when window closes ---
+            primaryStage.setOnCloseRequest(event -> {
+                try {
+                    if (chatServer != null) chatServer.stop();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
 
             primaryStage.show();
 
