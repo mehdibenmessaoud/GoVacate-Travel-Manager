@@ -4,6 +4,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -16,12 +17,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import tn.esprit.projet.entities.User;
+import tn.esprit.projet.services.SocialAuthService;
 import tn.esprit.projet.services.UserService;
 import tn.esprit.projet.utils.SceneManager;
 import tn.esprit.projet.utils.SessionManager;
 import tn.esprit.projet.utils.ValidationUtils;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
@@ -54,8 +57,14 @@ public class AuthController implements Initializable {
     @FXML private Label registerErrorLabel;
     @FXML private Label passwordStrengthLabel;
 
+    @FXML private Button googleLoginBtn;
+    @FXML private Button facebookLoginBtn;
+    @FXML private Button googleSignBtn;
+    @FXML private Button facebookSignBtn;
+
     private boolean isLoginView = true;
     private UserService userService;
+    private SocialAuthService socialAuthService;
 
     private boolean isLoginPassVisible = false;
     private boolean isSignPassVisible = false;
@@ -63,6 +72,11 @@ public class AuthController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            socialAuthService = new SocialAuthService();
+        } catch (Exception e) {
+            System.err.println("Erreur initialisation SocialAuthService: " + e.getMessage());
+        }
         try {
             userService = new UserService();
         } catch (Exception e) {
@@ -99,6 +113,67 @@ public class AuthController implements Initializable {
         
         if (signPassVisible != null) {
             signPassVisible.setOnKeyReleased(event -> updatePasswordStrength(signPassVisible.getText()));
+        }
+    }
+
+    @FXML
+    private void handleGoogleLogin() {
+        if (socialAuthService == null) {
+            showLoginError("Service d'authentification sociale indisponible.");
+            return;
+        }
+        socialAuthService.authenticateWithGoogle(
+            userInfo -> Platform.runLater(() -> processSocialLogin(userInfo.get("email"), userInfo.get("name"))),
+            errorMessage -> Platform.runLater(() -> showLoginError(errorMessage))
+        );
+    }
+
+    @FXML
+    private void handleFacebookLogin() {
+        if (socialAuthService == null) {
+            showLoginError("Service d'authentification sociale indisponible.");
+            return;
+        }
+        socialAuthService.authenticateWithFacebook(
+            fbUser -> Platform.runLater(() -> processSocialLogin(fbUser.get("email"), fbUser.get("name"))),
+            errorMessage -> Platform.runLater(() -> showLoginError(errorMessage))
+        );
+    }
+
+    private void processSocialLogin(String email, String name) {
+        try {
+            if (userService == null) {
+                showLoginError("Base de données indisponible. Veuillez réessayer plus tard.");
+                return;
+            }
+            if (email == null || email.isEmpty()) {
+                showLoginError("Impossible de récupérer l'email de votre compte social.");
+                return;
+            }
+            
+            if (userService.emailExiste(email)) {
+                User user = userService.getUserByEmail(email);
+                if (user != null) {
+                    if (!user.isActive()) {
+                        showLoginError("Compte verrouillé. Veuillez contacter l'administrateur.");
+                        return;
+                    }
+                    SessionManager.login(user);
+                    SceneManager.redirectBasedOnRole();
+                } else {
+                    showLoginError("Erreur de connexion. Utilisateur non trouvé.");
+                }
+            } else {
+                // Create a new user
+                User newUser = new User(name, email, "social_login", "", null, 2, "actif");
+                userService.create(newUser);
+                SessionManager.login(newUser);
+                SceneManager.redirectBasedOnRole();
+            }
+        } catch (SQLException e) {
+            showLoginError("Erreur base de données: " + e.getMessage());
+        } catch (Exception e) {
+            showLoginError("Erreur: " + e.getMessage());
         }
     }
     

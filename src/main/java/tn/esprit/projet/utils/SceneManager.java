@@ -49,17 +49,8 @@ public class SceneManager {
             }
 
             FXMLLoader loader = new FXMLLoader(resourceUrl);
-            
-            // Vérifier que le controller peut être chargé
-            try {
-                loader.load();
-            } catch (IOException e) {
-                LOG.log(Level.SEVERE, "Erreur chargement FXML: " + fxmlPath, e);
-                showErrorDialog("Erreur de chargement", "Impossible de charger la vue: " + fxmlPath);
-                return;
-            }
+            Parent root = loader.load();
 
-            Parent root = loader.getRoot();
             if (root == null) {
                 LOG.severe("Root null après chargement FXML: " + fxmlPath);
                 showErrorDialog("Erreur", "Erreur lors du chargement de la vue");
@@ -248,4 +239,3 @@ public class SceneManager {
         }
     }
 }
-

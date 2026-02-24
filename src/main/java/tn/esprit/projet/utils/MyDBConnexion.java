@@ -15,7 +15,6 @@ public class MyDBConnexion {
     
     private Connection connection;
     private static MyDBConnexion instance;
-    private static boolean configLoaded = false;
 
     // Bloc statique pour charger la configuration
     static {
@@ -30,7 +29,6 @@ public class MyDBConnexion {
                 URL = props.getProperty("db.url", "jdbc:mysql://localhost:3306/pi_dev");
                 USER = props.getProperty("db.user", "root");
                 PASSWORD = props.getProperty("db.password", "");
-                configLoaded = true;
                 System.out.println("✅ Configuration chargée depuis database.properties");
             } else {
                 // Valeurs par défaut

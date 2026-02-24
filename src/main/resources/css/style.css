@@ -130,60 +130,117 @@
     -fx-border-color: #FF8210;
 }
 
-/* Professional Orange Button */
+/* Professional Orange Button - Creative Modern Style */
 .btn-orange-pro {
     -fx-background-color: #FF8210;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-background-radius: 8;
+    -fx-font-size: 15px;
+    -fx-font-family: 'Segoe UI', sans-serif;
     -fx-cursor: hand;
-    -fx-letter-spacing: 1;
+    -fx-letter-spacing: 1.5;
+    -fx-padding: 12 35;
+    -fx-effect: dropshadow(gaussian, #00000030, 5, 0.3, 0, 2);
 }
 
 .btn-orange-pro:hover {
-    -fx-background-color: #FF9F3D;
-    -fx-effect: dropshadow(gaussian, #FF821040, 8, 0, 0, 2);
+    -fx-background-color: linear-gradient(to right, #FF9F3D, #FF8210);
+        -fx-effect: dropshadow(gaussian, #FF821060, 15, 0.4, 0, 4);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-translate-y: -2;
 }
 
 .btn-orange-pro:pressed {
     -fx-background-color: #E67300;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, #FF821030, 8, 0.2, 0, 1);
+    -fx-translate-y: 1;
 }
 
-/* Professional Outline Orange Button */
+.btn-orange-pro:focused {
+    -fx-border-color: #FFBD59;
+    -fx-border-width: 2;
+    -fx-border-radius: 25;
+}
+
+/* Professional Outline Orange Button - Creative Modern Style */
 .btn-outline-orange-pro {
     -fx-background-color: transparent;
     -fx-border-color: #FF8210;
     -fx-border-width: 2;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
     -fx-text-fill: #FF8210;
     -fx-font-weight: bold;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
+    -fx-font-family: 'Segoe UI', sans-serif;
     -fx-cursor: hand;
+    -fx-letter-spacing: 1;
+    -fx-padding: 10 25;
+    -fx-effect: dropshadow(gaussian, #00000015, 3, 0.2, 0, 1);
 }
 
 .btn-outline-orange-pro:hover {
     -fx-background-color: #FF8210;
     -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, #FF821050, 12, 0.3, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
 }
 
-/* Professional Outline White Button */
+.btn-outline-orange-pro:pressed {
+    -fx-background-color: #E67300;
+    -fx-border-color: #E67300;
+    -fx-text-fill: white;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.btn-outline-orange-pro:focused {
+    -fx-border-color: #FFBD59;
+    -fx-border-width: 2;
+}
+
+/* Professional Outline White Button - Creative Modern Style */
 .btn-outline-white-pro {
     -fx-background-color: transparent;
     -fx-border-color: white;
     -fx-border-width: 2;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
+    -fx-font-family: 'Segoe UI', sans-serif;
     -fx-cursor: hand;
+    -fx-letter-spacing: 1.5;
+    -fx-padding: 12 30;
+    -fx-effect: dropshadow(gaussian, #00000030, 5, 0.3, 0, 2);
 }
 
 .btn-outline-white-pro:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-effect: dropshadow(gaussian, #FFFFFF40, 6, 0, 0, 2);
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-effect: dropshadow(gaussian, #FFFFFF60, 15, 0.4, 0, 4);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-translate-y: -2;
+}
+
+.btn-outline-white-pro:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, #FFFFFF30, 8, 0.2, 0, 1);
+    -fx-translate-y: 1;
+}
+
+.btn-outline-white-pro:focused {
+    -fx-border-color: #FFBD59;
+    -fx-border-width: 2;
 }
 
 /* =========================================================
@@ -622,3 +679,91 @@
     -fx-text-fill: #FF8210;
 }
 
+/* =========================================================
+   SOCIAL AUTH BUTTONS
+========================================================= */
+.social-btn {
+    -fx-background-radius: 8;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 2);
+}
+
+.social-btn:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0, 0, 4);
+}
+
+.google-btn {
+    -fx-background-color: #DB4437;
+    -fx-border-color: #C33D2E;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.facebook-btn {
+    -fx-background-color: #4267B2;
+    -fx-border-color: #3B5B9F;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+/* Optional: subtle icon spacing if you add icons later */
+.social-btn .graphic {
+    -fx-padding: 0 6 0 0;
+}
+/* =========================================================
+   SOCIAL AUTH BUTTONS - INNOVATIVE & CREATIVE
+========================================================= */
+
+/* Classe de base pour les boutons circulaires */
+.social-btn-innovative {
+    -fx-pref-width: 50;
+    -fx-pref-height: 50;
+    -fx-background-radius: 50;
+    -fx-border-radius: 50;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER;
+    -fx-content-display: TEXT_ONLY;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 3);
+}
+
+/* Style Google : Dégradé chaud cohérent avec l'Orange GoVacate */
+.google-innovative {
+    -fx-background-color: linear-gradient(to bottom right, #FF8210, #DB4437);
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+}
+
+/* Style Facebook : Dégradé bleu cohérent avec le Bleu Deep Water */
+.facebook-innovative {
+    -fx-background-color: linear-gradient(to bottom right, #00447B, #4267B2);
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+}
+
+/* --- EFFETS INNOVANTS AU SURVOL --- */
+
+.social-btn-innovative:hover {
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-rotate: 10; /* Légère rotation pour le côté créatif */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 12, 0, 0, 6);
+}
+
+.social-btn-innovative:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+    -fx-rotate: 0;
+}
+
+/* Optionnel : Ajout d'une lueur de focus */
+.social-btn-innovative:focused {
+    -fx-border-color: #FFBD59;
+    -fx-border-width: 2;
+}
