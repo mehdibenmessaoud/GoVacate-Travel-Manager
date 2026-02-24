@@ -2,6 +2,7 @@ package tn.esprit.projet.test;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
 import tn.esprit.projet.utils.MyDBConnexion;
 import tn.esprit.projet.utils.SceneManager;
 
@@ -14,6 +15,9 @@ public class MainGovacate extends Application {
         primaryStage.setTitle("GoVacate - Gestion de Voyages");
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(700);
+
+        Image appIcon = new Image(getClass().getResourceAsStream("/logo/logo.jpg"));
+        primaryStage.getIcons().add(appIcon);
 
         primaryStage.setOnCloseRequest(event -> {
             try {
