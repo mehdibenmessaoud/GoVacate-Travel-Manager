@@ -861,3 +861,65 @@ Circle#avatarPlaceholder { -fx-fill: #e6eef8; -fx-stroke: #d7e9fb; -fx-stroke-wi
     -fx-background-radius: 15px;
     -fx-font-weight: bold;
 }
+
+.chat-container {
+    -fx-background-color: rgba(30, 30, 30, 0.85);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 20;
+}
+
+.chat-header {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.1) transparent;
+}
+
+.chat-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.chat-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Style pour les messages de l'IA */
+.message-ai {
+    -fx-background-color: rgba(255, 130, 16, 0.15);
+    -fx-background-radius: 0 15 15 15;
+    -fx-padding: 10;
+    -fx-text-fill: white;
+    -fx-max-width: 300;
+}
+
+/* Style pour les messages du Client */
+.message-user {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15 15 0 15;
+    -fx-padding: 10;
+    -fx-text-fill: white;
+    -fx-max-width: 300;
+    -fx-alignment: center-right;
+}
+
+/* Bouton Flottant IA */
+.chat-fab {
+    -fx-background-color: linear-gradient(to bottom right, #FF8210, #e6760e);
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-min-width: 65px;
+    -fx-min-height: 65px;
+    -fx-max-width: 65px;
+    -fx-max-height: 65px;
+    -fx-background-radius: 50;
+    -fx-cursor: hand;
+    /* Ombre portée pour l'effet de profondeur */
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 15, 0, 0, 8);
+    -fx-transition: 0.3s;
+}
+
+.chat-fab:hover {
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.6), 20, 0, 0, 10);
+}

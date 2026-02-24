@@ -21,6 +21,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
 
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.Parent;
+import javafx.fxml.FXMLLoader;
+import java.io.IOException;
+
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -306,5 +312,33 @@ public class ClientPackController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void openAIChat() {
+        try {
+            // Chargement du FXML du Chat
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatAI.fxml"));
+            Parent root = loader.load();
+
+            // Création d'une nouvelle fenêtre (Stage)
+            Stage chatStage = new Stage();
+            chatStage.setTitle("Assistant Intelligent GoVacate");
+
+            // On rend la fenêtre non redimensionnable pour garder le design propre
+            chatStage.setResizable(false);
+
+            // On peut la rendre "toujours au dessus" pour que le client puisse lire et naviguer
+            chatStage.setAlwaysOnTop(true);
+
+            chatStage.setScene(new Scene(root));
+            chatStage.show();
+
+        } catch (IOException e) {
+            System.err.println("Erreur lors de l'ouverture du chat IA : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

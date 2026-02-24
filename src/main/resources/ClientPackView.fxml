@@ -39,6 +39,7 @@
                         <Button styleClass="liquid-btn, btn-logout" text="Déconnexion" prefWidth="210" />
                     </VBox>
                 </VBox>
+
             </AnchorPane>
         </left>
 
@@ -81,4 +82,13 @@
             </ScrollPane>
         </center>
     </BorderPane>
+    <Button onAction="#openAIChat" styleClass="chat-fab" text="💬"
+            StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin>
+            <Insets bottom="30.0" right="30.0" />
+        </StackPane.margin>
+        <tooltip>
+            <Tooltip text="Assistant IA GoVacate" />
+        </tooltip>
+    </Button>
 </StackPane>

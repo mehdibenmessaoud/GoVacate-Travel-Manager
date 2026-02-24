@@ -181,4 +181,35 @@ public class PackService implements IService<Pack> {
 
         return finalPrice;
     }
+
+    //méthode for IA
+    public String getPacksForAI() {
+        StringBuilder context = new StringBuilder();
+        try {
+            // Appeler getAll() et gérer l'exception qu'elle lance
+            List<Pack> packs = getAll();
+
+            if (packs.isEmpty()) {
+                return "Actuellement, il n'y a aucun pack disponible dans la base de données.";
+            }
+
+            context.append("Voici les packs disponibles chez GoVacate :\n");
+            for (Pack p : packs) {
+                // On utilise p.getDestinationName() qui est rempli par ta jointure dans getAll()
+                context.append(String.format("- Pack: %s | Destination: %s | Prix: %.1f DT | Catégorie: %s | Statut: %s\n",
+                        p.getName(),
+                        p.getDestinationName() != null ? p.getDestinationName() : "Inconnue",
+                        p.getPrix(),
+                        p.getCategorie(),
+                        p.getStatus()));
+            }
+        } catch (SQLException e) {
+            // En cas d'erreur SQL, on retourne un message d'erreur poli pour l'IA
+            System.err.println("Erreur lors de la récupération des packs pour l'IA : " + e.getMessage());
+            return "Erreur technique : impossible d'accéder à la liste des packs pour le moment.";
+        }
+        return context.toString();
+    }
+
+
 }
