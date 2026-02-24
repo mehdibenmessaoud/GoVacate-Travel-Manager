@@ -56,26 +56,20 @@
                                         <Button styleClass="btn-orange-glow" text="Plonger"/>
                                     </HBox>
                                 </VBox>
-                                <Label styleClass="section-title" text="Destinations Populaires"/>
-                                <FlowPane hgap="30.0" vgap="30.0" />
                             </VBox>
                         </content>
                     </ScrollPane>
 
                     <VBox fx:id="reservationView" spacing="25.0" visible="false">
                         <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/></padding>
-                        <VBox spacing="5">
-                            <Label styleClass="text-header" text="Gestion des Réservations" />
-                            <Label style="-fx-text-fill: #679AC1; -fx-font-size: 13px;" text="Suivi détaillé des réservations clients" />
-                        </VBox>
                         <TableView fx:id="tableMesReservations" styleClass="admin-table" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colUserId" prefWidth="70" text="Username" />
+                                <TableColumn fx:id="colUserId" prefWidth="120" text="Username" />
                                 <TableColumn fx:id="colType" prefWidth="180" text="EXPÉRIENCE" />
                                 <TableColumn fx:id="colDate" prefWidth="150" text="DATE" />
                                 <TableColumn fx:id="colPrix" prefWidth="100" text="PRIX (DT)" />
                                 <TableColumn fx:id="colStatut" prefWidth="140" text="STATUT" />
-                                <TableColumn fx:id="colAction" prefWidth="250" text="ACTIONS" />
+                                <TableColumn fx:id="colAction" prefWidth="150" text="ACTIONS" />
                             </columns>
                         </TableView>
                     </VBox>
@@ -87,18 +81,19 @@
                             <Label style="-fx-text-fill: #679AC1; -fx-font-size: 13px;" text="Discutez en temps réel avec les voyageurs" />
                         </VBox>
 
-                        <TextArea fx:id="adminChatDisplay" editable="false" prefHeight="400.0" VBox.vgrow="ALWAYS"
-                                  style="-fx-control-inner-background: #1e272e; -fx-text-fill: #00ff00; -fx-font-family: 'Consolas'; -fx-font-size: 14px; -fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 10;" />
+                        <ScrollPane fx:id="adminChatScrollPane" fitToWidth="true" prefHeight="400.0" VBox.vgrow="ALWAYS"
+                                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 15;">
+                            <content>
+                                <VBox fx:id="adminChatMessageContainer" spacing="15.0" style="-fx-padding: 20; -fx-background-color: transparent;" />
+                            </content>
+                        </ScrollPane>
 
                         <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="15.0" styleClass="admin-search-box">
                             <padding><Insets left="20" right="20" /></padding>
-
                             <TextField fx:id="adminChatInput" onAction="#handleAdminReply" promptText="Répondre au client..."
                                        styleClass="admin-input" HBox.hgrow="ALWAYS" prefHeight="45.0"/>
-
                             <Button onAction="#handleAdminReply" prefHeight="45.0" prefWidth="100.0"
                                     styleClass="btn-orange-glow" text="Envoyer" />
-
                             <Button onAction="#handleClearHistory" prefHeight="45.0" prefWidth="110.0"
                                     style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;"
                                     text="🗑 Effacer" />

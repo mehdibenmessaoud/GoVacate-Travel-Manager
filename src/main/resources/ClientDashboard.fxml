@@ -82,11 +82,26 @@
 
                 <VBox fx:id="clientChatView" spacing="20.0" visible="false" styleClass="view-container">
                     <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/></padding>
-                    <Label styleClass="text-header" text="Support en direct" />
-                    <TextArea fx:id="chatDisplay" editable="false" prefHeight="400.0" styleClass="glass-panel" wrapText="true" VBox.vgrow="ALWAYS" />
-                    <HBox spacing="10.0">
-                        <TextField fx:id="chatInput" onAction="#handleSendMessage" promptText="Écrivez votre message ici..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleSendMessage" styleClass="btn-orange-glow" text="Envoyer" />
+                    <VBox spacing="5">
+                        <Label styleClass="text-header" text="Support en direct" />
+                        <Label style="-fx-text-fill: #679AC1; -fx-font-size: 13px;" text="Posez vos questions à notre équipe" />
+                    </VBox>
+
+                    <ScrollPane fx:id="chatScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 15;">
+                        <content>
+                            <VBox fx:id="chatMessageContainer" spacing="15.0" style="-fx-padding: 20; -fx-background-color: rgba(30, 39, 46, 0.4); -fx-background-radius: 15;">
+                                <children>
+                                </children>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <TextField fx:id="chatInput" onAction="#handleSendMessage" promptText="Écrivez votre message ici..."
+                                   styleClass="search-field" HBox.hgrow="ALWAYS" prefHeight="45.0" />
+                        <Button onAction="#handleSendMessage" styleClass="btn-orange-glow" text="Envoyer" prefHeight="45.0" prefWidth="100.0"/>
                     </HBox>
                 </VBox>
             </StackPane>

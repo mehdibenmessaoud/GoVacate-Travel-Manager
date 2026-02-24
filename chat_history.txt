@@ -1,1 +1,8 @@
-[EFFACER_TOUT]
+Client: sdc|16:42
+Client: sdc|16:42
+Client: aaa|16:43
+Client: aaa|16:43
+Client: salem|16:43
+Client: salem|16:43
+Admin: bara|16:44
+Admin: mrigl|16:44

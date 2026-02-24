@@ -4,12 +4,15 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button; // AJOUTÉ
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -24,7 +27,10 @@ public class ClientDashboardController {
     @FXML private VBox clientReservationView;
     @FXML private VBox clientFactureView;
     @FXML private VBox clientChatView;
-    @FXML private TextArea chatDisplay;
+
+    // UI components for the modern chat
+    @FXML private VBox chatMessageContainer; // Replace TextArea with this in FXML
+    @FXML private ScrollPane chatScrollPane;
     @FXML private TextField chatInput;
 
     private WebSocketClient webSocketClient;
@@ -33,40 +39,68 @@ public class ClientDashboardController {
     @FXML
     public void initialize() {
         showExplorer();
+
+        // Auto-scroll chat to bottom when new messages arrive
+        chatMessageContainer.heightProperty().addListener((obs, oldVal, newVal) ->
+                chatScrollPane.setVvalue(1.0));
+
         loadChatHistory();
         connectToChatServer();
-
-        // --- AJOUT DYNAMIQUE DU BOUTON SUPPRIMER (Pas besoin de FXML) ---
         addDeleteButtonToUI();
     }
 
-    private void addDeleteButtonToUI() {
-        Button btnDelete = new Button("🗑 Supprimer l'historique");
-        btnDelete.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-        btnDelete.setMaxWidth(Double.MAX_VALUE);
+    // --- MODERN UI MESSAGE BUBBLES ---
 
-        // Action du bouton
-        btnDelete.setOnAction(e -> handleClearHistory());
-
-        // On l'ajoute à la fin de la vue chat
-        if (clientChatView != null) {
-            clientChatView.setSpacing(10);
-            clientChatView.getChildren().add(btnDelete);
+    private void addMessageToUI(String message) {
+        if (message.contains("[EFFACER_TOUT]")) {
+            chatMessageContainer.getChildren().clear();
+            return;
         }
-    }
 
-    // --- LOGIQUE DU CHAT ---
+        String messageContent = message;
+        String messageTime = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
 
-    private void loadChatHistory() {
-        File file = new File(HISTORY_FILE);
-        if (file.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    chatDisplay.appendText(line + "\n");
-                }
-            } catch (IOException e) { e.printStackTrace(); }
+        // Check if the message has a timestamp attached (e.g., "Client: Hello|14:30")
+        if (message.contains("|")) {
+            String[] parts = message.split("\\|");
+            messageContent = parts[0];
+            messageTime = parts[1];
         }
+
+        HBox row = new HBox();
+        VBox bubbleContainer = new VBox(2);
+
+        String cleanMsg = messageContent.replace("Client: ", "").replace("Admin: ", "").replace("ADMIN: ", "");
+        Label bubble = new Label(cleanMsg);
+        bubble.setWrapText(true);
+        bubble.setMaxWidth(400);
+
+        // DISPLAY THE EXTRACTED TIME
+        Label timeLabel = new Label(messageTime);
+        timeLabel.setStyle("-fx-font-size: 9px; -fx-text-fill: #bdc3c7;");
+
+        if (messageContent.startsWith("Client:")) {
+            row.setAlignment(Pos.CENTER_RIGHT);
+            bubbleContainer.setAlignment(Pos.CENTER_RIGHT);
+            bubble.setStyle("-fx-background-color: linear-gradient(to bottom right, #00FFCC, #00cca3); " +
+                    "-fx-text-fill: #1a1a1a; -fx-padding: 12 18; -fx-background-radius: 20 20 5 20; " +
+                    "-fx-font-size: 14px; -fx-font-weight: bold;");
+        } else if (messageContent.startsWith("[Système]")) {
+            row.setAlignment(Pos.CENTER);
+            bubbleContainer.setAlignment(Pos.CENTER);
+            bubble.setStyle("-fx-text-fill: #679AC1; -fx-font-style: italic; -fx-font-size: 12px;");
+            timeLabel.setVisible(false);
+        } else {
+            row.setAlignment(Pos.CENTER_LEFT);
+            bubbleContainer.setAlignment(Pos.CENTER_LEFT);
+            bubble.setStyle("-fx-background-color: #3d3d3d; -fx-text-fill: #ecf0f1; " +
+                    "-fx-padding: 12 18; -fx-background-radius: 20 20 20 5; -fx-font-size: 14px;");
+        }
+
+        bubbleContainer.getChildren().addAll(bubble, timeLabel);
+        row.getChildren().add(bubbleContainer);
+        VBox.setMargin(row, new javafx.geometry.Insets(0, 0, 10, 0));
+        chatMessageContainer.getChildren().add(row);
     }
 
     private void connectToChatServer() {
@@ -74,21 +108,20 @@ public class ClientDashboardController {
             webSocketClient = new WebSocketClient(new URI("ws://localhost:8887")) {
                 @Override
                 public void onOpen(ServerHandshake h) {
-                    Platform.runLater(() -> chatDisplay.appendText("[Système] Connecté au support.\n"));
+                    Platform.runLater(() -> addMessageToUI("[Système] Connecté au support."));
                 }
 
                 @Override
                 public void onMessage(String message) {
                     Platform.runLater(() -> {
                         if (message.equals("[EFFACER_TOUT]")) {
-                            chatDisplay.clear();
-                            chatDisplay.appendText("[Système] L'historique a été réinitialisé.\n");
+                            chatMessageContainer.getChildren().clear();
+                            addMessageToUI("[Système] Historique réinitialisé.");
                         } else {
-                            chatDisplay.appendText(message + "\n");
+                            addMessageToUI(message);
                         }
                     });
                 }
-
                 @Override public void onClose(int c, String r, boolean rem) {}
                 @Override public void onError(Exception ex) {}
             };
@@ -100,17 +133,52 @@ public class ClientDashboardController {
     private void handleSendMessage() {
         String msg = chatInput.getText().trim();
         if (webSocketClient != null && webSocketClient.isOpen() && !msg.isEmpty()) {
-            webSocketClient.send("Client: " + msg);
+            // 1. Capture the time right now
+            String time = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+
+            // 2. Format the message with the timestamp
+            String fullMsgWithTime = "Client: " + msg + "|" + time;
+
+            // 3. Send and Save
+            webSocketClient.send(fullMsgWithTime);
+            saveMessageToFile(fullMsgWithTime);
+
             chatInput.clear();
         }
+    }
+    private void saveMessageToFile(String m) {
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(HISTORY_FILE, true)))) {
+            out.println(m);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void loadChatHistory() {
+        File file = new File(HISTORY_FILE);
+        if (file.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    final String msg = line;
+                    addMessageToUI(msg);
+                }
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+    }
+
+    private void addDeleteButtonToUI() {
+        Button btnDelete = new Button("🗑 Supprimer l'historique");
+        btnDelete.getStyleClass().add("delete-button");
+        btnDelete.setMaxWidth(Double.MAX_VALUE);
+        btnDelete.setOnAction(e -> handleClearHistory());
+        if (clientChatView != null) clientChatView.getChildren().add(btnDelete);
     }
 
     @FXML
     private void handleClearHistory() {
         File file = new File(HISTORY_FILE);
         if (file.exists()) file.delete();
-
-        chatDisplay.clear();
+        chatMessageContainer.getChildren().clear();
         if (webSocketClient != null && webSocketClient.isOpen()) {
             webSocketClient.send("[EFFACER_TOUT]");
         }
