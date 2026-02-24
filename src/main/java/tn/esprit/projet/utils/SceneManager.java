@@ -3,6 +3,7 @@ package tn.esprit.projet.utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 public class SceneManager {
     private static final Logger LOG = Logger.getLogger(SceneManager.class.getName());
     private static Stage primaryStage;
+    private static Image appIcon;
     private static Pane adminContentPane;
     private static Pane clientContentPane;
 
@@ -24,6 +26,7 @@ public class SceneManager {
             throw new IllegalArgumentException("Le Stage ne peut pas être null");
         }
         primaryStage = stage;
+        applyAppIcons(primaryStage);
     }
 
     // ============================================
@@ -87,6 +90,7 @@ public class SceneManager {
             }
             
             primaryStage.setScene(scene);
+            applyAppIcons(primaryStage);
             primaryStage.show();
 
         } catch (Exception e) {
@@ -222,6 +226,24 @@ public class SceneManager {
         }
     }
     
+    // ============================================
+    // ICONES D'APPLICATION
+    // ============================================
+
+    public static void applyAppIcons(Stage stage) {
+        if (stage == null) return;
+        try {
+            if (appIcon == null) {
+                appIcon = new Image(SceneManager.class.getResourceAsStream("/logo/logo.jpg"));
+            }
+            if (appIcon != null && !stage.getIcons().contains(appIcon)) {
+                stage.getIcons().add(appIcon);
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Impossible de charger l'icone: /logo/logo.jpg", e);
+        }
+    }
+
     // ============================================
     // DIALOGS D'ERREUR
     // ============================================

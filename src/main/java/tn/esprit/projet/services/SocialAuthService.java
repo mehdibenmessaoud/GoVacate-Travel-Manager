@@ -11,6 +11,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +63,7 @@ public class SocialAuthService {
             authStage.setScene(new Scene(webView, 600, 700));
             authStage.initModality(Modality.APPLICATION_MODAL);
             authStage.setTitle("Google Login");
+            authStage.getIcons().add(new Image(getClass().getResourceAsStream("/logo/logo.jpg")));
             authStage.show();
         });
     }
@@ -110,6 +112,7 @@ public class SocialAuthService {
             authStage.setScene(new Scene(webView, 600, 700));
             authStage.initModality(Modality.APPLICATION_MODAL);
             authStage.setTitle("Facebook Login");
+            authStage.getIcons().add(new Image(getClass().getResourceAsStream("/logo/logo.jpg")));
             authStage.show();
         });
     }
