@@ -64,4 +64,20 @@ public class FactureServiceImpl {
         }
         return factures;
     }
+    public boolean existsByReservationId(Long resId) {
+        String sql = "SELECT COUNT(*) FROM facture WHERE reservation_id = ?";
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, resId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

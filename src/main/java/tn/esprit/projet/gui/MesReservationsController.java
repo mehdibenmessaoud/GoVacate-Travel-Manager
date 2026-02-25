@@ -5,7 +5,6 @@ import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -31,7 +30,6 @@ import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -40,7 +38,6 @@ import java.util.ArrayList;
 
 public class MesReservationsController {
 
-    // Holds UI state to return from Stripe without breaking the Chat Sidebar
     private List<Node> originalUIElements = new ArrayList<>();
 
     @FXML private TableView<Reservation> tableMesReservations;
@@ -55,8 +52,6 @@ public class MesReservationsController {
     @FXML private ComboBox<String> statusFilterCombo;
 
     private final ReservationServiceImpl service = new ReservationServiceImpl();
-    private final ReservationRestaurantServiceImpl serviceResto = new ReservationRestaurantServiceImpl();
-    private final ReservationExcursionServiceImpl serviceExc = new ReservationExcursionServiceImpl();
     private final FactureServiceImpl factureService = new FactureServiceImpl();
 
     private final ObservableList<Reservation> masterData = FXCollections.observableArrayList();
@@ -82,7 +77,6 @@ public class MesReservationsController {
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
 
-        // Status Badge Design
         colStatut.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Object item, boolean empty) {
@@ -102,7 +96,6 @@ public class MesReservationsController {
             }
         });
 
-        // Date & Time Column
         colDate.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDate date, boolean empty) {
@@ -110,8 +103,6 @@ public class MesReservationsController {
                 if (empty || date == null) {
                     setText(null);
                 } else {
-                    // DO NOT call serviceResto.findByReservationId here!
-                    // Just show the date. If you want the hour, load it once in chargerDonnees()
                     setText(date.toString());
                     setStyle("-fx-text-fill: #00FFCC; -fx-font-weight: bold;");
                 }
@@ -122,13 +113,17 @@ public class MesReservationsController {
         setupTicketColumn();
     }
 
-    // --- NAVIGATION & SUPPORT SAFE STRIPE LOGIC ---
-
     @FXML
     void handlePayerSelection() {
         Reservation selectedRes = tableMesReservations.getSelectionModel().getSelectedItem();
         if (selectedRes == null) {
             showAlert("Attention", "Veuillez sélectionner une réservation.");
+            return;
+        }
+
+        // BLOCK: Stop if already confirmed
+        if (StatutReservation.CONFIRMEE.equals(selectedRes.getStatut())) {
+            showAlert("Info", "Cette réservation est déjà payée.");
             return;
         }
 
@@ -159,7 +154,6 @@ public class MesReservationsController {
     }
 
     private void switchToPaymentView(String url, String sessionId, Reservation res) {
-        // Target ONLY the content area, leaving the Sidebar (Support Chat) alive
         VBox contentArea = (VBox) tableMesReservations.getScene().lookup("#clientReservationView");
         if (contentArea == null) return;
 
@@ -189,15 +183,7 @@ public class MesReservationsController {
         engine.load(url);
     }
 
-    private void restoreOriginalView(VBox contentArea) {
-        if (!originalUIElements.isEmpty()) {
-            contentArea.getChildren().setAll(originalUIElements);
-            chargerDonnees();
-        }
-    }
-
     private void verifierStatusStripe(String sessionId, Reservation res) {
-        // Run in separate thread so it doesn't freeze the Chat/Support UI
         new Thread(() -> {
             try {
                 Session s = Session.retrieve(sessionId);
@@ -213,25 +199,21 @@ public class MesReservationsController {
                         showAlert("Succès", "Paiement validé !");
                     });
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         }).start();
     }
-
-    // =========================================================
-    // REMAINING UI HELPERS (Modified to keep Support Stable)
-    // =========================================================
 
     private void setupActionColumn() {
         colAction.setCellFactory(param -> new TableCell<>() {
             private final Button btnModifier = new Button("Modifier");
             private final Button btnAnnuler = new Button("Supprimer");
-            private final HBox pane = new HBox(12, btnModifier, btnAnnuler);
+            private final Label lblLocked = new Label("Payé ✓");
+            private final HBox pane = new HBox(12);
             {
                 String btnStyle = "-fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 8; -fx-min-width: 85;";
                 btnModifier.setStyle("-fx-background-color: #FF8210; " + btnStyle);
                 btnAnnuler.setStyle("-fx-background-color: #FF4B5C; " + btnStyle);
+                lblLocked.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                 pane.setAlignment(Pos.CENTER);
                 btnModifier.setOnAction(e -> handleModifierAction(getTableView().getItems().get(getIndex())));
                 btnAnnuler.setOnAction(e -> confirmerAnnulation(getTableView().getItems().get(getIndex())));
@@ -243,30 +225,74 @@ public class MesReservationsController {
                 else {
                     Reservation res = getTableView().getItems().get(getIndex());
                     pane.getChildren().clear();
-                    if ("PACK".equalsIgnoreCase(res.getType_res())) pane.getChildren().add(btnAnnuler);
-                    else pane.getChildren().addAll(btnModifier, btnAnnuler);
+
+                    // LOCK LOGIC: If confirmed, hide buttons
+                    if (StatutReservation.CONFIRMEE.equals(res.getStatut())) {
+                        pane.getChildren().add(lblLocked);
+                    } else {
+                        if (!"PACK".equalsIgnoreCase(res.getType_res())) pane.getChildren().add(btnModifier);
+                        pane.getChildren().add(btnAnnuler);
+                    }
                     setGraphic(pane);
                 }
             }
         });
     }
 
+    private void showQRCodePopup(Reservation res) {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("E-Ticket #" + res.getId());
+
+        String id = String.valueOf(res.getId());
+        String type = res.getType_res().toUpperCase();
+        String date = res.getDate_debut().toString();
+        String prix = res.getPrix_total() + "€";
+        String statut = res.getStatut().toString();
+
+        try {
+            String ticketContent = "https://image-charts.com/chart?chco=333333,00FFCC&chd=t:1,1,1,1,1&chf=bg,s,FFFFFF&chs=400x300&cht=gv&chl="
+                    + URLEncoder.encode("digraph { node [shape=record, fontname=Arial, fontsize=14]; "
+                    + "ticket [label=\"{GOVACATE TICKET|ID: #" + id + "|TYPE: " + type + "|DATE: " + date + "|PRIX: " + prix + "|STATUT: " + statut + "}\"];"
+                    + "}", StandardCharsets.UTF_8);
+
+            String qrApiURL = "https://quickchart.io/qr?text=" + URLEncoder.encode(ticketContent, StandardCharsets.UTF_8) +
+                    "&size=250&margin=2";
+
+            ImageView qrImageView = new ImageView(new Image(qrApiURL, true));
+            qrImageView.setFitWidth(250);
+            qrImageView.setFitHeight(250);
+
+            VBox root = new VBox(15);
+            root.setAlignment(Pos.CENTER);
+            root.setStyle("-fx-background-color: white; -fx-padding: 30; -fx-border-color: #00FFCC; -fx-border-width: 3; -fx-background-radius: 15; -fx-border-radius: 15;");
+
+            Label title = new Label("VOTRE BILLET ÉLECTRONIQUE");
+            title.setStyle("-fx-text-fill: #1a1a1a; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+            Button btnFermer = new Button("Fermer");
+            btnFermer.setOnAction(e -> popupStage.close());
+            btnFermer.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 8 20; -fx-background-radius: 5;");
+
+            root.getChildren().addAll(title, qrImageView, btnFermer);
+            popupStage.setScene(new Scene(root));
+            popupStage.show();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
     private void chargerDonnees() {
-        // Use background thread for fetching to keep the Chat fluid
         new Thread(() -> {
             List<Reservation> list = service.getAllReservations();
-            Platform.runLater(() -> {
-                if (list != null) masterData.setAll(list);
-            });
+            Platform.runLater(() -> { if (list != null) masterData.setAll(list); });
         }).start();
     }
 
     private void setupTicketColumn() {
         if (colTicket == null) return;
         colTicket.setCellFactory(param -> new TableCell<>() {
-            private final Button btnQR = new Button("Voir...");
+            private final Button btnQR = new Button("Voir e-Ticket");
             {
-                btnQR.setStyle("-fx-background-color: #00FFCC; -fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8; -fx-min-width: 70;");
+                btnQR.setStyle("-fx-background-color: #20B2AA; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8; -fx-min-width: 90;");
                 btnQR.setOnAction(e -> showQRCodePopup(getTableView().getItems().get(getIndex())));
             }
             @Override
@@ -327,8 +353,10 @@ public class MesReservationsController {
         tableMesReservations.refresh();
     }
 
-    // showQRCodePopup logic remains the same...
-    private void showQRCodePopup(Reservation res) {
-        // (Existing popup logic from your file)
+    private void restoreOriginalView(VBox contentArea) {
+        if (!originalUIElements.isEmpty()) {
+            contentArea.getChildren().setAll(originalUIElements);
+            chargerDonnees();
+        }
     }
 }
