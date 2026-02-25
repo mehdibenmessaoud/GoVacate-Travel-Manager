@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class MainApp extends Application {
+public class TestReservationResto extends Application {
 
     @Override
     public void start(Stage primaryStage) {
