@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainContainer" spacing="20.0" styleClass="content-pane" stylesheets="@/css/admin_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantMenuFormController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <Button onAction="#handleCancel" styleClass="btn-action-view" text="← Annuler" />
+        <Label fx:id="lblTitle" styleClass="text-header" text="Détails du Plat" />
+    </HBox>
+
+    <VBox spacing="20" styleClass="glass-panel" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+        </padding>
+
+        <GridPane hgap="20" vgap="15">
+            <columnConstraints>
+                <ColumnConstraints minWidth="100" prefWidth="120" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <Label styleClass="form-label" text="Nom du Plat" GridPane.rowIndex="0" />
+            <TextField fx:id="txtName" promptText="Ex: Couscous Royal" styleClass="search-field-large" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="form-label" text="Description" GridPane.rowIndex="1" />
+            <TextArea fx:id="txtDescription" prefHeight="100" promptText="Décrivez les ingrédients..." styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="form-label" text="Prix (TND)" GridPane.rowIndex="2" />
+            <HBox alignment="CENTER_LEFT" spacing="15" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <TextField fx:id="txtPrice" prefWidth="120" promptText="0.00" styleClass="search-field-large" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label styleClass="form-label" text="Statut :" />
+                <ComboBox fx:id="cbStatus" prefWidth="160" styleClass="combo-box-glass" />
+            </HBox>
+        </GridPane>
+
+        <Separator opacity="0.1" />
+
+        <VBox spacing="12" VBox.vgrow="ALWAYS">
+            <HBox alignment="BOTTOM_LEFT" spacing="10">
+                <Label styleClass="form-label" text="Photo du Plat" />
+                <Label style="-fx-font-size: 10px;" styleClass="text-sub" text="(PNG, JPG uniquement)" />
+            </HBox>
+
+            <Button onAction="#handleUploadImage" styleClass="btn-orange-glow" text="+ Sélectionner une Photo" />
+
+            <StackPane minHeight="200" styleClass="image-thumbnail-container" VBox.vgrow="ALWAYS">
+                <VBox fx:id="imagePreviewContainer" alignment="CENTER" spacing="10">
+                    <Label styleClass="text-sub" text="Aucune image sélectionnée" />
+                </VBox>
+            </StackPane>
+        </VBox>
+    </VBox>
+
+    <HBox alignment="CENTER_RIGHT" spacing="15">
+        <Button onAction="#handleSave" prefHeight="50" prefWidth="240" styleClass="btn-orange-glow" text="VALIDER LE PLAT" />
+    </HBox>
+</VBox>

@@ -1,0 +1,514 @@
+/* General Text Styles */
+.text-header {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+}
+
+/* Category Pills (ToggleButtons) */
+.category-pill {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.category-pill:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+}
+
+.category-pill:selected {
+    -fx-background-color: #FF8210;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+/* Combo Box Styling */
+.combo-box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+}
+.combo-box .label { -fx-text-fill: white; }
+.combo-box .list-view { -fx-background-color: #1a2a3a; }
+
+/* Restaurant Card with Hover Effect */
+.restaurant-card {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+    -fx-transition: 0.3s;
+}
+
+.restaurant-card:hover {
+    -fx-translate-y: -8;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-border-color: rgba(255, 130, 16, 0.4);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 5);
+}
+
+.badge-category {
+    -fx-background-color: rgba(255, 130, 16, 0.9);
+    -fx-text-fill: white;
+    -fx-padding: 4 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* Discover Button */
+.btn-view-details {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-font-weight: bold;
+    -fx-padding: 6 15;
+    -fx-cursor: hand;
+}
+
+.btn-view-details:hover {
+    -fx-background-color: #e6760e;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Typography */
+.hero-title {
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5);
+}
+
+.hero-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+
+/* Glass Toolbar */
+.toolbar-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 20;
+}
+
+/* Modern Inputs */
+.modern-input {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.4);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+    -fx-padding: 0 15;
+}
+
+.modern-input:focused {
+    -fx-border-color: #FF8210;
+}
+
+.modern-combo {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+}
+.modern-combo .label { -fx-text-fill: white; }
+
+/* Refined Cards */
+.restaurant-card {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 10);
+}
+
+.restaurant-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-translate-y: -10;
+    -fx-border-color: #FF8210;
+}
+
+/* ScrollPane Fix */
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.transparent-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.card-location {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+}
+
+.rating-note {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-padding: 4 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #FFD700; /* Gold color */
+    -fx-font-weight: bold;
+}
+
+/* Like Button Overlay */
+.btn-like {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-text-fill: white;
+    -fx-background-radius: 50;
+    -fx-min-width: 35;
+    -fx-min-height: 35;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 50;
+}
+
+.btn-like:hover {
+    -fx-background-color: #ff4757;
+    -fx-text-fill: white;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Reserve Button Style */
+.btn-reserve {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.btn-reserve:hover {
+    -fx-background-color: #e6760e;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+.text-sub-small {
+    -fx-font-size: 11px;
+    -fx-text-fill: rgba(255, 255, 255, 0.4);
+}
+
+/* Header Elements */
+.client-header-name {
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.client-badge-cat {
+    -fx-background-color: rgba(255, 130, 16, 0.15);
+    -fx-text-fill: #FF8210;
+    -fx-padding: 5 15;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* Reservation Box (Glassmorphism) */
+.reserve-box {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 25;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 10);
+}
+
+.btn-reserve-large {
+    -fx-background-color: linear-gradient(to right, #FF8210, #e6760e);
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-padding: 15 30;
+}
+
+.btn-reserve-large:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 15, 0, 0, 0);
+}
+
+.client-carousel-frame {
+    -fx-background-color: #050b15;
+    -fx-background-radius: 30;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 30;
+    -fx-overflow: hidden;
+}
+
+.client-image-counter {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: white;
+    -fx-padding: 6 12;
+    -fx-background-radius: 10;
+    -fx-font-size: 12px;
+}
+
+.gallery-thumb {
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-opacity: 0.7;
+    -fx-transition: 0.3s;
+}
+
+.gallery-thumb:hover {
+    -fx-opacity: 1.0;
+    -fx-scale-x: 1.05;
+}
+
+.client-menu-card {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 20;
+    -fx-padding: 10;
+    -fx-transition: 0.3s;
+}
+
+.client-menu-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-border-color: rgba(255, 130, 16, 0.3);
+    -fx-translate-y: -5;
+}
+
+/* Submission Pane */
+.submit-review-pane {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 25;
+    -fx-padding: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 25;
+}
+
+.client-textarea {
+    -fx-control-inner-background: rgba(0, 0, 0, 0.3);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #666;
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+}
+
+.btn-submit-review {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF8210;
+    -fx-border-radius: 12;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-submit-review:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+/* Individual Review Cards */
+.review-card-client {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 15;
+}
+
+.client-section-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.client-root {
+    -fx-background-color: #0b0f14;
+    -fx-background: #0b0f14; /* Important for ScrollPane background */
+}
+
+.btn-submit-review:disabled {
+    -fx-opacity: 0.5;
+    -fx-background-color: #333;
+    -fx-border-color: #555;
+    -fx-text-fill: #888;
+    -fx-cursor: default;
+}
+
+.client-textarea:disabled {
+    -fx-opacity: 0.6;
+}
+
+/* Sidebar Styling */
+.sidebar-container {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-width: 0 1 0 0;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-padding: 12 15;
+    -fx-background-radius: 12;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: white;
+}
+
+.nav-button.active {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+    -fx-text-fill: #FF8210;
+    -fx-border-color: rgba(255, 130, 16, 0.3);
+    -fx-border-width: 0 0 0 4;
+}
+
+.nav-button-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff4757;
+    -fx-padding: 12 15;
+    -fx-cursor: hand;
+}
+
+/* Modern Input Wrapper */
+.modern-input-wrapper {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15;
+    -fx-padding: 5;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 15;
+}
+
+/* --- Glass Toolbar Container --- */
+.toolbar-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 15;
+}
+
+/* --- MenuButton (Filtres & Tri) --- */
+.menu-button-client {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 10;
+}
+
+.menu-button-client:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: #FF8210;
+}
+
+/* Styling the MenuButton Popup */
+.menu-button-client .context-menu {
+    -fx-background-color: #121926; /* Match Admin sidebar/dark theme */
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+    -fx-padding: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 10);
+}
+
+.menu-button-client .menu-item:focused {
+    -fx-background-color: rgba(255, 130, 16, 0.15);
+}
+
+.menu-button-client .menu-item .label {
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+}
+
+/* --- ComboBox Inside Menu (ComboBox-Glass) --- */
+.combo-box-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 8;
+    -fx-text-fill: white;
+}
+
+.combo-box-glass .label {
+    -fx-text-fill: white;
+}
+
+/* Ensure ComboBox dropdown matches the theme */
+.combo-box-glass .list-view {
+    -fx-background-color: #1a2230;
+    -fx-background-radius: 8;
+    -fx-border-color: #FF8210;
+}
+
+.combo-box-glass .list-cell:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+/* Reset Button Special Styling */
+.menu-item-reset .label {
+    -fx-text-fill: #ff4757 !important; /* Soft red for reset */
+}
+
+/* General Filter Container */
+.combo-box {
+    -fx-background-color: #1a1e23;
+    -fx-background-radius: 8;
+    -fx-border-color: #333;
+    -fx-border-radius: 8;
+    -fx-padding: 2;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-padding: 8 12;
+}
+
+/* Fix the dropdown list appearance */
+.combo-box-popup .list-view {
+    -fx-background-color: #1a1e23;
+    -fx-border-color: #FF8210;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 10, 0, 0, 5);
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: black;
+}
+
+/* Tooltip Styling */
+.tooltip {
+    -fx-background-color: #252a31;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-background-radius: 10;
+    -fx-border-color: #FF8210;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}

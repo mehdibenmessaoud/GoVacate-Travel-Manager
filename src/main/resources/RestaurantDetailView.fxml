@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Line?>
+
+<ScrollPane fitToWidth="true" styleClass="root-pane" stylesheets="@/css/admin_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantDetailController">
+    <content>
+        <VBox spacing="30.0" style="-fx-background-color: transparent;">
+            <padding>
+                <Insets bottom="40.0" left="40.0" right="40.0" top="30.0" />
+            </padding>
+
+            <VBox spacing="15">
+                <Button onAction="#handleBack" styleClass="btn-action-view" text="← Retour au Dashboard" />
+                <HBox alignment="BOTTOM_LEFT" spacing="20">
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblName" styleClass="text-header" style="-fx-font-size: 40;" text="Chargement..." />
+                        <HBox alignment="CENTER_LEFT" spacing="15">
+                            <Label fx:id="lblCategory" style="-fx-background-color: rgba(255,130,16,0.1); -fx-text-fill: #FF8210; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold;" text="CATEGORIE" />
+                            <Label fx:id="lblStatus" style="-fx-padding: 5 15; -fx-background-radius: 20;" text="STATUT" />
+                            <Label fx:id="lblCapacity" styleClass="text-sub" text="0 Places" />
+                        </HBox>
+                    </VBox>
+                    <VBox alignment="BOTTOM_RIGHT" spacing="5" styleClass="water-card" style="-fx-padding: 10 20;">
+                        <Label fx:id="lblAddress" style="-fx-text-fill: white;" text="Adresse" />
+                        <Label fx:id="lblEmail" style="-fx-text-fill: #679AC1;" text="Email" />
+                        <Label fx:id="lblPhone" style="-fx-text-fill: #679AC1;" text="Phone" />
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="15" styleClass="water-card" style="-fx-padding: 15;">
+                <HBox alignment="CENTER_LEFT">
+                    <Label styleClass="form-label" text="Galerie de l'établissement" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnToggleAutoPlay" onAction="#toggleAutoPlay" style="-fx-background-color: #FF8210; -fx-text-fill: white; -fx-background-radius: 20;" text="⏸ Auto-Play" />
+                </HBox>
+
+                <StackPane fx:id="carouselContainer" prefHeight="450.0" style="-fx-background-color: #050b15; -fx-background-radius: 20;">
+                    <children>
+                        <ImageView fx:id="mainCarouselImageView" fitHeight="430.0" fitWidth="1000.0" preserveRatio="true" />
+                        <Button onAction="#handlePrevImage" styleClass="btn-nav-glass" text="‹" StackPane.alignment="CENTER_LEFT" />
+                        <Button onAction="#handleNextImage" styleClass="btn-nav-glass" text="›" StackPane.alignment="CENTER_RIGHT" />
+                        <Label fx:id="lblImageCounter" styleClass="image-counter-badge" text="0 / 0" StackPane.alignment="BOTTOM_CENTER">
+                            <StackPane.margin><Insets bottom="15" /></StackPane.margin>
+                        </Label>
+                        <Button onAction="#handleFullScreen" styleClass="btn-full-glass" text="⛶ Plein Écran" StackPane.alignment="TOP_RIGHT">
+                            <StackPane.margin><Insets right="15" top="15" /></StackPane.margin>
+                        </Button>
+                    </children>
+                </StackPane>
+
+                <HBox fx:id="paginationContainer" alignment="CENTER" spacing="8" />
+
+                <ScrollPane fitToHeight="true" minHeight="100" prefHeight="100" styleClass="transparent-scroll" vbarPolicy="NEVER">
+                    <HBox fx:id="thumbnailContainer" alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 5;" />
+                </ScrollPane>
+            </VBox>
+
+            <Separator opacity="0.1" />
+
+            <VBox spacing="20">
+                <HBox alignment="CENTER_LEFT" spacing="20">
+                    <VBox>
+                        <Label styleClass="text-header" text="Menu du Restaurant" />
+                        <Label fx:id="lblMenuCount" styleClass="text-sub" text="0 Plats" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="water-card" style="-fx-padding: 8 20; -fx-background-radius: 50;">
+                        <TextField fx:id="txtSearchMenu" prefWidth="250" promptText="Rechercher un plat..." styleClass="search-field" />
+                        <ComboBox fx:id="comboSort" prefWidth="150" promptText="Trier par" styleClass="combo-box-glass" />
+                    </HBox>
+                </HBox>
+
+                <FlowPane fx:id="menuFlowPane" hgap="25" prefWrapLength="1100" vgap="25">
+                </FlowPane>
+            </VBox>
+
+            <Separator opacity="0.1" />
+
+            <VBox spacing="25">
+                <HBox alignment="CENTER_LEFT" spacing="20">
+                    <VBox>
+                        <Label styleClass="text-header" text="Avis et Notes" />
+                        <Label fx:id="lblReviewStats" styleClass="text-sub" text="Note moyenne: 0.0 ★ (0 avis)" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label text="Trier par:" style="-fx-text-fill: #679AC1;" />
+                        <ComboBox fx:id="comboSortReviews" prefWidth="200" promptText="Filtrer les avis" styleClass="combo-box-glass" />
+                    </HBox>
+                </HBox>
+
+                <VBox fx:id="reviewsContainer" spacing="20">
+                    <padding>
+                        <Insets bottom="20" />
+                    </padding>
+                </VBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

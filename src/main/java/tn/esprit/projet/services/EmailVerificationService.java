@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Génère un code à 6 chiffres, le stocke et l'envoie par email.
  * Priorité: 1) Brevo API (si clé configurée), 2) Backend local, 3) Mode dev (affiche le code).
- * Config Brevo: propriété système govacate.brevo.api.key ou variable d'environnement BREVO_API_KEY
+ * Config Brevo: propriété système govacate.brevo.api.key ou variable d'environnement BREVO_API_KEY.
  */
 public class EmailVerificationService {
 
@@ -44,7 +44,8 @@ public class EmailVerificationService {
         if (senderEmail != null && !senderEmail.isBlank()) brevoSenderEmail = senderEmail.trim();
         String senderName = System.getProperty("govacate.brevo.sender.name");
         if (senderName != null && !senderName.isBlank()) brevoSenderName = senderName.trim();
-        // Toujours charger depuis les fichiers config (config.local override config.properties)
+
+        // Load from config files (config.local override config.properties)
         loadFromConfig();
     }
 
@@ -75,25 +76,14 @@ public class EmailVerificationService {
         this.brevoApiKey = key;
     }
 
-    /**
-     * Indique si le dernier envoi a utilisé le mode dev (code affiché car API indisponible).
-     */
     public boolean isLastSendFallback() {
         return lastSendWasFallback;
     }
 
-    /**
-     * Retourne le code affiché en mode dev (uniquement si isLastSendFallback()).
-     */
     public String getLastSentCodeForDev() {
         return lastSendWasFallback ? lastSentCode : null;
     }
 
-    /**
-     * Génère un code à 6 chiffres et l'envoie à l'email.
-     * En mode dev (API indisponible), retourne le code pour que le flux continue.
-     * @return le code généré, ou null si email invalide
-     */
     public String sendVerificationCode(String email) {
         if (email == null || email.isBlank()) return null;
         String code = generateCode();
@@ -104,14 +94,13 @@ public class EmailVerificationService {
         if (sendViaBrevo(email, code) || sendCodeViaBackendApi(email, code)) {
             return code;
         }
+
+        // Fallback for Development
         lastSendWasFallback = true;
         System.out.println("[DEV] Code pour " + email + " : " + code);
         return code;
     }
 
-    /**
-     * Renvoie un nouveau code à l'email.
-     */
     public boolean resendCode(String email) {
         if (email == null || email.isBlank()) return false;
         String code = generateCode();
@@ -122,6 +111,7 @@ public class EmailVerificationService {
         if (sendViaBrevo(email, code) || sendCodeViaBackendApi(email, code)) {
             return true;
         }
+
         lastSendWasFallback = true;
         System.out.println("[DEV] Code renvoyé pour " + email + " : " + code);
         return true;
@@ -147,20 +137,20 @@ public class EmailVerificationService {
         return sb.toString();
     }
 
-    /** Envoie via l'API Brevo (Sendinblue) si la clé est configurée. */
     private boolean sendViaBrevo(String email, String code) {
         if (brevoApiKey == null || brevoApiKey.isBlank()) return false;
         try {
             String html = "<html><body><p>Votre code GoVacate: <strong>" + code + "</strong></p>"
-                    + "<p>Expire dans 10 minutes.</p><p>Si vous n'avez pas demandé ce code, ignorez cet email.</p></body></html>";
+                    + "<p>Expire dans 10 minutes.</p></body></html>";
             String escapedHtml = html.replace("\\", "\\\\").replace("\"", "\\\"");
             String json = String.format(
-                "{\"sender\":{\"name\":\"%s\",\"email\":\"%s\"}," +
-                "\"to\":[{\"email\":\"%s\"}]," +
-                "\"subject\":\"Code de réinitialisation GoVacate\"," +
-                "\"htmlContent\":\"%s\"}",
-                escapeJson(brevoSenderName), escapeJson(brevoSenderEmail),
-                escapeJson(email), escapedHtml);
+                    "{\"sender\":{\"name\":\"%s\",\"email\":\"%s\"}," +
+                            "\"to\":[{\"email\":\"%s\"}]," +
+                            "\"subject\":\"Code de réinitialisation GoVacate\"," +
+                            "\"htmlContent\":\"%s\"}",
+                    escapeJson(brevoSenderName), escapeJson(brevoSenderEmail),
+                    escapeJson(email), escapedHtml);
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BREVO_API_URL))
                     .header("accept", "application/json")
@@ -169,18 +159,15 @@ public class EmailVerificationService {
                     .timeout(Duration.ofSeconds(15))
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
+
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                return true;
-            }
-            System.err.println("Brevo API erreur " + response.statusCode() + ": " + response.body());
+            return response.statusCode() >= 200 && response.statusCode() < 300;
         } catch (Exception e) {
             System.err.println("Erreur Brevo API: " + e.getMessage());
         }
         return false;
     }
 
-    /** Envoie via l'API backend locale (ex. Spring Boot). */
     private boolean sendCodeViaBackendApi(String email, String code) {
         try {
             String body = String.format("{\"email\":\"%s\",\"code\":\"%s\"}", escapeJson(email), code);
@@ -191,12 +178,7 @@ public class EmailVerificationService {
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                return true;
-            }
-            if (response.statusCode() == 404) {
-                return false;
-            }
+            return response.statusCode() >= 200 && response.statusCode() < 300;
         } catch (Exception e) {
             System.err.println("Erreur API backend: " + e.getMessage());
         }

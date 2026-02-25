@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="30.0" styleClass="client-content-pane" stylesheets="@/css/client_style.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.ClientRestaurantController">
+
+    <padding>
+        <Insets bottom="30.0" left="50.0" right="50.0" top="40.0" />
+    </padding>
+
+    <VBox spacing="10.0">
+        <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
+        <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="toolbar-glass">
+        <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+        </padding>
+
+        <TextField fx:id="searchField" prefHeight="50.0"
+                   promptText="🔍 Rechercher un plat, une ville, un restaurant..."
+                   HBox.hgrow="ALWAYS" styleClass="modern-input" />
+
+        <MenuButton prefHeight="50.0" prefWidth="200.0" styleClass="menu-button-client" text="⚙️ Filtres &amp; Tri">
+            <items>
+                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="FILTRER PAR" />
+
+                <CustomMenuItem hideOnClick="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 8 12;">
+                            <Label text="Catégorie" style="-fx-text-fill: white; -fx-font-size: 11;"/>
+                            <ComboBox fx:id="categoryFilter" prefWidth="170.0" styleClass="combo-box-glass" />
+                        </VBox>
+                    </content>
+                </CustomMenuItem>
+
+                <CustomMenuItem hideOnClick="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 8 12;">
+                            <Label text="Note Minimale" style="-fx-text-fill: white; -fx-font-size: 11;"/>
+                            <ComboBox fx:id="scoreFilter" prefWidth="170.0" styleClass="combo-box-glass" />
+                        </VBox>
+                    </content>
+                </CustomMenuItem>
+
+                <SeparatorMenuItem />
+                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="TRIER PAR" />
+
+                <MenuItem onAction="#handleSortName" text="🔤 Nom (A-Z)" />
+                <MenuItem onAction="#handleSortDate" text="📅 Plus récents" />
+
+                <SeparatorMenuItem />
+
+                <MenuItem onAction="#handleReset" styleClass="menu-item-reset" text="🔄 Réinitialiser tous les filtres" />
+            </items>
+        </MenuButton>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+        <content>
+            <FlowPane fx:id="restaurantGrid" hgap="30.0" vgap="35.0" style="-fx-background-color: transparent;">
+                <padding>
+                    <Insets bottom="30.0" top="10.0" />
+                </padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+
+</VBox>

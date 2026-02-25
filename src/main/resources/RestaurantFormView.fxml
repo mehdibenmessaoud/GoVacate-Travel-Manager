@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox fx:id="rootPane" spacing="25.0" styleClass="content-pane" stylesheets="@/css/admin_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantFormController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Button onAction="#handleBack" styleClass="btn-action-view" text="← Retour" />
+        <VBox>
+            <Label fx:id="lblTitle" styleClass="text-header" text="Ajouter un Restaurant" />
+            <Label styleClass="text-sub" text="Gestion des informations, menu et galerie" />
+        </VBox>
+    </HBox>
+
+    <TabPane styleClass="glass-panel" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="COORDONNÉES">
+            <GridPane hgap="25.0" vgap="20.0">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                </padding>
+
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120" prefWidth="150" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+
+                <Label styleClass="form-label" text="Nom du Restaurant" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtName" prefHeight="40" styleClass="search-field-large" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label styleClass="form-label" text="Email Contact" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtEmail" prefHeight="40" styleClass="search-field-large" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label styleClass="form-label" text="Téléphone" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtPhone" prefHeight="40" styleClass="search-field-large" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label styleClass="form-label" text="Adresse Physique" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtAddress" prefHeight="40" styleClass="search-field-large" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <HBox spacing="15" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="Destination" />
+                        <ComboBox fx:id="cbDestination" prefHeight="40" prefWidth="180" promptText="Lieu..." styleClass="combo-box-glass" />
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="Catégorie" />
+                        <ComboBox fx:id="cbCategory" prefHeight="40" prefWidth="150" styleClass="combo-box-glass" />
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="Statut" />
+                        <ComboBox fx:id="cbStatus" prefHeight="40" prefWidth="130" styleClass="combo-box-glass" />
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="Capacité" />
+                        <Spinner fx:id="spnCapacity" prefHeight="40" prefWidth="100" />
+                    </VBox>
+                </HBox>
+            </GridPane>
+        </Tab>
+
+        <Tab text="GALERIE PHOTOS">
+            <VBox spacing="20">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                </padding>
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Button onAction="#handleUploadImage" prefHeight="40" styleClass="btn-orange-glow" text="+ Importer des photos" />
+                    <Label styleClass="text-sub" text="Fichiers acceptés: JPG, PNG" />
+                </HBox>
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                    <FlowPane fx:id="imageFlowPane" hgap="15" prefWrapLength="800" styleClass="image-thumbnail-container" vgap="15">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </FlowPane>
+                </ScrollPane>
+            </VBox>
+        </Tab>
+
+        <Tab text="MENU &amp; CARTE">
+            <VBox spacing="20">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="15" styleClass="glass-panel">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                    <TextField fx:id="menuSearchField" prefHeight="35" prefWidth="250" promptText="Rechercher un plat..." styleClass="search-field" />
+                    <ComboBox fx:id="menuStatusFilter" prefHeight="35" prefWidth="150" promptText="Filtrer par statut" styleClass="combo-box-glass" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#sortMenuByName" styleClass="btn-action-view" text="Sort A-Z" />
+                    <Button onAction="#sortMenuByPriceDesc" styleClass="btn-action-view" text="Sort Prix $$$" />
+                    <Button onAction="#btnAddMenuItem" prefHeight="40" styleClass="btn-orange-glow" text="+ Nouveau Plat" />
+                </HBox>
+
+                <TableView fx:id="menuTable" styleClass="glass-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMenuImage" prefWidth="80" style="-fx-alignment: CENTER;" text="Image" />
+                        <TableColumn fx:id="colMenuName" prefWidth="200" text="Nom du Plat" />
+                        <TableColumn fx:id="colMenuDesc" prefWidth="300" text="Description" />
+                        <TableColumn fx:id="colMenuPrice" prefWidth="120" text="Prix (TND)" />
+                        <TableColumn fx:id="colMenuStatus" prefWidth="120" text="Statut" />
+                        <TableColumn fx:id="colMenuActions" prefWidth="150" style="-fx-alignment: CENTER;" text="Actions" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <HBox alignment="CENTER_RIGHT" spacing="20">
+        <Button onAction="#handleBack" prefHeight="45" prefWidth="120" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand;" text="Annuler" />
+        <Button onAction="#handleSave" prefHeight="50" prefWidth="250.0" styleClass="btn-orange-glow" text="ENREGISTRER TOUT" />
+    </HBox>
+</VBox>

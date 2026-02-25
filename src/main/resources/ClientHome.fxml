@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="mainBorderPane" prefHeight="800.0" prefWidth="1400.0"
+            styleClass="client-root" stylesheets="@/css/client_style.css"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.projet.gui.ClientController">
+
+    <left>
+        <VBox prefWidth="260.0" styleClass="sidebar-container" spacing="30">
+            <padding>
+                <Insets top="40" right="20" bottom="40" left="20"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Circle fill="#FF8210" radius="8"/>
+                <Label text="GoVacate" styleClass="text-header" style="-fx-font-size: 24;"/>
+            </HBox>
+
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <Button fx:id="btnHome" text="Explorer" styleClass="nav-button" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic><Label text="🏠" style="-fx-font-size: 18;"/></graphic>
+                </Button>
+                <Button fx:id="btnRestaurantClient" text="Restaurants" styleClass="nav-button" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic><Label text="🍽️" style="-fx-font-size: 18;"/></graphic>
+                </Button>
+                <Button fx:id="btnFavorites" text="Favoris" styleClass="nav-button" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic><Label text="❤" style="-fx-font-size: 18;"/></graphic>
+                </Button>
+                <Button fx:id="btnProfile" text="Paramètres" styleClass="nav-button" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic><Label text="⚙" style="-fx-font-size: 18;"/></graphic>
+                </Button>
+            </VBox>
+
+            <Button fx:id="btnLogout" text="Déconnexion" styleClass="nav-button-logout" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                <graphic><Label text="🚪" style="-fx-font-size: 18;"/></graphic>
+            </Button>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane>
+            <ScrollPane fitToWidth="true" styleClass="transparent-scroll">
+                <VBox spacing="30" style="-fx-padding: 40;">
+                    <HBox alignment="CENTER_LEFT" spacing="20">
+                        <VBox spacing="5">
+                            <Label text="Bienvenue sur GoVacate" styleClass="text-sub"/>
+                            <Label text="Découvrez votre prochaine aventure" styleClass="text-header"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <HBox alignment="CENTER" spacing="10" styleClass="modern-input-wrapper">
+                            <TextField fx:id="searchField" promptText="Rechercher..." styleClass="modern-input" prefWidth="300"/>
+                        </HBox>
+                    </HBox>
+
+                    <StackPane fx:id="contentArea"/>
+                </VBox>
+            </ScrollPane>
+        </StackPane>
+    </center>
+</BorderPane>
