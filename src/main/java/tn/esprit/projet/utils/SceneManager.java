@@ -71,6 +71,15 @@ public class SceneManager {
             }
             
             // Style dashboard admin ou client selon le chemin
+            if (fxmlPath.contains("/admin/") || fxmlPath.contains("/client/")) {
+                URL commonDashboardCss = SceneManager.class.getResource("/css/common-dashboard.css");
+                if (commonDashboardCss != null) {
+                    scene.getStylesheets().add(commonDashboardCss.toExternalForm());
+                } else {
+                    LOG.warning("CSS commun non trouvé: /css/common-dashboard.css");
+                }
+            }
+
             if (fxmlPath.contains("/admin/")) {
                 URL adminCss = SceneManager.class.getResource("/css/admin-dashboard-style.css");
                 if (adminCss != null) {
