@@ -65,6 +65,8 @@ public class Admin2Controller implements Initializable {
         setupActionsColumn();
         loadPackData();
         setupSidebarAnimations();
+
+        javafx.application.Platform.runLater(this::handleShowDashboard);
     }
 
     private void loadPackData() {
@@ -303,6 +305,8 @@ public class Admin2Controller implements Initializable {
         confirm.setHeaderText("Supprimer le pack : " + p.getName());
         confirm.setContentText("Voulez-vous vraiment supprimer ce pack ?");
 
+        applyCustomStyle(confirm);
+
         if (confirm.showAndWait().get() == ButtonType.OK) {
             try {
                 // 1. Suppression base de données
@@ -349,6 +353,9 @@ public class Admin2Controller implements Initializable {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
+
+        applyCustomStyle(alert);
+
         alert.showAndWait();
     }
 
@@ -375,6 +382,32 @@ public class Admin2Controller implements Initializable {
                     tt.play();
                 });
             }
+        }
+    }
+
+    private void applyCustomStyle(Alert alert) {
+        DialogPane dialogPane = alert.getDialogPane();
+        // On récupère le CSS que tu utilises déjà pour ton interface admin
+        String css = getClass().getResource("/css/admin.css").toExternalForm();
+        dialogPane.getStylesheets().add(css);
+        dialogPane.getStyleClass().add("custom-alert");
+    }
+
+    @FXML
+
+    private void handleShowDashboard() {
+        try {
+            // Charge le nouveau fichier FXML du Dashboard
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Admin_Dashboard.fxml"));
+            Parent dashboardView = loader.load();
+
+            // L'insère au centre du layout principal
+            if (mainLayout != null) {
+                mainLayout.setCenter(dashboardView);
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur chargement Dashboard: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

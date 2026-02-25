@@ -36,9 +36,12 @@
 
                 <VBox fx:id="menuContainer" layoutY="140.0" spacing="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                     <children>
-                        <Button fx:id="btnExplorer" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Tableau de Bord"/>
+                        <Button fx:id="btnDashBoard" onAction="#handleShowDashboard" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Tableau de Bord"/>
+
+
 
                         <Button fx:id="btnPack" onAction="#handleShowPacks" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Packs"/>
+
 
                         <Button fx:id="btnDestinations" onAction="#handleShowDestinations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Destination"/>
 
