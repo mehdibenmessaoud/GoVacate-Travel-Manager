@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class AIService {
     // REMPLACEZ PAR VOTRE CLÉ GROQ
-    private static final String API_KEY = "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";
+    private static final String API_KEY = "Key";
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     public CompletableFuture<String> getRecommendationAsync(String userQuery, String packsContext) {
