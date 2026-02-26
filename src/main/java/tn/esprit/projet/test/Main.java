@@ -2,7 +2,6 @@ package tn.esprit.projet.test;
 
 import tn.esprit.projet.entities.Restaurant;
 import tn.esprit.projet.services.RestaurantService;
-import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.sql.Connection;
 import java.sql.SQLException;

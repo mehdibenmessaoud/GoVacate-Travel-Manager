@@ -15,7 +15,7 @@ public class Restaurant {
     private int capacity;
     private String status; // OPEN / CLOSED / SUSPENDED
     private int destinationId;
-
+    private String destinationName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -125,7 +125,14 @@ public class Restaurant {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+    public String getDestinationName() {
+        return destinationName;
+    }
 
+    // Add this Setter to fix the error
+    public void setDestinationName(String destinationName) {
+        this.destinationName = destinationName;
+    }
     @Override
     public String toString() {
         return "Restaurant{" +

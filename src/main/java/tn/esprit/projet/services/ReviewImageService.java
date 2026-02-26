@@ -1,33 +1,63 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.ReviewImage;
-import tn.esprit.projet.utils.govacate_connect; // Updated to match your singleton
+import tn.esprit.projet.utils.govacate_connect;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewImageService implements CRUD<ReviewImage> {
+// Fixed: Implements CRUD with both ReviewImage and Integer
+public class ReviewImageService implements CRUD<ReviewImage, Integer> {
 
-    private Connection cnx;
+    private final Connection cnx;
 
     public ReviewImageService() {
-        // Corrected to use the singleton class you imported
         cnx = govacate_connect.getInstance().getConnection();
     }
 
+    // Fixed: Changed return type from void to ReviewImage
     @Override
-    public void insert(ReviewImage ri) throws SQLException {
+    public ReviewImage insert(ReviewImage ri) throws SQLException {
         String sql = "INSERT INTO restaurant_review_image (image_url, review_id) VALUES (?, ?)";
+        try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, ri.getImageUrl());
+            ps.setInt(2, ri.getReviewId());
+            ps.executeUpdate();
+
+            // Retrieve generated ID to keep the object complete
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) ri.setId(rs.getInt(1));
+            return ri;
+        }
+    }
+
+    // Fixed: Changed return type from void to ReviewImage
+    @Override
+    public ReviewImage update(ReviewImage ri) throws SQLException {
+        String sql = "UPDATE restaurant_review_image SET image_url=?, review_id=? WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, ri.getImageUrl());
             ps.setInt(2, ri.getReviewId());
+            ps.setInt(3, ri.getId());
+            ps.executeUpdate();
+            return ri;
+        }
+    }
+
+    // Fixed: Changed parameter from ReviewImage object to Integer ID to match CRUD<T, ID>
+    @Override
+    public void delete(Integer id) throws SQLException {
+        String sql = "DELETE FROM restaurant_review_image WHERE id=?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, id);
             ps.executeUpdate();
         }
     }
 
+    // Fixed: Removed the parameter to match the interface selectAll() signature
     @Override
-    public List<ReviewImage> selectAll(ReviewImage unused) throws SQLException {
+    public List<ReviewImage> selectAll() throws SQLException {
         List<ReviewImage> images = new ArrayList<>();
         String sql = "SELECT * FROM restaurant_review_image";
 
@@ -41,35 +71,12 @@ public class ReviewImageService implements CRUD<ReviewImage> {
                         rs.getInt("review_id")
                 ));
             }
-        } catch (SQLException e) {
-            System.err.println("Critical Error in ReviewImageService.selectAll: " + e.getMessage());
-            throw e;
         }
         return images;
     }
 
     @Override
-    public void update(ReviewImage ri) throws SQLException {
-        String sql = "UPDATE restaurant_review_image SET image_url=?, review_id=? WHERE id=?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setString(1, ri.getImageUrl());
-            ps.setInt(2, ri.getReviewId());
-            ps.setInt(3, ri.getId());
-            ps.executeUpdate();
-        }
-    }
-
-    @Override
-    public void delete(ReviewImage ri) throws SQLException {
-        String sql = "DELETE FROM restaurant_review_image WHERE id=?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, ri.getId()); // Using the ID from the object to match interface
-            ps.executeUpdate();
-        }
-    }
-
-    @Override
-    public ReviewImage getById(int id) throws SQLException {
+    public ReviewImage getById(Integer id) throws SQLException {
         String sql = "SELECT * FROM restaurant_review_image WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);

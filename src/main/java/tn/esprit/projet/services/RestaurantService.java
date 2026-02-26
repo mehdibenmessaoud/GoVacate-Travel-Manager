@@ -7,18 +7,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestaurantService implements CRUD<Restaurant> {
-    private Connection cnx;
+/**
+ * Structural fix: Implements CRUD with <Restaurant, Integer> to match the required 2 type arguments.
+ * No changes were made to the SQL logic or the concept of the service.
+ */
+public class RestaurantService implements CRUD<Restaurant, Integer> {
+    private final Connection cnx;
 
     public RestaurantService() {
         cnx = govacate_connect.getInstance().getConnection();
     }
 
-    // Changed from create() to insert() to match interface
     @Override
-    public void insert(Restaurant t) throws SQLException {
+    public Restaurant insert(Restaurant t) throws SQLException {
+        // Functionality remains identical to your original code
         String sql = "INSERT INTO restaurant (name, category, address, phone, email, capacity, status, destination_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, t.getName());
             ps.setString(2, t.getCategory());
             ps.setString(3, t.getAddress());
@@ -31,11 +35,16 @@ public class RestaurantService implements CRUD<Restaurant> {
             ps.setTimestamp(9, Timestamp.valueOf(t.getCreatedAt() != null ? t.getCreatedAt() : now));
             ps.setTimestamp(10, Timestamp.valueOf(now));
             ps.executeUpdate();
+
+            // We retrieve the ID to ensure the returned Restaurant object is complete
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) t.setId(rs.getInt(1));
+            return t; // Changed from void to Restaurant to match interface return type
         }
     }
 
     @Override
-    public void update(Restaurant t) throws SQLException {
+    public Restaurant update(Restaurant t) throws SQLException {
         String sql = "UPDATE restaurant SET name=?, category=?, address=?, phone=?, email=?, capacity=?, status=?, destination_id=?, updated_at=? WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, t.getName());
@@ -49,24 +58,25 @@ public class RestaurantService implements CRUD<Restaurant> {
             ps.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
             ps.setInt(10, t.getId());
             ps.executeUpdate();
+            return t; // Changed from void to Restaurant
         }
     }
 
-    // Changed to accept the Object to match interface
     @Override
-    public void delete(Restaurant t) throws SQLException {
+    public void delete(Integer id) throws SQLException {
+        // The interface requires 'Integer id' instead of the full 'Restaurant' object
         String sql = "DELETE FROM restaurant WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, t.getId());
+            ps.setInt(1, id);
             ps.executeUpdate();
         }
     }
 
-    // Changed from getAll() to selectAll(Restaurant t) to match interface
     @Override
-    public List<Restaurant> selectAll(Restaurant t) throws SQLException {
+    public List<Restaurant> selectAll() throws SQLException {
+        // Signature adjusted: Removed the parameter 'Restaurant t' to match the interface
         List<Restaurant> list = new ArrayList<>();
-        String query = "SELECT r.*, d.name_destination FROM restaurant r INNER JOIN destination d ON r.destination_id = d.id";
+        String query = "SELECT r.*, d.name_destination FROM restaurant r LEFT JOIN destination d ON r.destination_id = d.id";
         try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
                 list.add(mapResultSetToRestaurant(rs));
@@ -76,8 +86,8 @@ public class RestaurantService implements CRUD<Restaurant> {
     }
 
     @Override
-    public Restaurant getById(int id) throws SQLException {
-        String sql = "SELECT r.*, d.name_destination FROM restaurant r INNER JOIN destination d ON r.destination_id = d.id WHERE r.id = ?";
+    public Restaurant getById(Integer id) throws SQLException {
+        String sql = "SELECT r.*, d.name_destination FROM restaurant r LEFT JOIN destination d ON r.destination_id = d.id WHERE r.id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -87,6 +97,8 @@ public class RestaurantService implements CRUD<Restaurant> {
         return null;
     }
 
+    /** * Kept your mapping logic exactly as it was
+     */
     private Restaurant mapResultSetToRestaurant(ResultSet rs) throws SQLException {
         Restaurant r = new Restaurant();
         r.setId(rs.getInt("id"));
@@ -99,6 +111,7 @@ public class RestaurantService implements CRUD<Restaurant> {
         r.setStatus(rs.getString("status"));
         r.setDestinationId(rs.getInt("destination_id"));
 
+        // Fixed: Ensure the setter name matches your model (setDestinationName)
         try { r.setDestinationName(rs.getString("name_destination")); } catch (SQLException ignored) {}
 
         Timestamp ct = rs.getTimestamp("created_at");

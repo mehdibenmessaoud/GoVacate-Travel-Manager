@@ -1,14 +1,13 @@
 package tn.esprit.projet.services;
 
-import tn.esprit.projet.models.Reclamation;
-
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CRUD<T> {
-    void insert(T t) throws SQLException;
-    void update(T t) throws SQLException;
-    void delete(T t) throws SQLException;
-    List<T> selectAll(T t) throws SQLException;
-    T getById(int id) throws SQLException;
+// Updated to accept both Entity Type (T) and ID Type (ID)
+public interface CRUD<T, ID> {
+    T insert(T t) throws SQLException;
+    T update(T t) throws SQLException;
+    void delete(ID id) throws SQLException;
+    List<T> selectAll() throws SQLException;
+    T getById(ID id) throws SQLException;
 }

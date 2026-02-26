@@ -2,7 +2,6 @@ package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.Role;
 import tn.esprit.projet.entities.User;
-import tn.esprit.projet.utils.MyDBConnexion;
 import tn.esprit.projet.utils.PasswordHasher;
 
 import java.sql.*;

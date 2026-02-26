@@ -6,51 +6,83 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentService implements CRUD<Comment> {
-    private Connection cnx = govacate_connect.getInstance().getConnection();
+// Fixed: Implements CRUD with both Entity (Comment) and ID type (Integer)
+public class CommentService implements CRUD<Comment, Integer> {
+    private final Connection cnx = govacate_connect.getInstance().getConnection();
 
     @Override
-    public void insert(Comment comment) throws SQLException {
+    public Comment insert(Comment comment) throws SQLException {
+        // Updated to return Comment to match interface return type requirements
         String req = "INSERT INTO comment (id_blogue, userid, content, createdat) VALUES (?, ?, ?, NOW())";
-        PreparedStatement pst = cnx.prepareStatement(req);
-        pst.setInt(1, comment.getPostid());
-        pst.setInt(2, comment.getUserid());
-        pst.setString(3, comment.getContent());
-        pst.executeUpdate();
+        try (PreparedStatement pst = cnx.prepareStatement(req, Statement.RETURN_GENERATED_KEYS)) {
+            pst.setInt(1, comment.getPostid());
+            pst.setInt(2, comment.getUserid());
+            pst.setString(3, comment.getContent());
+            pst.executeUpdate();
+
+            ResultSet rs = pst.getGeneratedKeys();
+            if (rs.next()) {
+                comment.setId(rs.getInt(1));
+            }
+            return comment;
+        }
     }
 
     @Override
-    public void update(Comment comment) throws SQLException {
+    public Comment update(Comment comment) throws SQLException {
+        // Changed from void to return Comment
         String req = "UPDATE comment SET content = ? WHERE id = ?";
-        PreparedStatement pst = cnx.prepareStatement(req);
-        pst.setString(1, comment.getContent());
-        pst.setInt(2, comment.getId());
-        pst.executeUpdate();
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setString(1, comment.getContent());
+            pst.setInt(2, comment.getId());
+            pst.executeUpdate();
+            return comment;
+        }
     }
 
     @Override
-    public void delete(Comment comment) throws SQLException {
+    public void delete(Integer id) throws SQLException {
+        // Changed parameter from Comment to Integer ID to match CRUD<T, ID>
         String req = "DELETE FROM comment WHERE id = ?";
-        PreparedStatement pst = cnx.prepareStatement(req);
-        pst.setInt(1, comment.getId());
-        pst.executeUpdate();
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setInt(1, id);
+            pst.executeUpdate();
+        }
     }
 
     @Override
-    public List<Comment> selectAll(Comment filter) throws SQLException {
+    public List<Comment> selectAll() throws SQLException {
+        // Removed unused parameter to match standard interface signature
         List<Comment> list = new ArrayList<>();
-        // On utilise l'objet filter pour récupérer les coms d'un blog précis
-        String req = "SELECT * FROM comment WHERE postid = ? ORDER BY createdat DESC";
-        PreparedStatement pst = cnx.prepareStatement(req);
-        pst.setInt(1, filter.getPostid());
-        ResultSet rs = pst.executeQuery();
-        while (rs.next()) {
-            Comment c = new Comment();
-            c.setId(rs.getInt("id"));
-            c.setContent(rs.getString("content"));
-            c.setUserid(rs.getInt("userid"));
-            list.add(c);
+        String req = "SELECT * FROM comment ORDER BY createdat DESC";
+        try (Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(req)) {
+            while (rs.next()) {
+                list.add(mapResultSetToComment(rs));
+            }
         }
         return list;
+    }
+
+    @Override
+    public Comment getById(Integer id) throws SQLException {
+        String req = "SELECT * FROM comment WHERE id = ?";
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setInt(1, id);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) return mapResultSetToComment(rs);
+            }
+        }
+        return null;
+    }
+
+    // Helper method to keep code clean and reusable
+    private Comment mapResultSetToComment(ResultSet rs) throws SQLException {
+        Comment c = new Comment();
+        c.setId(rs.getInt("id"));
+        c.setPostid(rs.getInt("id_blogue"));
+        c.setContent(rs.getString("content"));
+        c.setUserid(rs.getInt("userid"));
+        return c;
     }
 }
