@@ -869,3 +869,13 @@
 .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
+.btn-scan {
+    -fx-background-color: #4CAF50; /* Green */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+.btn-scan:hover {
+    -fx-background-color: #45a049;
+}

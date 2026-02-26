@@ -76,6 +76,7 @@ public class ClientRestaurantDetailController {
 
     private final Map<Node, String> originalTexts = new HashMap<>();
 
+    private final String PLACEHOLDER_IMAGE = "/images/placeholder_dish.png";
 
     public void setMainClientController(ClientController controller) {
         this.mainClientController = controller;
@@ -258,22 +259,19 @@ public class ClientRestaurantDetailController {
         };
     }
 
-    private VBox createTranslatedMenuCard(Menu m, String lang) {
+    private HBox createTranslatedMenuCard(Menu m, String lang) {
+        HBox card = createMenuCard(m); // Now returns HBox
 
-        VBox card = createMenuCard(m);
-
+        // info is the second child of HBox, name is the first child of info
         VBox info = (VBox) card.getChildren().get(1);
         Label nameLabel = (Label) info.getChildren().get(0);
 
         originalLabelText.putIfAbsent(nameLabel, m.getName());
 
         new Thread(() -> {
-
             String originalText = originalLabelText.get(nameLabel);
             String translated = fetchTranslation(originalText, lang);
-
             Platform.runLater(() -> nameLabel.setText(translated));
-
         }).start();
 
         return card;
@@ -386,32 +384,68 @@ public class ClientRestaurantDetailController {
         for (Menu m : filtered) menuFlowPane.getChildren().add(createMenuCard(m));
     }
 
-    private VBox createMenuCard(Menu m) {
-        VBox card = new VBox(0);
-        card.setStyle("-fx-background-color: #1a1e23; -fx-background-radius: 12; -fx-overflow: hidden;");
-        card.setPrefWidth(260);
+    private HBox createMenuCard(Menu m) {
+        // 1. Create the Main Card Container
+        HBox card = new HBox(20);
+        card.getStyleClass().add("menu-card");
+        card.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
+        // RESPONSIVE: Card fills the width of the menuFlowPane automatically
+        card.prefWidthProperty().bind(menuFlowPane.widthProperty().subtract(25));
+        card.setMaxWidth(Double.MAX_VALUE);
+
+        // 2. Dish Image with Placeholder logic
         ImageView iv = new ImageView();
-        iv.setFitWidth(260); iv.setFitHeight(160); iv.setPreserveRatio(false);
+        iv.setFitWidth(150);
+        iv.setFitHeight(110);
+        iv.setPreserveRatio(false);
+        iv.getStyleClass().add("menu-image");
+
+        // Clip for rounded corners on the image
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(150, 110);
+        clip.setArcWidth(15); clip.setArcHeight(15);
+        iv.setClip(clip);
+
         try {
             List<MenuImage> imgs = mis.getByMenuId(m.getId());
-            if (!imgs.isEmpty()) {
-                Image img = new Image(imgs.get(0).getImageUrl(), 260, 160, true, true, true);
+            if (imgs != null && !imgs.isEmpty()) {
+                // Load actual image
+                Image img = new Image(imgs.get(0).getImageUrl(), 150, 110, true, true, true);
                 iv.setImage(img);
-                iv.setOnMouseClicked(e -> openFullScreenWindow(img));
-                iv.setCursor(javafx.scene.Cursor.HAND);
+            } else {
+                // Load Placeholder Image
+                iv.setImage(new Image(getClass().getResourceAsStream("/images/placeholder_dish.png")));
             }
-        } catch (SQLException e) {}
+        } catch (Exception e) {
+            // Fallback for missing resources
+            System.out.println("Image error: " + e.getMessage());
+        }
 
-        VBox info = new VBox(5);
-        info.setPadding(new Insets(10));
+        // Full Screen functionality on image click
+        iv.setOnMouseClicked(e -> {
+            if (iv.getImage() != null) openFullScreenWindow(iv.getImage());
+        });
+
+        // 3. Details Container
+        VBox info = new VBox(8);
+        info.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        HBox.setHgrow(info, Priority.ALWAYS); // Stretch info to fill horizontal space
+
         Label name = new Label(m.getName());
-        name.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-        Label price = new Label(m.getPrice() + " TND");
-        price.setStyle("-fx-text-fill: #FF8210;");
-        info.getChildren().addAll(name, price);
+        name.getStyleClass().add("menu-item-name");
 
+        Label description = new Label(m.getDescription());
+        description.getStyleClass().add("menu-item-description");
+        description.setWrapText(true);
+
+        Label price = new Label(String.format("%.2f TND", m.getPrice()));
+        price.getStyleClass().add("menu-item-price");
+
+        info.getChildren().addAll(name, description, price);
+
+        // 4. Assemble
         card.getChildren().addAll(iv, info);
+
         return card;
     }
 

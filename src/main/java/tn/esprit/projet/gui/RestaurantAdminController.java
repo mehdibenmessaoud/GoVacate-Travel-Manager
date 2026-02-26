@@ -16,6 +16,7 @@ import tn.esprit.projet.entities.Restaurant;
 import tn.esprit.projet.services.MenuService;
 import tn.esprit.projet.services.RestaurantImageService;
 import tn.esprit.projet.services.RestaurantService;
+import tn.esprit.projet.test.App;
 
 import java.io.IOException;
 import java.net.URL;
@@ -258,4 +259,10 @@ public class RestaurantAdminController implements Initializable {
         restaurantTable.getSortOrder().clear();
         loadData();
     }
+
+    @FXML
+    private void handleSwitchRole() {
+        App.showClientView();
+    }
 }
+

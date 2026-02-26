@@ -15,6 +15,7 @@
     <VBox spacing="10.0">
         <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
         <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
+        <Button fx:id="btnSwitchAdmin" text="⚙ Switch to Admin" onAction="#handleSwitchRole" styleClass="menu-button-special"/>
     </VBox>
 
     <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="toolbar-glass">

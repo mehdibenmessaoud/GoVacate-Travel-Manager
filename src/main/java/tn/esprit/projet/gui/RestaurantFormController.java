@@ -30,6 +30,14 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
+import javafx.concurrent.Task;
+import javafx.stage.FileChooser;
+
+
+import tn.esprit.projet.gui.MenuConfirmationDialog;
+import java.math.BigDecimal;
+
+
 public class RestaurantFormController implements Initializable {
 
     // --- FXML UI Components ---
@@ -50,6 +58,7 @@ public class RestaurantFormController implements Initializable {
     @FXML private TableColumn<Menu, Void> colMenuActions;
     @FXML private TextField menuSearchField;
     @FXML private ComboBox<String> menuStatusFilter;
+    @FXML private Button btnScanMenu;
 
     // --- Services ---
     private final RestaurantService rs = new RestaurantService();
@@ -92,6 +101,7 @@ public class RestaurantFormController implements Initializable {
                 "Street food"            // Found as 'Street food'
         ));
 
+        btnScanMenu.setOnAction(e -> handleScanMenu());
         // Setup Spinner
         spnCapacity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 20));
 
@@ -412,4 +422,53 @@ public class RestaurantFormController implements Initializable {
     }
 
     public List<MenuImage> getImagesForMenu(Menu m) { return menuImageMap.get(m); }
+    @FXML
+    private void handleScanMenu() {
+        int restaurantId = (currentRestaurant != null) ? currentRestaurant.getId() : 0;
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Menu Image");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
+
+        File selectedFile = fileChooser.showOpenDialog(btnScanMenu.getScene().getWindow());
+        if (selectedFile == null) return;
+
+        // Show a loading indicator if you have one
+        btnScanMenu.setDisable(true);
+
+        Task<List<Menu>> geminiTask = new Task<>() {
+            @Override
+            protected List<Menu> call() throws Exception {
+                GeminiService service = new GeminiService();
+                return service.extractMenu(selectedFile, restaurantId);
+            }
+        };
+
+        geminiTask.setOnSucceeded(event -> {
+            btnScanMenu.setDisable(false);
+            List<Menu> parsedMenus = geminiTask.getValue();
+
+            if (parsedMenus == null || parsedMenus.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "No Items", "Gemini couldn't find any menu items.");
+                return;
+            }
+
+            // Reuse your existing confirmation dialog
+            MenuConfirmationDialog dialog = new MenuConfirmationDialog(parsedMenus);
+            dialog.showAndWait().ifPresent(buttonType -> {
+                if (buttonType == ButtonType.OK) {
+                    tempMenuList.addAll(dialog.getConfirmedItems());
+                    menuTable.refresh();
+                }
+            });
+        });
+
+        geminiTask.setOnFailed(event -> {
+            btnScanMenu.setDisable(false);
+            geminiTask.getException().printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "AI Failed", "Could not process image: " + geminiTask.getException().getMessage());
+        });
+
+        new Thread(geminiTask).start();
+    }
 }

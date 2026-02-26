@@ -21,6 +21,7 @@ import tn.esprit.projet.services.MenuService;
 import tn.esprit.projet.services.RestaurantService;
 import tn.esprit.projet.services.RestaurantImageService;
 import tn.esprit.projet.services.RestaurantReviewService;
+import tn.esprit.projet.test.App;
 import tn.esprit.projet.utils.CuisineWikiService;
 
 import java.io.IOException;
@@ -216,6 +217,13 @@ public class ClientRestaurantController {
         System.out.println("Image error: " + image.isError());
 
     }
+
+    @FXML
+    private void handleSwitchRole() {
+        // You can add a confirmation alert here if you want
+        App.showAdminView();
+    }
+
 
     private void applyDeepFilters() {
         String query = (searchField.getText() == null) ? "" : searchField.getText().toLowerCase().trim();

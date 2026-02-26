@@ -74,6 +74,20 @@
             <version>20231013</version>
         </dependency>
 
+
+
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-vertexai</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
