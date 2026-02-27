@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +19,7 @@ import tn.esprit.projet.services.ReservationExcursionServiceImpl;
 import java.io.IOException;
 import java.time.LocalDate;
 import javafx.scene.layout.VBox;
+
 public class ExcursionBookingController {
 
     @FXML private DatePicker dateExc;
@@ -27,12 +29,22 @@ public class ExcursionBookingController {
     @FXML private Button btnValider;
     @FXML private Button btnAnnuler;
 
+    // Persist theme state
+    private static boolean isDarkMode = true;
+
     private final ReservationExcursionServiceImpl service = new ReservationExcursionServiceImpl();
     private Reservation reservationModif = null;
 
     @FXML
     public void initialize() {
-        // Remplir le combo des heures
+        // Fix: Apply theme immediately to prevent white screen
+        Platform.runLater(() -> {
+            if (btnValider.getScene() != null) {
+                applyTheme(btnValider.getScene());
+            }
+        });
+
+        // --- KEPT: Your Original Logic ---
         ObservableList<String> hours = FXCollections.observableArrayList();
         for (int h = 8; h <= 19; h++) {
             hours.add(String.format("%02d:00", h));
@@ -40,7 +52,6 @@ public class ExcursionBookingController {
         }
         comboHeure.setItems(hours);
 
-        // Bloquer les dates passées
         dateExc.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -52,7 +63,6 @@ public class ExcursionBookingController {
             }
         });
 
-
         try {
             Excursion exc = service.findExcursionById(1);
             if (exc != null) {
@@ -63,29 +73,38 @@ public class ExcursionBookingController {
         }
     }
 
+    // --- ADDED: Theme Toggle Logic ---
+    @FXML
+    void toggleTheme(ActionEvent event) {
+        isDarkMode = !isDarkMode;
+        applyTheme(((Node) event.getSource()).getScene());
+    }
+
+    private void applyTheme(Scene scene) {
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(getClass().getResource("/css/booking_style.css").toExternalForm());
+        if (!isDarkMode) {
+            scene.getStylesheets().add(getClass().getResource("/css/light-mode.css").toExternalForm());
+        }
+    }
+
+    // --- KEPT: Your Original Methods ---
+
     public void initModif(Reservation res) {
         this.reservationModif = res;
-
-        // Afficher le bouton annuler
         if (btnAnnuler != null) {
             btnAnnuler.setVisible(true);
             btnAnnuler.setManaged(true);
         }
-
         if (res.getDate_debut() != null) {
             dateExc.setValue(res.getDate_debut());
         }
-
         int nb = res.getNombre_personnes();
-
         try {
             ReservationExcursion re = service.findByReservationId(res.getId());
             if (re != null) {
                 if (nb <= 0) nb = re.getNombre_personnes();
-
-                // Sélectionner l'heure enregistrée
                 comboHeure.setValue(re.getHeure_souhaitee());
-
                 if (nb > 0) {
                     txtPrixUnitaire.setText(String.format("%.2f", re.getPrix() / nb));
                 }
@@ -93,7 +112,6 @@ public class ExcursionBookingController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         txtPersonnes.setText(String.valueOf(nb));
         if (btnValider != null) btnValider.setText("METTRE À JOUR");
     }
@@ -111,7 +129,6 @@ public class ExcursionBookingController {
 
             int nb = Integer.parseInt(txtPersonnes.getText());
             LocalDate date = dateExc.getValue();
-
             double total = nb * exc.getPrice();
 
             Reservation res = (reservationModif != null) ? reservationModif : new Reservation();
@@ -137,9 +154,7 @@ public class ExcursionBookingController {
                 service.updateFullExcursion(res, re);
                 showAlert("Succès", "Mise à jour réussie !");
             }
-
             redirectToMesReservations(event);
-
         } catch (NumberFormatException e) {
             showAlert("Erreur", "Le nombre de personnes doit être un chiffre.");
         } catch (Exception e) {
@@ -154,33 +169,23 @@ public class ExcursionBookingController {
 
     private void redirectToMesReservations(ActionEvent event) {
         try {
-            // 1. Charger uniquement le fragment de la liste des réservations
-            // Assure-toi que le nom du fichier est exactement "Mes Réservations.fxml"
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-
-            // 2. Accéder à la Scène actuelle
             Scene scene = ((Node) event.getSource()).getScene();
+            applyTheme(scene); // Maintain theme
 
-            // 3. Chercher la zone de contenu centrale du Dashboard par son ID
-            // Note: L'ID doit correspondre à celui défini dans ton ClientDashboard.fxml (ex: clientReservationView)
             VBox contentArea = (VBox) scene.lookup("#clientReservationView");
-
             if (contentArea != null) {
-                // Vider la zone centrale (qui contient le formulaire de modif actuel)
                 contentArea.getChildren().clear();
-                // Ajouter la liste des réservations
                 contentArea.getChildren().add(root);
             } else {
-                // Fallback : Si on ne trouve pas le conteneur, on recharge tout le dashboard
-                // pour éviter de rester bloqué sur une page vide.
                 Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
                 scene.setRoot(dashboard);
             }
         } catch (IOException e) {
-            System.err.println("Erreur de navigation : " + e.getMessage());
             e.printStackTrace();
         }
     }
+
     private void showAlert(String t, String c) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(t); a.setHeaderText(null); a.setContentText(c); a.showAndWait();

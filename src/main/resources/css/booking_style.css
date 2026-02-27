@@ -41,3 +41,17 @@
     -fx-scale-y: 1.03;
     -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.5), 15, 0, 0, 0);
 }
+/* This targets the text inside the ComboBox box AFTER you select a time */
+.combo-box > .list-cell {
+    -fx-text-fill: white !important;
+}
+
+/* This targets the arrow button to make it more visible (optional but better) */
+.combo-box > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+/* Fix for the DatePicker text as well so it matches */
+.date-picker > .text-field {
+    -fx-text-fill: white !important;
+}

@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,15 +17,52 @@ import tn.esprit.projet.services.ReservationPackServiceImpl;
 import java.io.IOException;
 import java.time.LocalDate;
 import javafx.scene.layout.VBox;
+
 public class PackBookingController {
 
     @FXML private Label lblPackName, lblDateDepart, lblDateArrivee, lblPrix, lblCategorie;
+
+    // Persist theme state
+    private static boolean isDarkMode = true;
 
     private final ReservationPackServiceImpl service = new ReservationPackServiceImpl();
     private int selectedPackId;
     private double packPrix;
     private LocalDate dDepart, dArrivee;
     private String packName;
+
+    @FXML
+    public void initialize() {
+        // This ensures that when the window opens, it's NOT white.
+        // It applies your pack.css immediately.
+        Platform.runLater(() -> {
+            if (lblPackName.getScene() != null) {
+                applyTheme(lblPackName.getScene());
+            }
+        });
+    }
+
+    @FXML
+    void toggleTheme(ActionEvent event) {
+        isDarkMode = !isDarkMode;
+        applyTheme(((Node) event.getSource()).getScene());
+    }
+
+    private void applyTheme(Scene scene) {
+        // 1. Clear everything to avoid the "ghosting" / white background issue
+        scene.getStylesheets().clear();
+
+        // 2. Add your original pack.css (The design you want to keep)
+        scene.getStylesheets().add(getClass().getResource("/css/pack.css").toExternalForm());
+
+        // 3. If it's light mode, add the overrides on top.
+        // If dark, we do nothing extra because pack.css is already dark.
+        if (!isDarkMode) {
+            scene.getStylesheets().add(getClass().getResource("/css/light-mode.css").toExternalForm());
+        }
+    }
+
+    // --- Data & Navigation Logic ---
 
     public void setPackDataFromEntity(Pack pack) {
         this.selectedPackId = pack.getId();
@@ -57,13 +95,9 @@ public class PackBookingController {
             rp.setPack_id((long) selectedPackId);
             rp.setPrix_pack(packPrix);
 
-            // Insertion réelle en BDD
             service.createFullPack(res, rp);
-
             new Alert(Alert.AlertType.INFORMATION, "Réservation effectuée avec succès !").showAndWait();
-
             redirectToMesReservations(event);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,27 +105,20 @@ public class PackBookingController {
 
     private void redirectToMesReservations(ActionEvent event) {
         try {
-            // 1. Charger la vue de la liste
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-
-            // 2. Récupérer la scène actuelle
             Scene scene = ((Node) event.getSource()).getScene();
 
-            // 3. Trouver le conteneur central (VBox) du Dashboard
-            // Le cast (VBox) fonctionne uniquement si l'import est présent
-            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+            applyTheme(scene); // Keep the theme consistent after redirect
 
+            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
             if (contentArea != null) {
-                // Nettoyer la zone centrale et injecter la liste
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(root);
             } else {
-                // Si on ne trouve pas le conteneur, on recharge tout le dashboard
                 Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
                 scene.setRoot(dashboard);
             }
         } catch (IOException e) {
-            System.err.println("Erreur de navigation : " + e.getMessage());
             e.printStackTrace();
         }
     }

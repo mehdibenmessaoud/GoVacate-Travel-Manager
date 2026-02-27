@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,22 +17,32 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public class RestaurantBookingController {
-    @FXML private Button btnAnnuler;
+    @FXML private Button btnAnnuler, btnValider;
     @FXML private ComboBox<Restaurant> comboResto;
     @FXML private DatePicker dateRes;
     @FXML private TextField txtPersonnes;
     @FXML private ComboBox<String> comboHeure;
-    @FXML private Button btnValider;
+
+    // Persist theme state across the session
+    private static boolean isDarkMode = true;
 
     private final ReservationRestaurantServiceImpl serviceResto = new ReservationRestaurantServiceImpl();
     private Reservation reservationModif = null;
 
     @FXML
     public void initialize() {
+        // Fix: Apply theme immediately when the view is ready to prevent white screen
+        Platform.runLater(() -> {
+            if (btnValider.getScene() != null) {
+                applyTheme(btnValider.getScene());
+            }
+        });
+
         comboResto.setItems(FXCollections.observableArrayList(serviceResto.findAllRestaurants()));
         setupDateConstraints();
         setupTimePicker();
 
+        // Custom cell factory for status colors
         comboResto.setCellFactory(lv -> new ListCell<Restaurant>() {
             @Override protected void updateItem(Restaurant r, boolean empty) {
                 super.updateItem(r, empty);
@@ -49,15 +60,29 @@ public class RestaurantBookingController {
         comboResto.setButtonCell(comboResto.getCellFactory().call(null));
     }
 
+    @FXML
+    void toggleTheme(ActionEvent event) {
+        isDarkMode = !isDarkMode;
+        applyTheme(((Node) event.getSource()).getScene());
+    }
+
+    private void applyTheme(Scene scene) {
+        scene.getStylesheets().clear();
+        // 1. Always load your base design first
+        scene.getStylesheets().add(getClass().getResource("/css/booking_style.css").toExternalForm());
+
+        // 2. Add overrides ONLY if in Light Mode
+        if (!isDarkMode) {
+            scene.getStylesheets().add(getClass().getResource("/css/light-mode.css").toExternalForm());
+        }
+    }
+
     private void setupDateConstraints() {
         dateRes.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 setDisable(empty || date.isBefore(LocalDate.now()));
-                if (date.isBefore(LocalDate.now())) {
-                    setStyle("-fx-background-color: #2a2a2a; -fx-text-fill: #555555;");
-                }
             }
         });
         dateRes.setEditable(false);
@@ -72,39 +97,8 @@ public class RestaurantBookingController {
         comboHeure.setItems(hours);
     }
 
-    public void initModif(Reservation res) {
-        this.reservationModif = res;
-        if (btnAnnuler != null) {
-            btnAnnuler.setVisible(true);
-            btnAnnuler.setManaged(true);
-        }
-        dateRes.setValue(res.getDate_debut());
-        txtPersonnes.setText(String.valueOf(res.getNombre_personnes()));
-
-        ReservationRestaurant rr = serviceResto.findByReservationId(res.getId());
-        if (rr != null) {
-            if (rr.getNombre_personnes() > 0) {
-                txtPersonnes.setText(String.valueOf(rr.getNombre_personnes()));
-            }
-            comboHeure.setValue(rr.getHeure_souhaitee());
-            for (Restaurant r : comboResto.getItems()) {
-                if (r.getId() == rr.getRestaurant_id().intValue()) {
-                    comboResto.getSelectionModel().select(r);
-                    break;
-                }
-            }
-        }
-        if (btnValider != null) btnValider.setText("METTRE À JOUR LA RÉSERVATION");
-    }
-
     @FXML
-    void handleCancel(ActionEvent event) {
-        // Retourne à la liste des réservations
-        navigateToReservationList(event);
-    }
-
-    @FXML
-    void handleReserverRestaurant(ActionEvent event) { // Ajout de ActionEvent ici
+    void handleReserverRestaurant(ActionEvent event) {
         try {
             Restaurant selected = comboResto.getSelectionModel().getSelectedItem();
             String heure = comboHeure.getValue();
@@ -114,66 +108,47 @@ public class RestaurantBookingController {
                 return;
             }
 
-            int nbPersonnes = Integer.parseInt(txtPersonnes.getText());
-
             Reservation resParent = (reservationModif != null) ? reservationModif : new Reservation();
             resParent.setStatut(StatutReservation.CONFIRMEE);
             resParent.setType_res("RESTAURANT");
             resParent.setDate_debut(dateRes.getValue());
-            resParent.setNombre_personnes(nbPersonnes);
+            resParent.setNombre_personnes(Integer.parseInt(txtPersonnes.getText()));
             resParent.setUser_id(1L);
 
             ReservationRestaurant rr = new ReservationRestaurant();
             rr.setRestaurant_id((long) selected.getId());
             rr.setDate_reservation(dateRes.getValue());
             rr.setHeure_souhaitee(heure);
-            rr.setNombre_personnes(nbPersonnes);
+            rr.setNombre_personnes(resParent.getNombre_personnes());
             rr.setPrix(0.0);
 
             if (reservationModif == null) {
                 serviceResto.createFullReservation(resParent, rr);
-                showAlert("Succès", "Table réservée !");
             } else {
                 serviceResto.updateFullReservation(resParent, rr);
-                showAlert("Succès", "Mise à jour effectuée !");
             }
 
-            // Retourne à la liste après succès
             navigateToReservationList(event);
-
-        } catch (NumberFormatException e) {
-            showAlert("Erreur", "Le nombre de personnes doit être un chiffre.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Méthode centrale pour naviguer vers "Mes Réservations" à l'intérieur du Dashboard
-     */
     private void navigateToReservationList(ActionEvent event) {
         try {
-            // 1. Charger la vue de la liste (Mes Réservations)
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
-
-            // 2. Récupérer la scène à partir du bouton qui a déclenché l'événement
             Scene scene = ((Node) event.getSource()).getScene();
+            applyTheme(scene); // Ensure theme persists
 
-            // 3. Chercher la zone centrale du Dashboard par son ID fx:id
             VBox contentArea = (VBox) scene.lookup("#clientReservationView");
-
             if (contentArea != null) {
-                // Vider l'interface actuelle et injecter la liste
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(root);
             } else {
-                // Si on ne trouve pas le conteneur (test ou structure différente)
-                // On recharge le Dashboard complet comme solution de secours
                 Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
                 scene.setRoot(dashboard);
             }
         } catch (IOException e) {
-            System.err.println("Erreur de navigation : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -185,4 +160,6 @@ public class RestaurantBookingController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    @FXML void handleCancel(ActionEvent event) { navigateToReservationList(event); }
 }

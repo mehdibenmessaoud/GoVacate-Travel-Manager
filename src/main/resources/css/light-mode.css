@@ -1,0 +1,111 @@
+/* light-mode.css - Only color overrides */
+
+.main-bg {
+    -fx-background-color: #f1f5f9; /* Light Grey background */
+}
+
+.title-main {
+    -fx-text-fill: #0f172a; /* Dark text for light bg */
+}
+
+.luxury-card {
+    -fx-background-color: #ffffff; /* White card */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 20, 0, 0, 0);
+    -fx-border-color: #e2e8f0;
+}
+
+.pack-title {
+    -fx-text-fill: #1e293b;
+}
+
+.info-value {
+    -fx-text-fill: #334155;
+}
+
+.price-section {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+}
+
+.cancel-link {
+    -fx-text-fill: #94a3b8;
+}
+
+/* We keep the neongreen button even in light mode because it looks cool! */
+/* light-mode.css */
+
+/* 1. Main Background and Card */
+.main-bg {
+    -fx-background-color: #f1f5f9 !important;
+}
+
+.glass-card {
+    -fx-background-color: white !important;
+    -fx-border-color: #cbd5e1 !important;
+}
+
+/* 2. Labels and Titles */
+.label, .title-label {
+    -fx-text-fill: #0f172a !important;
+}
+
+/* 3. THE FIX: Force Black Text on all ComboBox and DatePicker cells */
+/* This !important rule will override your Java setStyle() colors */
+.combo-box .list-cell,
+.combo-box .button-cell,
+.date-picker .text-field,
+.text-field {
+    -fx-text-fill: #000000 !important;
+    -fx-font-weight: bold;
+}
+
+/* 4. Dropdown list items background */
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: white;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+/* 5. Inputs background */
+.text-input, .combo-box, .date-picker {
+    -fx-background-color: #f8fafc !important;
+    -fx-border-color: #cbd5e1 !important;
+}
+/* light-mode.css */
+.main-bg { -fx-background-color: #f1f5f9 !important; }
+
+.glass-card {
+    -fx-background-color: white !important;
+    -fx-border-color: #cbd5e1 !important;
+}
+
+/* Force BLACK text on all fields and labels */
+.label, .text-input, .combo-box .list-cell, .combo-box .button-cell, .date-picker .text-field {
+    -fx-text-fill: #000000 !important;
+}
+
+/* Adjust the unit price field (txtPrixUnitaire) which had specific green styling */
+#txtPrixUnitaire {
+    -fx-background-color: #e2e8f0 !important;
+    -fx-text-fill: #0f172a !important;
+}
+
+/* Dropdown Arrow Fix */
+.combo-box .arrow, .date-picker .arrow {
+    -fx-background-color: #1e293b !important;
+}
+/* Overrides for text and fields */
+.price-field {
+    -fx-background-color: #f1f5f9 !important;
+    -fx-text-fill: #059669 !important; /* Dark green for light mode */
+}
+.btn-cancel {
+    -fx-border-color: #cbd5e1 !important;
+    -fx-text-fill: #475569 !important;
+}
+.hint-label {
+    -fx-text-fill: #64748b !important;
+}
+

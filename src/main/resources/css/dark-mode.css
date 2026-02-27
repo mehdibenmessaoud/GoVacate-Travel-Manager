@@ -1,0 +1,34 @@
+.root {
+    -fx-base: #1a1a1a;
+    -fx-background-color: #0f2027;
+}
+.label {
+    -fx-text-fill: #ffffff;
+}
+.glass-card {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 0);
+}
+/* booking_style.css */
+
+/* Ensure the selected value in the box is white by default */
+.combo-box .button-cell,
+.combo-box .list-cell {
+    -fx-text-fill: white;
+}
+
+/* Your existing glass-card and main-bg rules here... */
+.price-field {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: #00FFCC;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+}
+.btn-cancel {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255,255,255,0.3);
+    -fx-border-radius: 10;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
