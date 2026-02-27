@@ -1,6 +1,7 @@
 package tn.esprit.projet.gui;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -13,10 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import tn.esprit.projet.entities.*;
 import tn.esprit.projet.entities.Menu;
-import tn.esprit.projet.entities.Restaurant;
-import tn.esprit.projet.entities.RestaurantImage;
-import tn.esprit.projet.entities.RestaurantReview;
 import tn.esprit.projet.services.MenuService;
 import tn.esprit.projet.services.RestaurantService;
 import tn.esprit.projet.services.RestaurantImageService;
@@ -30,12 +29,20 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+
 public class ClientRestaurantController {
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categoryFilter;
     @FXML private ComboBox<String> scoreFilter;
     @FXML private FlowPane restaurantGrid;
+
+    @FXML private VBox aiPanel;
+    @FXML private TextArea aiInputField;
+    @FXML private Label aiResponseLabel;
+    @FXML private Label aiStatusLabel;
+    @FXML private ProgressBar aiProgress;
 
     private final RestaurantService rs = new RestaurantService();
     private final RestaurantImageService ris = new RestaurantImageService();
@@ -51,6 +58,10 @@ public class ClientRestaurantController {
     private List<RestaurantReview> allReviews = new ArrayList<>();
     private List<Menu> allMenusCache = new ArrayList<>();
 
+    private final tn.esprit.projet.services.LocalAIService aiService = new tn.esprit.projet.services.LocalAIService();
+    private final javafx.animation.PauseTransition aiAutomationTimer = new javafx.animation.PauseTransition(Duration.seconds(1.5));
+    private List<Integer> aiRecommendedRestaurantIds = new ArrayList<>();
+
     @FXML
     public void initialize() {
         loadDataFromDatabase();
@@ -58,6 +69,13 @@ public class ClientRestaurantController {
         searchField.textProperty().addListener((obs, old, val) -> applyDeepFilters());
         categoryFilter.valueProperty().addListener((obs, old, val) -> applyDeepFilters());
         scoreFilter.valueProperty().addListener((obs, old, val) -> applyDeepFilters());
+
+        aiInputField.textProperty().addListener((obs, old, val) -> {
+            aiProgress.setProgress(-1); // Indeterminate (spinning)
+            aiStatusLabel.setText("L'IA analyse votre demande...");
+            aiAutomationTimer.playFromStart();
+        });
+        aiAutomationTimer.setOnFinished(event -> runAIWorkflow());
     }
 
     public void setMainClientController(ClientController mainClientController) {
@@ -232,26 +250,54 @@ public class ClientRestaurantController {
 
         List<Restaurant> filtered = allRestaurants.stream()
                 .filter(r -> {
+                    // --- STEP 1: AI OVERRIDE ---
+                    // If the AI has generated a recommendation list, we filter STRICTLY by that list.
+                    // This ensures the "Solid Response" you requested.
+                    if (aiRecommendedRestaurantIds != null && !aiRecommendedRestaurantIds.isEmpty()) {
+                        return aiRecommendedRestaurantIds.contains(r.getId());
+                    }
+
+                    // --- STEP 2: MANUAL FILTERS (Fallback) ---
+                    // This code only runs if the AI list is empty or hasn't triggered yet.
+
+                    // A. Category Filter
                     boolean matchCat = selectedCat.equals("Toutes les catégories") ||
                             (r.getCategory() != null && r.getCategory().equalsIgnoreCase(selectedCat));
                     if (!matchCat) return false;
 
+                    // B. Rating Filter
                     double avg = calculateAverage(r.getId());
                     if (selectedScore.equals("4.5+ ⭐") && avg < 4.5) return false;
                     if (selectedScore.equals("4.0+ ⭐") && avg < 4.0) return false;
                     if (selectedScore.equals("3.0+ ⭐") && avg < 3.0) return false;
 
+                    // C. Search Bar Logic
                     if (query.isEmpty()) return true;
 
+                    // Basic Restaurant Info Match
                     boolean basicMatch = (r.getName() != null && r.getName().toLowerCase().contains(query)) ||
                             (r.getDestinationName() != null && r.getDestinationName().toLowerCase().contains(query)) ||
                             (r.getAddress() != null && r.getAddress().toLowerCase().contains(query));
                     if (basicMatch) return true;
 
+                    // Deep Menu Search (Matches items even if restaurant name doesn't match)
                     return allMenusCache.stream()
                             .filter(m -> m.getRestaurantId() == r.getId())
                             .anyMatch(m -> (m.getName() != null && m.getName().toLowerCase().contains(query)) ||
                                     (m.getDescription() != null && m.getDescription().toLowerCase().contains(query)));
+                })
+                // --- STEP 3: SORTING ---
+                .sorted((r1, r2) -> {
+                    // Keep AI matches at the top even if other filters are active
+                    int p1 = (aiRecommendedRestaurantIds != null && aiRecommendedRestaurantIds.contains(r1.getId())) ? 0 : 1;
+                    int p2 = (aiRecommendedRestaurantIds != null && aiRecommendedRestaurantIds.contains(r2.getId())) ? 0 : 1;
+
+                    int compare = Integer.compare(p1, p2);
+                    if (compare == 0) {
+                        // Alphabetical fallback
+                        return r1.getName().compareToIgnoreCase(r2.getName());
+                    }
+                    return compare;
                 })
                 .collect(Collectors.toList());
 
@@ -328,6 +374,18 @@ public class ClientRestaurantController {
 
         body.getChildren().addAll(titleRow, details, new Separator(), footer);
         card.getChildren().addAll(topArea, body);
+
+
+        if (aiRecommendedRestaurantIds.contains(r.getId())) {
+            card.setStyle("-fx-border-color: #FF8210; -fx-border-width: 2; -fx-border-radius: 15; -fx-background-radius: 15;");
+
+            // Optional: Add a small sparkle icon to the top area
+            Label aiSparkle = new Label("✨");
+            aiSparkle.setStyle("-fx-font-size: 20;");
+            StackPane.setAlignment(aiSparkle, Pos.TOP_LEFT);
+            StackPane.setMargin(aiSparkle, new Insets(40, 0, 0, 10)); // Below the "Popular" badge
+            topArea.getChildren().add(aiSparkle);
+        }
         return card;
     }
 
@@ -368,5 +426,41 @@ public class ClientRestaurantController {
         categoryFilter.setValue("Toutes les catégories");
         scoreFilter.setValue("Toutes les notes");
         applyDeepFilters();
+    }
+
+    @FXML
+    private void toggleAIPanel() {
+        aiPanel.setVisible(!aiPanel.isVisible());
+    }
+
+    private void runAIWorkflow() {
+        String input = aiInputField.getText();
+        if (input == null || input.trim().isEmpty()) return;
+
+        aiProgress.setProgress(-1);
+
+        Task<AIRecommendation> task = new Task<>() {
+            @Override
+            protected AIRecommendation call() {
+                // Send Restaurants, Menus, and Reviews
+                return aiService.getAutomatedAdvice(input, allRestaurants, allMenusCache, allReviews);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            AIRecommendation result = task.getValue();
+            aiResponseLabel.setText(result.explanation());
+
+            // Directly set the IDs returned by the AI
+            this.aiRecommendedRestaurantIds = result.ids();
+
+            // Refresh the Grid - Now the "Solid Response" works
+            // The table will only show restaurants the AI picked!
+            applyDeepFilters();
+
+            aiProgress.setProgress(1);
+        });
+
+        new Thread(task).start();
     }
 }

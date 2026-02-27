@@ -8,20 +8,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import tn.esprit.projet.entities.Menu;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GeminiService {
-    // Replace this with your freshly generated key from AI Studio
-    private final String API_KEY = "apiiiii";
+
+    private final String Gemini_api = getProp("Gemini_api");
+
+    private final String API_KEY = Gemini_api;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Menu> extractMenu(File imageFile, int restaurantId) throws Exception {
@@ -94,5 +96,16 @@ public class GeminiService {
             menuList.add(m);
         }
         return menuList;
+    }
+
+    private String getProp(String key) {
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream("config.properties")) {
+            prop.load(input);
+            return prop.getProperty(key);
+        } catch (IOException ex) {
+            System.err.println("Could not find config.properties! Using defaults.");
+            return null;
+        }
     }
 }

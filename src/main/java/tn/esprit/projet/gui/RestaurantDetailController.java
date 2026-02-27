@@ -27,6 +27,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.io.File;
+import java.net.URL;
+
 public class RestaurantDetailController {
 
     @FXML private Label lblName, lblCategory, lblStatus, lblAddress, lblEmail, lblPhone, lblCapacity, lblImageCounter, lblMenuCount, lblReviewStats;
@@ -115,8 +118,9 @@ public class RestaurantDetailController {
     }
 
     private void addThumbnail(String url, int index) {
-        // Load original resolution but display it small
-        ImageView thumb = new ImageView(new Image(url, 0, 0, true, true, true));
+        // UPDATED: Using the smart loader
+        Image img = loadSmartImage(url);
+        ImageView thumb = new ImageView(img);
         thumb.setFitWidth(120);
         thumb.setFitHeight(80);
         thumb.setPreserveRatio(true);
@@ -197,15 +201,20 @@ public class RestaurantDetailController {
         VBox card = new VBox(0); card.getStyleClass().add("water-card"); card.setPrefWidth(260);
         StackPane imgContainer = new StackPane(); imgContainer.setPrefHeight(150);
         ImageView iv = new ImageView(); iv.setFitWidth(260); iv.setFitHeight(150); iv.setPreserveRatio(true);
+
         try {
             List<MenuImage> mImgs = mis.getByMenuId(menu.getId());
             if (!mImgs.isEmpty()) {
-                Image img = new Image(mImgs.get(0).getImageUrl(), 0, 0, true, true, true);
-                iv.setImage(img);
-                iv.setOnMouseClicked(e -> handleFullScreen(iv.getImage()));
-                iv.setStyle("-fx-cursor: hand;");
+                // UPDATED: Using the smart loader
+                Image img = loadSmartImage(mImgs.get(0).getImageUrl());
+                if (img != null) {
+                    iv.setImage(img);
+                    iv.setOnMouseClicked(e -> handleFullScreen(iv.getImage()));
+                    iv.setStyle("-fx-cursor: hand;");
+                }
             }
         } catch (SQLException e) { e.printStackTrace(); }
+
         imgContainer.getChildren().add(iv);
 
         VBox info = new VBox(8); info.setPadding(new Insets(15));
@@ -362,5 +371,31 @@ public class RestaurantDetailController {
     @FXML private void handleBack() {
         if (autoPlayTimeline != null) autoPlayTimeline.stop();
         if (mainController != null) mainController.loadSection("/RestaurantAdminView.fxml");
+    }
+
+
+    private Image loadSmartImage(String path) {
+        if (path == null || path.isEmpty()) return null;
+
+        try {
+            if (path.startsWith("http")) {
+                return new Image(path, true);
+            }
+
+            // 1. Try absolute disk path (for real-time newly added images)
+            File file = new File("src/main/resources" + path);
+            if (file.exists()) {
+                return new Image(file.toURI().toString(), true);
+            }
+
+            // 2. Fallback to Classpath (for images already in target/classes)
+            URL resource = getClass().getResource(path);
+            if (resource != null) {
+                return new Image(resource.toExternalForm(), true);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading image at: " + path);
+        }
+        return null;
     }
 }

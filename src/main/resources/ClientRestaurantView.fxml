@@ -4,72 +4,101 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="30.0" styleClass="client-content-pane" stylesheets="@/css/client_style.css"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="tn.esprit.projet.gui.ClientRestaurantController">
+<StackPane stylesheets="@/css/client_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientRestaurantController">
 
-    <padding>
-        <Insets bottom="30.0" left="50.0" right="50.0" top="40.0" />
-    </padding>
-
-    <VBox spacing="10.0">
-        <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
-        <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
-        <Button fx:id="btnSwitchAdmin" text="⚙ Switch to Admin" onAction="#handleSwitchRole" styleClass="menu-button-special"/>
-    </VBox>
-
-    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="toolbar-glass">
+    <VBox spacing="30.0" styleClass="client-content-pane">
         <padding>
-            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            <Insets bottom="30.0" left="50.0" right="50.0" top="40.0" />
         </padding>
 
-        <TextField fx:id="searchField" prefHeight="50.0"
-                   promptText="🔍 Rechercher un plat, une ville, un restaurant..."
-                   HBox.hgrow="ALWAYS" styleClass="modern-input" />
+        <VBox spacing="10.0">
+            <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
+            <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
+            <Button fx:id="btnSwitchAdmin" onAction="#handleSwitchRole" styleClass="menu-button-special" text="⚙ Switch to Admin" />
+        </VBox>
 
-        <MenuButton prefHeight="50.0" prefWidth="200.0" styleClass="menu-button-client" text="⚙️ Filtres &amp; Tri">
-            <items>
-                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="FILTRER PAR" />
+        <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="toolbar-glass">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
 
-                <CustomMenuItem hideOnClick="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 8 12;">
-                            <Label text="Catégorie" style="-fx-text-fill: white; -fx-font-size: 11;"/>
-                            <ComboBox fx:id="categoryFilter" prefWidth="170.0" styleClass="combo-box-glass" />
-                        </VBox>
-                    </content>
-                </CustomMenuItem>
+            <TextField fx:id="searchField" prefHeight="50.0" promptText="🔍 Rechercher un plat, une ville, un restaurant..." styleClass="modern-input" HBox.hgrow="ALWAYS" />
 
-                <CustomMenuItem hideOnClick="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 8 12;">
-                            <Label text="Note Minimale" style="-fx-text-fill: white; -fx-font-size: 11;"/>
-                            <ComboBox fx:id="scoreFilter" prefWidth="170.0" styleClass="combo-box-glass" />
-                        </VBox>
-                    </content>
-                </CustomMenuItem>
+            <MenuButton prefHeight="50.0" prefWidth="200.0" styleClass="menu-button-client" text="⚙️ Filtres &amp; Tri">
+                <items>
+                    <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="FILTRER PAR" />
+                    <CustomMenuItem hideOnClick="false">
+                        <content>
+                            <VBox spacing="5" style="-fx-padding: 8 12;">
+                                <Label style="-fx-text-fill: white; -fx-font-size: 11;" text="Catégorie" />
+                                <ComboBox fx:id="categoryFilter" prefWidth="170.0" styleClass="combo-box-glass" />
+                            </VBox>
+                        </content>
+                    </CustomMenuItem>
+                    <CustomMenuItem hideOnClick="false">
+                        <content>
+                            <VBox spacing="5" style="-fx-padding: 8 12;">
+                                <Label style="-fx-text-fill: white; -fx-font-size: 11;" text="Note Minimale" />
+                                <ComboBox fx:id="scoreFilter" prefWidth="170.0" styleClass="combo-box-glass" />
+                            </VBox>
+                        </content>
+                    </CustomMenuItem>
+                    <SeparatorMenuItem />
+                    <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="TRIER PAR" />
+                    <MenuItem onAction="#handleSortName" text="🔤 Nom (A-Z)" />
+                    <MenuItem onAction="#handleSortDate" text="📅 Plus récents" />
+                    <SeparatorMenuItem />
+                    <MenuItem onAction="#handleReset" styleClass="menu-item-reset" text="🔄 Réinitialiser tous les filtres" />
+                </items>
+            </MenuButton>
+        </HBox>
 
-                <SeparatorMenuItem />
-                <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="TRIER PAR" />
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+            <content>
+                <FlowPane fx:id="restaurantGrid" hgap="30.0" style="-fx-background-color: transparent;" vgap="35.0">
+                    <padding>
+                        <Insets bottom="30.0" top="10.0" />
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </VBox>
 
-                <MenuItem onAction="#handleSortName" text="🔤 Nom (A-Z)" />
-                <MenuItem onAction="#handleSortDate" text="📅 Plus récents" />
+    <VBox fx:id="aiPanel" visible="false" maxWidth="380.0" maxHeight="450.0" spacing="15.0"
+          style="-fx-background-color: rgba(30, 30, 30, 0.98); -fx-background-radius: 20; -fx-border-color: #FF8210; -fx-border-width: 1.5; -fx-border-radius: 20;"
+          StackPane.alignment="BOTTOM_RIGHT">
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+        <StackPane.margin>
+            <Insets bottom="90.0" right="30.0" />
+        </StackPane.margin>
 
-                <SeparatorMenuItem />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label style="-fx-text-fill: #FF8210; -fx-font-size: 18; -fx-font-weight: bold;" text="✨ Concierge IA" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#toggleAIPanel" style="-fx-background-color: transparent; -fx-text-fill: gray; -fx-font-size: 18; -fx-cursor: hand;" text="✕" />
+        </HBox>
 
-                <MenuItem onAction="#handleReset" styleClass="menu-item-reset" text="🔄 Réinitialiser tous les filtres" />
-            </items>
-        </MenuButton>
-    </HBox>
+        <TextArea fx:id="aiInputField" prefHeight="100.0" promptText="Ex: Je cherche un endroit romantique pour manger des pâtes avec un budget de 50 DT..."
+                  style="-fx-control-inner-background: #1a1a1a; -fx-text-fill: white; -fx-prompt-text-fill: #555; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #333; -fx-wrap-text: true;" />
 
-    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
-        <content>
-            <FlowPane fx:id="restaurantGrid" hgap="30.0" vgap="35.0" style="-fx-background-color: transparent;">
-                <padding>
-                    <Insets bottom="30.0" top="10.0" />
-                </padding>
-            </FlowPane>
-        </content>
-    </ScrollPane>
+        <VBox spacing="5.0">
+            <Label fx:id="aiStatusLabel" style="-fx-text-fill: #FF8210; -fx-font-size: 11;" text="En attente de votre demande..." />
+            <ProgressBar fx:id="aiProgress" maxWidth="Infinity" prefHeight="4.0" progress="0.0" styleClass="ai-progress-bar" />
+        </VBox>
 
-</VBox>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+            <Label fx:id="aiResponseLabel" style="-fx-text-fill: #ddd; -fx-font-size: 13; -fx-line-spacing: 5;" wrapText="true" text="L'IA analysera tous les menus des restaurants pour trouver la correspondance parfaite." />
+        </ScrollPane>
+    </VBox>
+
+    <Button onAction="#toggleAIPanel" prefHeight="60.0" prefWidth="60.0"
+            style="-fx-background-color: #FF8210; -fx-background-radius: 50; -fx-text-fill: white; -fx-font-size: 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 5);"
+            text="✨" StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin>
+            <Insets bottom="20.0" right="30.0" />
+        </StackPane.margin>
+    </Button>
+
+</StackPane>

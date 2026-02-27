@@ -1,5 +1,6 @@
 package tn.esprit.projet.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -59,6 +60,7 @@ public class RestaurantFormController implements Initializable {
     @FXML private TextField menuSearchField;
     @FXML private ComboBox<String> menuStatusFilter;
     @FXML private Button btnScanMenu;
+    @FXML private Button btnAutoFindImages;
 
     // --- Services ---
     private final RestaurantService rs = new RestaurantService();
@@ -78,6 +80,8 @@ public class RestaurantFormController implements Initializable {
     private final List<File> selectedFiles = new ArrayList<>();
     private final List<Integer> imagesToDelete = new ArrayList<>();
     private final List<Menu> menusToDelete = new ArrayList<>();
+
+    private final FoodImageService foodImageService = new FoodImageService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -140,17 +144,45 @@ public class RestaurantFormController implements Initializable {
             colMenuImage.setCellFactory(param -> new TableCell<>() {
                 private final ImageView iv = new ImageView();
                 { iv.setFitHeight(50); iv.setFitWidth(50); iv.setPreserveRatio(true); }
+
                 @Override
                 protected void updateItem(Void item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty) setGraphic(null);
-                    else {
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
                         Menu m = getTableView().getItems().get(getIndex());
                         List<MenuImage> images = menuImageMap.get(m);
+
                         if (images != null && !images.isEmpty()) {
-                            iv.setImage(new Image(images.get(0).getImageUrl(), true));
-                            setGraphic(iv);
-                        } else setGraphic(new Label("No Img"));
+                            String path = images.get(0).getImageUrl();
+                            Image img = null;
+
+                            if (path.startsWith("http")) {
+                                img = new Image(path, true);
+                            } else {
+                                // REAL-TIME FIX: Try loading from absolute file system if resource is null
+                                File file = new File("src/main/resources" + path);
+                                if (file.exists()) {
+                                    img = new Image(file.toURI().toString(), true);
+                                } else {
+                                    // Fallback to classpath for images already there from previous runs
+                                    URL resource = getClass().getResource(path);
+                                    if (resource != null) {
+                                        img = new Image(resource.toExternalForm(), true);
+                                    }
+                                }
+                            }
+
+                            if (img != null) {
+                                iv.setImage(img);
+                                setGraphic(iv);
+                            } else {
+                                setGraphic(new Label("Loading..."));
+                            }
+                        } else {
+                            setGraphic(new Label("No Img"));
+                        }
                     }
                 }
             });
@@ -470,5 +502,73 @@ public class RestaurantFormController implements Initializable {
         });
 
         new Thread(geminiTask).start();
+    }
+
+    @FXML
+    private void handleAutoFindImages() {
+        // Filter menus that have no images assigned yet
+        List<Menu> queue = tempMenuList.stream()
+                .filter(m -> !menuImageMap.containsKey(m) || menuImageMap.get(m).isEmpty())
+                .toList();
+
+        if (queue.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Information", "Tous les plats ont déjà une image.");
+            return;
+        }
+        processImageQueue(new java.util.LinkedList<>(queue));
+    }
+
+    private void processImageQueue(java.util.Queue<Menu> queue) {
+        if (queue.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Terminé", "Recherche d'images terminée.");
+            return;
+        }
+
+        Menu currentMenu = queue.poll();
+        Task<List<String>> searchTask = new Task<>() {
+            @Override
+            protected List<String> call() throws Exception {
+                return foodImageService.searchImages(currentMenu.getName());
+            }
+        };
+
+        searchTask.setOnSucceeded(e -> {
+            List<String> results = searchTask.getValue();
+            if (results != null && !results.isEmpty()) {
+                ImageValidationDialog dialog = new ImageValidationDialog(currentMenu.getName(), results);
+                dialog.showAndWait().ifPresent(selectedUrl -> {
+                    try {
+                        // 1. Save file and get the path
+                        String localPath = foodImageService.saveImageLocally(selectedUrl, currentMenu.getName());
+
+                        // 2. Create the Image Object
+                        MenuImage mi = new MenuImage();
+                        mi.setId(0);
+                        mi.setImageUrl(localPath);
+                        mi.setMenuId(currentMenu.getId());
+
+                        // 3. Update the Map
+                        List<MenuImage> list = new ArrayList<>();
+                        list.add(mi);
+                        menuImageMap.put(currentMenu, list);
+
+                        // 4. THE FIX: Force JavaFX to redraw the table row immediately
+                        Platform.runLater(() -> {
+                            menuTable.refresh();
+                            // Optional: If you want to be extra sure, trigger a dummy update
+                            applyMenuPredicate();
+                        });
+
+                        System.out.println("Image assigned and UI refreshed for: " + currentMenu.getName());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+            processImageQueue(queue); // Move to next item
+        });
+
+        searchTask.setOnFailed(e -> processImageQueue(queue));
+        new Thread(searchTask).start();
     }
 }

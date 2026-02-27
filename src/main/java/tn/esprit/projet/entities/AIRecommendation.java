@@ -1,4 +1,5 @@
 package tn.esprit.projet.entities;
+import java.util.List;
 
-public class AIRecommendation {
-}
+// This holds the IDs of the menus and the "Why" text from the AI
+public record AIRecommendation(List<Integer> ids, String explanation) {}

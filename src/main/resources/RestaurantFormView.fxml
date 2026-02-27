@@ -99,6 +99,7 @@
                     <Button onAction="#sortMenuByPriceDesc" styleClass="btn-action-view" text="Sort Prix $$$" />
                     <Button onAction="#btnAddMenuItem" prefHeight="40" styleClass="btn-orange-glow" text="+ Nouveau Plat" />
                     <Button fx:id="btnScanMenu" text="Scan Menu from Image" styleClass="btn-scan"/>
+                    <Button fx:id="btnAutoFindImages" text="Trouver images auto." onAction="#handleAutoFindImages" styleClass="btn-secondary"/>
                 </HBox>
 
                 <TableView fx:id="menuTable" styleClass="glass-table" VBox.vgrow="ALWAYS">
