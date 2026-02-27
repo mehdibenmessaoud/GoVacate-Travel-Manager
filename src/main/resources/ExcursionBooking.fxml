@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import java.net.URL?>
+
+<StackPane prefHeight="800.0" prefWidth="1200.0" styleClass="main-bg" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.GUI.ExcursionBookingController">
+
+    <stylesheets>
+        <URL value="@/css/booking_style.css" />
+    </stylesheets>
+
+    <children>
+        <VBox alignment="CENTER" maxWidth="500.0" spacing="35.0">
+            <children>
+
+                <VBox alignment="CENTER" spacing="5">
+                    <children>
+                        <Label style="-fx-letter-spacing: 3;" text="AVENTURE &amp; NATURE" textFill="#00FFCC">
+                            <font><Font name="System Bold" size="11.0" /></font>
+                        </Label>
+                        <Label text="Réserver une Excursion" textFill="WHITE">
+                            <font><Font name="Segoe UI Bold" size="32.0" /></font>
+                        </Label>
+                        <Separator maxWidth="50" style="-fx-opacity: 0.3; -fx-background-color: #00FFCC;" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="25.0" styleClass="glass-card">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                    </padding>
+                    <children>
+                        <HBox spacing="15.0" alignment="CENTER">
+                            <children>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="📅 Date" textFill="#679AC1" />
+                                    <DatePicker fx:id="dateExc" prefHeight="45.0" prefWidth="200.0" promptText="Choisir date" />
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="⏰ Heure" textFill="#679AC1" />
+                                    <ComboBox fx:id="comboHeure" prefHeight="45.0" prefWidth="200.0" promptText="--:--" />
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="15" alignment="CENTER">
+                            <children>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="👥 Participants" textFill="#679AC1" />
+                                    <TextField fx:id="txtPersonnes" prefHeight="45.0" promptText="Nombre" style="-fx-background-radius: 10;" />
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="💰 Prix Unit. (DT)" textFill="#679AC1" />
+                                    <TextField fx:id="txtPrixUnitaire" editable="false" prefHeight="45.0" style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: #00FFCC; -fx-font-weight: bold; -fx-background-radius: 10;" />
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox alignment="CENTER" spacing="15.0">
+                    <children>
+                        <Button fx:id="btnValider" mnemonicParsing="false" onAction="#handleReserverExcursion" prefHeight="55.0" prefWidth="350.0" styleClass="btn-confirm" text="CONFIRMER LA RÉSERVATION">
+                            <font><Font name="System Bold" size="15.0" /></font>
+                        </Button>
+
+                        <Button fx:id="btnAnnuler" managed="false" visible="false" mnemonicParsing="false" onAction="#handleBack" prefHeight="40.0" prefWidth="350.0"
+                                style="-fx-background-color: transparent; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 10; -fx-text-fill: white; -fx-cursor: hand;"
+                                text="ANNULER LES MODIFICATIONS">
+                        </Button>
+
+                        <Label text="Explorez les plus beaux paysages avec nos guides" textFill="rgba(255,255,255,0.4)">
+                            <font><Font size="11.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

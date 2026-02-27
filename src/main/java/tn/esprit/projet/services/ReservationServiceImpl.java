@@ -1,0 +1,155 @@
+package tn.esprit.projet.services;
+
+import tn.esprit.projet.entities.Reservation;
+import tn.esprit.projet.entities.StatutReservation;
+import tn.esprit.projet.utils.MyDBConnexion;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ReservationServiceImpl implements CRUD<Reservation, Long> {
+
+    // Using private final for better practice
+    private final Connection cnx = MyDBConnexion.getInstance().getConnection();
+
+    @Override
+    public Reservation insert(Reservation r) { // Renamed from create
+        String sql = """
+            INSERT INTO reservation
+            (statut, date_debut, date_fin, nombre_personnes,
+             prix_total, commentaire_client, user_id)
+            VALUES (?,?,?,?,?,?,?)
+        """;
+        try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, r.getStatut().name());
+            ps.setDate(2, Date.valueOf(r.getDate_debut()));
+            ps.setDate(3, Date.valueOf(r.getDate_fin()));
+            ps.setInt(4, r.getNombre_personnes());
+            ps.setDouble(5, r.getPrix_total());
+            ps.setString(6, r.getCommentaire_client());
+            ps.setLong(7, r.getUser_id());
+            ps.executeUpdate();
+
+            // Get generated ID to keep the object updated
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) r.setId(rs.getLong(1));
+
+            return r;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Reservation update(Reservation r) {
+        String sql = """
+            UPDATE reservation
+            SET statut=?, prix_total=?, commentaire_client=?
+            WHERE id=?
+        """;
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, r.getStatut().name());
+            ps.setDouble(2, r.getPrix_total());
+            ps.setString(3, r.getCommentaire_client());
+            ps.setLong(4, r.getId());
+            ps.executeUpdate();
+            return r;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        String sql = "DELETE FROM reservation WHERE id=?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Reservation getById(Long id) { // Renamed from findById
+        String sql = "SELECT * FROM reservation WHERE id=?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToReservation(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Reservation> selectAll() { // Renamed from findAll
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT * FROM reservation";
+        try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(mapResultSetToReservation(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // --- Helper & Custom Methods ---
+
+    private Reservation mapResultSetToReservation(ResultSet rs) throws SQLException {
+        Reservation r = new Reservation();
+        r.setId(rs.getLong("id"));
+        r.setStatut(StatutReservation.valueOf(rs.getString("statut")));
+        r.setDate_debut(rs.getDate("date_debut").toLocalDate());
+        r.setDate_fin(rs.getDate("date_fin").toLocalDate());
+        r.setNombre_personnes(rs.getInt("nombre_personnes"));
+        r.setPrix_total(rs.getDouble("prix_total"));
+        r.setCommentaire_client(rs.getString("commentaire_client"));
+        r.setUser_id(rs.getLong("user_id"));
+        return r;
+    }
+
+    public List<Reservation> getAllReservations() {
+        List<Reservation> reservations = new ArrayList<>();
+        String sql = "SELECT r.*, u.nom FROM reservation r LEFT JOIN utilisateur u ON r.user_id = u.id";
+
+        try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Reservation r = new Reservation();
+                r.setId(rs.getLong("id"));
+                r.setPrix_total(rs.getDouble("prix_total"));
+                r.setType_res(rs.getString("type_res"));
+                r.setCommentaire_client(rs.getString("nom") != null ? rs.getString("nom") : "Inconnu");
+                r.setUser_id(rs.getLong("user_id"));
+
+                Date d = rs.getDate("date_debut");
+                if (d != null) r.setDate_debut(d.toLocalDate());
+
+                String stStr = rs.getString("statut");
+                if (stStr != null) r.setStatut(StatutReservation.valueOf(stStr.toUpperCase()));
+
+                reservations.add(r);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return reservations;
+    }
+
+    public void updateStatus(long id, String newStatus) {
+        String sql = "UPDATE reservation SET statut = ? WHERE id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}

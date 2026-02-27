@@ -1,0 +1,436 @@
+.root-pane {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    /* Dark Navy Blue */
+    -fx-background-color: #001F3F;
+}
+
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+.sidebar-liquid {
+    /* Much clearer: White tint with very low opacity */
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+
+    /* Crisp thin border on the right */
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.sidebar-liquid:hover .sliding-highlight {
+    /* Fond : léger reflet Cyan en bas pour le volume de l'eau */
+    -fx-background-color: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.01) 60%,
+            rgba(0, 255, 255, 0.1) 100%
+    );
+
+    /* Bordure arc-en-ciel (Prisme) */
+    -fx-border-color: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.5) 0%,   /* Haut blanc */
+            rgba(255, 255, 255, 0.0) 40%,  /* Milieu transparent */
+            rgba(0, 255, 255, 0.6) 80%,    /* Cyan */
+            rgba(255, 0, 255, 0.6) 100%    /* Magenta */
+    );
+
+    /* Lueur interne (Glow) */
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 255, 0.2), 10, 0, 0, 2);
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* LE CADRE MAGIQUE (Sliding Pane) */
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+    -fx-effect: null;
+
+    /* Transition fluide */
+    -fx-transition: -fx-border-color 0.4s ease-out, -fx-background-color 0.4s ease-out, -fx-effect 0.4s ease-out;
+}
+
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-transition: all 0.4s ease;
+    -fx-padding: 15 0 15 25;
+    -fx-background-insets: 0;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+    -fx-text-origin: baseline;
+    -fx-background-radius: 30px;
+    -fx-effect: null;
+}
+
+.liquid-btn:hover {
+    /*-fx-text-fill: #dd06ea;*/
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.12;
+}
+
+.liquid-btn.active {
+    -fx-text-fill: white;
+}
+
+.sliding-highlight.from-top {
+    -fx-background-color: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.16) 0%,
+            rgba(255, 255, 255, 0.08) 12%,
+            rgba(255, 255, 255, 0.03) 25%,
+            rgba(255, 255, 255, 0.0) 40%
+    );
+}
+
+.sliding-highlight.from-bottom {
+    -fx-background-color: linear-gradient(
+            to top,
+            rgba(255, 255, 255, 0.16) 0%,
+            rgba(255, 255, 255, 0.08) 12%,
+            rgba(255, 255, 255, 0.03) 25%,
+            rgba(255, 255, 255, 0.0) 40%
+    );
+}
+.text-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub {
+    -fx-font-size: 14px;
+    -fx-text-fill: #679AC1;
+}
+
+/* Panneau verre pour la recherche */
+.glass-panel {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -fx-background-radius: 30px;
+
+    /* Bordure prisme uniquement */
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0.6) 0%,
+            rgba(0, 255, 255, 0.4) 50%,
+            rgba(255, 0, 255, 0.4) 100%
+    );
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 4);
+    -fx-transition: all 0.4s ease-out;
+}
+
+.glass-panel:hover {
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0.8) 0%,
+            rgba(0, 255, 255, 0.6) 50%,
+            rgba(255, 0, 255, 0.6) 100%
+    );
+}
+
+.hero-title {
+    -fx-font-size: 22px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Barre de recherche interne */
+.search-bar-liquid {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 50px;
+    -fx-padding: 0 10 0 30;
+    -fx-effect: dropshadow(gaussian, rgba(0, 68, 123, 0.4), 20, 0, 0, 5);
+}
+
+.search-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-weight: 800;
+    -fx-text-transform: uppercase;
+}
+
+.search-field,
+.date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00447B;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #C0C0C0;
+}
+
+/* BOUTON ORANGE "GLOW" */
+.btn-orange-glow {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-background-radius: 30px;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 15, 0.3, 0, 0);
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: #FFBD59;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #C0C0C0;
+}
+.water-card {
+    /* Futuristic navy base */
+    -fx-background-color: linear-gradient(
+            to bottom right,
+            #0a1a33,
+            #0e2a4d
+    );
+
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1.2px;
+
+    /* Prismatic glass border */
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0.45),
+            rgba(0, 180, 255, 0.35),
+            rgba(140, 0, 255, 0.35)
+    );
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 18, 0, 0, 6);
+    -fx-cursor: hand;
+}
+
+/* Hover: lift + subtle color shift (NO text glow) */
+.water-card:hover {
+    -fx-translate-y: -10px;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0.7),
+            rgba(0, 200, 255, 0.6),
+            rgba(160, 0, 255, 0.6)
+    );
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 120, 255, 0.35), 26, 0, 0, 10);
+}
+
+.card-header {
+    -fx-background-radius: 20px 20px 0 0;
+}
+
+/* Header variants */
+.card-header.sunset {
+    -fx-background-color: linear-gradient(to top, #00447B, #FF8210);
+}
+
+.card-header.lagoon {
+    -fx-background-color: linear-gradient(to top, #00447B, #679AC1);
+}
+
+.card-header.abyss {
+    -fx-background-color: linear-gradient(to top, #00447B, #C0C0C0);
+}
+
+.card-content {
+    -fx-padding: 15px;
+    -fx-background-color: transparent;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.card-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+
+.card-price {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #FF8210;
+}
+
+.card-rate {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFBD59;
+}
+/* =========================================================
+   GLASS BLUR LAYER (INSIDE CARD)
+========================================================= */
+/* =========================================================
+   GLASS CARD – NO BLUR (JavaFX CORRECT)
+========================================================= */
+.glass-card {
+    /* Transparent glass */
+    -fx-background-color: linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0.14),
+            rgba(255,255,255,0.04)
+    );
+
+    /* Perfect rounded edges */
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+
+    /* Glass border */
+    -fx-border-width: 1.2px;
+    -fx-border-color: linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0.6),
+            rgba(0,180,255,0.35),
+            rgba(140,0,255,0.35)
+    );
+
+    /* Depth */
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0,0,0,0.35),
+            18,
+            0,
+            0,
+            6
+    );
+
+    /* Internal spacing */
+    -fx-padding: 18px;
+
+    /* IMPORTANT: removes sharp corners */
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+.glass-reflection {
+    -fx-background-color: linear-gradient(
+            to top left,
+            rgba(255,255,255,0.28),
+            rgba(255,255,255,0.12),
+            transparent 65%
+    );
+
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+
+    /* Overlay must not block interactions */
+    -fx-mouse-transparent: true;
+
+    /* Ensures it covers the StackPane */
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+}
+.glass-card:hover .glass-reflection {
+    -fx-background-color: linear-gradient(
+            to top left,
+            rgba(255,255,255,0.38),
+            rgba(255,255,255,0.15),
+            transparent 60%
+    );
+}
+
+/* --- DESIGN ADMIN RESERVATIONS --- */
+
+.admin-search-box {
+    -fx-background-color: rgba(15, 32, 53, 0.7);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 20;
+}
+
+.admin-white-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 40;
+    -fx-padding: 8 20 8 20;
+}
+
+.admin-mini-label { -fx-text-fill: #888; -fx-font-size: 9px; -fx-font-weight: 900; }
+
+.admin-input { -fx-background-color: transparent; -fx-text-fill: #333; -fx-padding: 0; }
+
+.admin-combo { -fx-background-color: transparent; -fx-padding: 0; }
+
+.status-badge {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-background-radius: 15;
+    -fx-padding: 4 10;
+}
+
+/* Boutons d'actions */
+.btn-details { -fx-background-color: #4A90E2; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; }
+.btn-modifier { -fx-background-color: #F5A623; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; }
+.btn-supprimer { -fx-background-color: #D0021B; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; }
+
+/* --- TABLE VIEW CLEANUP (DEEP SEA STYLE) --- */
+
+.admin-table {
+    -fx-background-color: transparent;
+    /* On s'assure qu'aucune bordure externe ne pollue le design */
+    -fx-border-color: transparent;
+}
+
+/* 1. Supprimer les lignes verticales entre les colonnes */
+.admin-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 12;
+    -fx-text-fill: white;
+}
+
+/* 2. Nettoyer les en-têtes (Column Headers) */
+.admin-table .column-header,
+.admin-table .column-header-background .filler {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    /* Supprime les petits séparateurs blancs du header */
+    -fx-border-color: transparent;
+    -fx-size: 45;
+}
+
+.admin-table .column-header .label {
+    -fx-text-fill: #679AC1; /* Ton bleu text-sub */
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+/* 3. Style des lignes (Rows) */
+.admin-table .table-row-cell {
+    -fx-background-color: transparent;
+    /* On garde une ligne horizontale très fine et sombre pour la lisibilité */
+    -fx-border-color: rgba(255, 255, 255, 0.05) transparent rgba(255, 255, 255, 0.05) transparent;
+}
+
+.admin-table .table-row-cell:odd {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* 4. Effet de sélection et de survol */
+.admin-table .table-row-cell:hover {
+    -fx-background-color: rgba(103, 154, 193, 0.1); /* Bleu text-sub léger */
+}
+
+.admin-table .table-row-cell:selected {
+    -fx-background-color: rgba(255, 130, 16, 0.1); /* Orange glow léger */
+    -fx-border-color: transparent transparent #FF8210 transparent;
+}

@@ -8,36 +8,72 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the CRUD interface for ReservationExcursion.
+ * ID type is Long as per the interface requirement.
+ */
 public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursion, Long> {
 
     private final Connection cnx = MyDBConnexion.getInstance().getConnection();
 
-    // --- HELPER FOR UI ---
-    public Excursion findExcursionById(int id) {
-        String sql = "SELECT * FROM excursion WHERE id = ?";
+    // --- CUSTOM SERVICE METHODS ---
+
+    public ReservationExcursion findByReservationId(Long resId) {
+        String sql = "SELECT * FROM reservation_excursion WHERE reservation_id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setLong(1, resId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Excursion exc = new Excursion();
-                    exc.setId(rs.getInt("id"));
-                    exc.setName(rs.getString("name"));
-                    exc.setPrice(rs.getDouble("price"));
-                    // imagePath logic removed as requested
-                    return exc;
+                    return mapResultSetToEntity(rs);
                 }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    // --- TRANSACTIONAL METHODS ---
+    public void updateFullExcursion(Reservation res, ReservationExcursion re) {
+        String sqlRes = "UPDATE reservation SET prix_total=?, date_debut=?, nombre_personnes=? WHERE id=?";
+        String sqlExc = "UPDATE reservation_excursion SET excursion_id=?, date_excursion=?, nombre_personnes=?, prix=?, heure_souhaitee=? WHERE reservation_id=?";
+
+        try {
+            cnx.setAutoCommit(false);
+
+            // 1. Update Table Parent (reservation)
+            PreparedStatement ps1 = cnx.prepareStatement(sqlRes);
+            ps1.setDouble(1, res.getPrix_total());
+            ps1.setDate(2, java.sql.Date.valueOf(res.getDate_debut()));
+            ps1.setInt(3, res.getNombre_personnes());
+            ps1.setLong(4, res.getId());
+            ps1.executeUpdate();
+
+            // 2. Update Table Enfant (reservation_excursion)
+            PreparedStatement ps2 = cnx.prepareStatement(sqlExc);
+            ps2.setLong(1, re.getExcursion_id());
+            ps2.setDate(2, java.sql.Date.valueOf(re.getDate_excursion()));
+            ps2.setInt(3, re.getNombre_personnes());
+            ps2.setDouble(4, re.getPrix());
+            ps2.setString(5, re.getHeure_souhaitee());
+            ps2.setLong(6, res.getId());
+            ps2.executeUpdate();
+
+            cnx.commit();
+        } catch (SQLException e) {
+            try { cnx.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+        } finally {
+            try { cnx.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
+        }
+    }
+
     public void createFullExcursion(Reservation res, ReservationExcursion re) {
         String sqlRes = "INSERT INTO reservation (prix_total, statut, type_res, date_debut, date_fin, nombre_personnes, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlExc = "INSERT INTO reservation_excursion (reservation_id, excursion_id, date_excursion, nombre_personnes, prix, heure_souhaitee) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             cnx.setAutoCommit(false);
+
             PreparedStatement ps1 = cnx.prepareStatement(sqlRes, Statement.RETURN_GENERATED_KEYS);
             ps1.setDouble(1, res.getPrix_total());
             ps1.setString(2, res.getStatut().name());
@@ -51,6 +87,7 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
             ResultSet rs = ps1.getGeneratedKeys();
             if (rs.next()) {
                 long generatedId = rs.getLong(1);
+
                 PreparedStatement ps2 = cnx.prepareStatement(sqlExc);
                 ps2.setLong(1, generatedId);
                 ps2.setLong(2, re.getExcursion_id());
@@ -59,6 +96,7 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
                 ps2.setDouble(5, re.getPrix());
                 ps2.setString(6, re.getHeure_souhaitee());
                 ps2.executeUpdate();
+
                 cnx.commit();
             }
         } catch (SQLException e) {
@@ -69,7 +107,9 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
         }
     }
 
-    // --- CRUD OVERRIDES ---
+    // --- CRUD INTERFACE OVERRIDES ---
+    // Methods must match exactly with the CRUD interface
+
     @Override
     public ReservationExcursion insert(ReservationExcursion re) throws SQLException {
         String sql = "INSERT INTO reservation_excursion (reservation_id, excursion_id, date_excursion, nombre_personnes, prix, heure_souhaitee) VALUES (?, ?, ?, ?, ?, ?)";
@@ -81,10 +121,28 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
             ps.setDouble(5, re.getPrix());
             ps.setString(6, re.getHeure_souhaitee());
             ps.executeUpdate();
+
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) re.setId(rs.getLong(1));
             return re;
         }
+    }
+    public Excursion findExcursionById(int id) {
+        Excursion exc = null;
+        String sql = "SELECT * FROM excursion WHERE id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    exc = new Excursion();
+                    exc.setId(rs.getInt("id"));
+                    exc.setName(rs.getString("name"));
+                    exc.setPrice(rs.getDouble("price"));
+                    exc.setMaxParticipants(rs.getInt("maxParticipants"));
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return exc;
     }
 
     @Override
@@ -110,16 +168,9 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
         }
     }
 
-    @Override
-    public List<ReservationExcursion> selectAll() throws SQLException {
-        List<ReservationExcursion> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservation_excursion";
-        try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) list.add(mapResultSetToEntity(rs));
-        }
-        return list;
-    }
-
+    /**
+     * Corrected to getById to resolve the "implement abstract method" error.
+     */
     @Override
     public ReservationExcursion getById(Long id) throws SQLException {
         String sql = "SELECT * FROM reservation_excursion WHERE id=?";
@@ -131,6 +182,23 @@ public class ReservationExcursionServiceImpl implements CRUD<ReservationExcursio
         }
         return null;
     }
+
+    /**
+     * Corrected to selectAll to resolve potential mismatches.
+     */
+    @Override
+    public List<ReservationExcursion> selectAll() throws SQLException {
+        List<ReservationExcursion> list = new ArrayList<>();
+        String sql = "SELECT * FROM reservation_excursion";
+        try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(mapResultSetToEntity(rs));
+            }
+        }
+        return list;
+    }
+
+    // --- HELPER METHODS ---
 
     private ReservationExcursion mapResultSetToEntity(ResultSet rs) throws SQLException {
         ReservationExcursion re = new ReservationExcursion();

@@ -1,4 +1,4 @@
-package tn.esprit.projet.gui;
+package tn.esprit.projet.GUI;
 
 import javafx.animation.*;
 import javafx.application.Platform;
