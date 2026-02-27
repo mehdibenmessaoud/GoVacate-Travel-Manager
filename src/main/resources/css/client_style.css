@@ -565,3 +565,130 @@
     -fx-border-color: #21262d;
     -fx-border-radius: 15;
 }
+
+.ai-panel {
+    -fx-background-color: rgba(30, 30, 30, 0.95);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 130, 16, 0.3);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 20, 0, 0, 10);
+}
+
+/* The Text Input Area */
+.ai-input-area {
+    -fx-control-inner-background: #1a1a1a;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #666;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #333;
+    -fx-focus-color: #FF8210;
+}
+
+.ai-input-area .content {
+    -fx-background-color: transparent;
+}
+
+/* Quick Suggestion Buttons */
+.ai-chip {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+    -fx-border-color: rgba(255, 130, 16, 0.4);
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-text-fill: #FF8210;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-transition: 0.3s;
+}
+
+.ai-chip:hover {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 10, 0, 0, 0);
+}
+
+/* Progress Bar Customization */
+.ai-progress-bar .bar {
+    -fx-background-color: linear-gradient(to right, #FF8210, #ffaa5e);
+    -fx-background-radius: 5;
+}
+
+.ai-progress-bar .track {
+    -fx-background-color: #222;
+    -fx-background-radius: 5;
+}
+
+/* The ✨ Floating Circle Button */
+.ai-floating-button {
+    -fx-background-color: linear-gradient(to bottom right, #FF8210, #e67200);
+    -fx-background-radius: 50;
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.6), 15, 0, 0, 5);
+}
+
+.ai-floating-button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Full Screen Loading Overlay */
+.loading-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.85);
+}
+
+.loading-overlay .progress-indicator .indicator {
+    -fx-border-color: #FF8210;
+}
+
+/* Reset AI Button */
+.btn-reset-ai {
+    -fx-background-color: transparent;
+    -fx-border-color: #444;
+    -fx-border-radius: 10;
+    -fx-text-fill: #888;
+    -fx-cursor: hand;
+}
+
+.btn-reset-ai:hover {
+    -fx-border-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+
+/* 1. The main container */
+.ai-input-area {
+    -fx-background-color: #1a1a1a !important; /* Force dark background */
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #333;
+    -fx-border-width: 1.5;
+    -fx-text-fill: white !important; /* Force text to be white */
+    -fx-prompt-text-fill: #666;
+    -fx-font-size: 13px;
+    -fx-padding: 2; /* Small padding so text doesn't touch borders */
+}
+
+/* 2. Target the internal scrollpane and content area (THE FIX) */
+.ai-input-area .content {
+    -fx-background-color: #1a1a1a !important;
+    -fx-text-fill: white !important;
+}
+
+/* 3. Target the text specifically inside the content area */
+.ai-input-area .text {
+    -fx-fill: white !important;
+}
+
+/* 4. Fix the focus state */
+.ai-input-area:focused {
+    -fx-border-color: #FF8210;
+    -fx-background-color: #1a1a1a !important;
+}
+
+.ai-input-area:focused .content {
+    -fx-background-color: #1a1a1a !important;
+}

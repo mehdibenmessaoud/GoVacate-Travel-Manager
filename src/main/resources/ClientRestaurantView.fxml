@@ -6,7 +6,7 @@
 
 <StackPane stylesheets="@/css/client_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientRestaurantController">
 
-    <VBox spacing="30.0" styleClass="client-content-pane">
+    <VBox fx:id="mainContent" spacing="30.0" styleClass="client-content-pane">
         <padding>
             <Insets bottom="30.0" left="50.0" right="50.0" top="40.0" />
         </padding>
@@ -21,9 +21,7 @@
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
-
             <TextField fx:id="searchField" prefHeight="50.0" promptText="🔍 Rechercher un plat, une ville, un restaurant..." styleClass="modern-input" HBox.hgrow="ALWAYS" />
-
             <MenuButton prefHeight="50.0" prefWidth="200.0" styleClass="menu-button-client" text="⚙️ Filtres &amp; Tri">
                 <items>
                     <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="FILTRER PAR" />
@@ -44,11 +42,10 @@
                         </content>
                     </CustomMenuItem>
                     <SeparatorMenuItem />
-                    <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="TRIER PAR" />
                     <MenuItem onAction="#handleSortName" text="🔤 Nom (A-Z)" />
                     <MenuItem onAction="#handleSortDate" text="📅 Plus récents" />
                     <SeparatorMenuItem />
-                    <MenuItem onAction="#handleReset" styleClass="menu-item-reset" text="🔄 Réinitialiser tous les filtres" />
+                    <MenuItem onAction="#handleReset" styleClass="menu-item-reset" text="🔄 Réinitialiser" />
                 </items>
             </MenuButton>
         </HBox>
@@ -56,49 +53,53 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
             <content>
                 <FlowPane fx:id="restaurantGrid" hgap="30.0" style="-fx-background-color: transparent;" vgap="35.0">
-                    <padding>
-                        <Insets bottom="30.0" top="10.0" />
-                    </padding>
+                    <padding><Insets bottom="30.0" top="10.0" /></padding>
                 </FlowPane>
             </content>
         </ScrollPane>
     </VBox>
 
-    <VBox fx:id="aiPanel" visible="false" maxWidth="380.0" maxHeight="450.0" spacing="15.0"
+    <VBox fx:id="aiPanel" visible="false" maxWidth="380.0" maxHeight="500.0" spacing="15.0"
           style="-fx-background-color: rgba(30, 30, 30, 0.98); -fx-background-radius: 20; -fx-border-color: #FF8210; -fx-border-width: 1.5; -fx-border-radius: 20;"
           StackPane.alignment="BOTTOM_RIGHT">
-        <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-        </padding>
-        <StackPane.margin>
-            <Insets bottom="90.0" right="30.0" />
-        </StackPane.margin>
+        <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+        <StackPane.margin><Insets bottom="90.0" right="30.0" /></StackPane.margin>
 
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <HBox alignment="CENTER_LEFT">
             <Label style="-fx-text-fill: #FF8210; -fx-font-size: 18; -fx-font-weight: bold;" text="✨ Concierge IA" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button onAction="#toggleAIPanel" style="-fx-background-color: transparent; -fx-text-fill: gray; -fx-font-size: 18; -fx-cursor: hand;" text="✕" />
+            <Button onAction="#toggleAIPanel" style="-fx-background-color: transparent; -fx-text-fill: gray; -fx-font-size: 18;" text="✕" />
         </HBox>
 
-        <TextArea fx:id="aiInputField" prefHeight="100.0" promptText="Ex: Je cherche un endroit romantique pour manger des pâtes avec un budget de 50 DT..."
-                  style="-fx-control-inner-background: #1a1a1a; -fx-text-fill: white; -fx-prompt-text-fill: #555; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #333; -fx-wrap-text: true;" />
-
-        <VBox spacing="5.0">
-            <Label fx:id="aiStatusLabel" style="-fx-text-fill: #FF8210; -fx-font-size: 11;" text="En attente de votre demande..." />
-            <ProgressBar fx:id="aiProgress" maxWidth="Infinity" prefHeight="4.0" progress="0.0" styleClass="ai-progress-bar" />
+        <VBox spacing="8.0">
+            <Label style="-fx-text-fill: gray; -fx-font-size: 11;" text="Suggestions rapides :" />
+            <HBox spacing="8.0">
+                <Button onAction="#handleQuickSuggestion" styleClass="ai-chip" text="🍕 Pizza" />
+                <Button onAction="#handleQuickSuggestion" styleClass="ai-chip" text="🍷 Romantique" />
+                <Button onAction="#handleQuickSuggestion" styleClass="ai-chip" text="☕ Café calme" />
+            </HBox>
         </VBox>
 
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
-            <Label fx:id="aiResponseLabel" style="-fx-text-fill: #ddd; -fx-font-size: 13; -fx-line-spacing: 5;" wrapText="true" text="L'IA analysera tous les menus des restaurants pour trouver la correspondance parfaite." />
+        <TextArea fx:id="aiInputField" prefHeight="80.0" promptText="Que cherchez-vous ?" styleClass="ai-input-area" wrapText="true" />
+
+        <VBox spacing="5.0">
+            <Label fx:id="aiStatusLabel" style="-fx-text-fill: #FF8210; -fx-font-size: 11;" text="Prêt à vous aider..." />
+            <ProgressBar fx:id="aiProgress" maxWidth="Infinity" prefHeight="4.0" progress="0.0" />
+        </VBox>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+            <Label fx:id="aiResponseLabel" style="-fx-text-fill: #ddd; -fx-font-size: 13;" wrapText="true" text="Posez-moi une question sur nos menus !" />
         </ScrollPane>
+
+        <Button onAction="#handleResetAI" maxWidth="Infinity" styleClass="btn-reset-ai" text="🔄 Réinitialiser l'IA" />
     </VBox>
 
-    <Button onAction="#toggleAIPanel" prefHeight="60.0" prefWidth="60.0"
-            style="-fx-background-color: #FF8210; -fx-background-radius: 50; -fx-text-fill: white; -fx-font-size: 24; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 5);"
-            text="✨" StackPane.alignment="BOTTOM_RIGHT">
-        <StackPane.margin>
-            <Insets bottom="20.0" right="30.0" />
-        </StackPane.margin>
+    <Button onAction="#toggleAIPanel" prefHeight="60.0" prefWidth="60.0" styleClass="ai-floating-button" text="✨" StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin><Insets bottom="20.0" right="30.0" /></StackPane.margin>
     </Button>
 
+    <VBox fx:id="loadingOverlay" alignment="CENTER" spacing="20.0" visible="false" style="-fx-background-color: rgba(0, 0, 0, 0.8);">
+        <ProgressIndicator prefHeight="70.0" prefWidth="70.0" />
+        <Label style="-fx-text-fill: white; -fx-font-size: 16;" text="Le Concierge IA analyse les données..." />
+    </VBox>
 </StackPane>

@@ -23,6 +23,8 @@ import tn.esprit.projet.services.RestaurantReviewService;
 import tn.esprit.projet.test.App;
 import tn.esprit.projet.utils.CuisineWikiService;
 
+
+import javafx.event.ActionEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -43,6 +45,7 @@ public class ClientRestaurantController {
     @FXML private Label aiResponseLabel;
     @FXML private Label aiStatusLabel;
     @FXML private ProgressBar aiProgress;
+    @FXML private VBox loadingOverlay;
 
     private final RestaurantService rs = new RestaurantService();
     private final RestaurantImageService ris = new RestaurantImageService();
@@ -75,7 +78,15 @@ public class ClientRestaurantController {
             aiStatusLabel.setText("L'IA analyse votre demande...");
             aiAutomationTimer.playFromStart();
         });
-        aiAutomationTimer.setOnFinished(event -> runAIWorkflow());
+        aiInputField.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                if (!event.isShiftDown()) { // Allow Shift+Enter for new lines
+                    event.consume();
+                    aiAutomationTimer.stop(); // Cancel the auto-timer
+                    runAIWorkflow();          // Run immediately
+                }
+            }
+        });
     }
 
     public void setMainClientController(ClientController mainClientController) {
@@ -318,8 +329,32 @@ public class ClientRestaurantController {
             placeholder.setStyle("-fx-text-fill: gray; -fx-font-style: italic; -fx-padding: 20;");
             restaurantGrid.getChildren().add(placeholder);
         } else {
+            double delay = 0;
             for (Restaurant r : list) {
-                restaurantGrid.getChildren().add(buildCard(r));
+                VBox card = buildCard(r);
+
+                // 2. Prepare for animation (start invisible and slightly lower)
+                card.setOpacity(0);
+                card.setTranslateY(15);
+
+                // 3. Add to grid
+                restaurantGrid.getChildren().add(card);
+
+                // 4. Create the animation
+                javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(Duration.millis(400), card);
+                fade.setFromValue(0);
+                fade.setToValue(1);
+
+                javafx.animation.TranslateTransition move = new javafx.animation.TranslateTransition(Duration.millis(400), card);
+                move.setFromY(15);
+                move.setToY(0);
+
+                // 5. Play together with a slight delay for each card (staggered effect)
+                javafx.animation.ParallelTransition parallel = new javafx.animation.ParallelTransition(fade, move);
+                parallel.setDelay(Duration.millis(delay));
+                parallel.play();
+
+                delay += 50; // Increase delay for the next card (50ms)
             }
         }
     }
@@ -437,7 +472,9 @@ public class ClientRestaurantController {
         String input = aiInputField.getText();
         if (input == null || input.trim().isEmpty()) return;
 
+        loadingOverlay.setVisible(true);
         aiProgress.setProgress(-1);
+        aiStatusLabel.setText("L'IA analyse votre demande...");
 
         Task<AIRecommendation> task = new Task<>() {
             @Override
@@ -448,6 +485,8 @@ public class ClientRestaurantController {
         };
 
         task.setOnSucceeded(e -> {
+
+            loadingOverlay.setVisible(false);
             AIRecommendation result = task.getValue();
             aiResponseLabel.setText(result.explanation());
 
@@ -459,8 +498,41 @@ public class ClientRestaurantController {
             applyDeepFilters();
 
             aiProgress.setProgress(1);
+            aiStatusLabel.setText("Recherche terminée avec succès !");
+
+
         });
 
-        new Thread(task).start();
+        task.setOnFailed(e -> {
+            // 3. Hide loading screen even if it fails
+            loadingOverlay.setVisible(false);
+            aiProgress.setProgress(0);
+            aiStatusLabel.setText("Désolé, une erreur est survenue.");
+
+            System.err.println("AI Workflow Error: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        Thread t = new Thread(task);
+        t.setDaemon(true); // Prevents app from hanging on exit
+        t.start();
+    }
+
+    @FXML
+    private void handleResetAI() {
+        this.aiRecommendedRestaurantIds.clear();
+        aiInputField.clear();
+        aiResponseLabel.setText("L'IA analysera tous les menus des restaurants pour trouver la correspondance parfaite.");
+        aiStatusLabel.setText("En attente de votre demande...");
+        aiProgress.setProgress(0);
+        applyDeepFilters(); // Show all restaurants again
+    }
+
+    @FXML
+    private void handleQuickSuggestion(ActionEvent event) { // Ensure javafx.event.ActionEvent
+        Button btn = (Button) event.getSource();
+        aiInputField.setText(btn.getText());
+        aiAutomationTimer.stop(); // Add this to prevent double execution
+        runAIWorkflow();
     }
 }
