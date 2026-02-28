@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox prefHeight="700.0" prefWidth="900.0" spacing="20.0" styleClass="main-content" stylesheets="@css/client_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ExcursionDetailsController">
+    <padding>
+        <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+    </padding>
+
+    <VBox spacing="20.0" styleClass="glass-card" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Button onAction="#handleBack" styleClass="btn-orange-glow" text="← Retour" />
+            <VBox spacing="2">
+                <Label fx:id="nameLabel" styleClass="details-title" text="Nom de l'Excursion" />
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label fx:id="locationLabel" style="-fx-text-fill: #FF8210; -fx-font-weight: bold; -fx-font-size: 14px;" text="Ville, Pays" />
+                    <Label text="•" style="-fx-text-fill: rgba(255,255,255,0.5);" />
+                    <Label fx:id="activiteLabel" styleClass="details-subtitle" text="Type d'activité" />
+                </HBox>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <VBox alignment="CENTER" prefWidth="150" spacing="5" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-padding: 10;">
+                <HBox alignment="CENTER" spacing="10">
+                    <ImageView fx:id="weatherIcon" fitHeight="40" fitWidth="40" preserveRatio="true" />
+                    <Label fx:id="tempLabel" style="-fx-font-size: 18; -fx-text-fill: #FF8210; -fx-font-weight: bold;" text="--°C" />
+                </HBox>
+                <Label fx:id="descLabel" style="-fx-text-fill: white; -fx-font-size: 11;" text="Chargement..." />
+            </VBox>
+
+            <Label fx:id="statusLabel" styleClass="status-badge-details" text="Disponible" />
+        </HBox>
+
+        <Separator opacity="0.2" />
+
+        <HBox spacing="30.0">
+            <VBox spacing="15.0" prefWidth="450.0">
+                <Label styleClass="section-label" text="Galerie Photos" />
+
+                <StackPane alignment="TOP_RIGHT">
+                    <ScrollPane fitToHeight="true" minHeight="250.0" prefHeight="250.0" styleClass="image-carousel-scroll" vbarPolicy="NEVER">
+                        <content>
+                            <HBox fx:id="imageContainer" alignment="CENTER_LEFT" spacing="15.0" styleClass="image-hbox-padding" />
+                        </content>
+                    </ScrollPane>
+                    <Label fx:id="promoBadge" visible="false"
+                           style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-weight: bold; -fx-background-radius: 0 15 0 15; -fx-font-size: 13;"
+                           text="PROMO" />
+                </StackPane>
+
+                <VBox alignment="CENTER" spacing="5" styleClass="price-container-details" style="-fx-padding: 15;">
+                    <Label text="PRIX PAR PERSONNE" styleClass="meta-label" style="-fx-text-fill: #adb5bd;"/>
+                    <HBox alignment="CENTER" spacing="15">
+                        <Label fx:id="priceLabel" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FF8210;" text="0.00 DT" />
+                        <Separator orientation="VERTICAL" prefHeight="30" opacity="0.2"/>
+                        <VBox alignment="CENTER_LEFT" spacing="2">
+                            <ComboBox fx:id="currencyCombo" prefWidth="90.0" styleClass="combo-box-custom"/>
+                            <Label fx:id="convertedPriceLabel" style="-fx-text-fill: #FF8210; -fx-font-weight: bold; -fx-font-size: 20px;" text="≈ 0.00" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+                <VBox spacing="5.0">
+                    <Label styleClass="meta-label" text="Période de l'excursion" />
+                    <Label fx:id="datesLabel" styleClass="meta-value" text="Dates non spécifiées" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label styleClass="meta-label" text="Durée estimée" />
+                    <Label fx:id="durationLabel" styleClass="meta-value" text="4 Heures" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label styleClass="meta-label" text="Capacité Maximum" />
+                    <Label fx:id="maxParticipantsLabel" styleClass="meta-value" text="20 personnes" />
+                </VBox>
+
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <Label styleClass="meta-label" text="Description de l'excursion" />
+                    <ScrollPane fitToWidth="true" styleClass="transparent-scroll">
+                        <content>
+                            <Text fx:id="descriptionLabel" styleClass="details-description" text="Détails complets ici..." wrappingWidth="350.0" />
+                        </content>
+                    </ScrollPane>
+                </VBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</VBox>
