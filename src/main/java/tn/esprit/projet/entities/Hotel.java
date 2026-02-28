@@ -1,8 +1,5 @@
 package tn.esprit.projet.entities;
 
-/**
- * Represents a hotel in the GoVacate system.
- */
 public class Hotel {
 
     private int id;
@@ -11,6 +8,8 @@ public class Hotel {
     private int stars;
     private String status;
     private int locationId;
+    private Double latitude;
+    private Double longitude;
 
     public Hotel() {
     }
@@ -72,6 +71,26 @@ public class Hotel {
         this.locationId = locationId;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public boolean hasCoordinates() {
+        return latitude != null && longitude != null;
+    }
+
     @Override
     public String toString() {
         return "Hotel{" +
@@ -81,6 +100,8 @@ public class Hotel {
                 ", stars=" + stars +
                 ", status='" + status + '\'' +
                 ", locationId=" + locationId +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 

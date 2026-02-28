@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.effect.GaussianBlur?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Circle?>
 
 <StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@css/client-style.css"
@@ -23,87 +24,16 @@
     </Pane>
 
     <BorderPane>
-
         <left>
-            <AnchorPane prefWidth="260.0" styleClass="sidebar-liquid">
-
-                <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="20.0">
-                    <Circle fill="#FF8210" radius="8.0" stroke="WHITE" strokeWidth="2.0"/>
-                    <Label styleClass="logo-text" text="GoVacate"/>
-                </HBox>
-
-                <Pane fx:id="slidingPane" layoutX="20.0" layoutY="140.0"
-                      mouseTransparent="true" pickOnBounds="false"
-                      prefHeight="45.0" prefWidth="220.0" styleClass="sliding-highlight"/>
-
-                <VBox fx:id="menuContainer" layoutY="140.0" spacing="0.0"
-                      AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-                    <children>
-                        <Button fx:id="btnHotels" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Hotels"/>
-                        <Button fx:id="btnChambres" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Chambres"/>
-                        <Button fx:id="btnReservations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Reservations"/>
-                        <Button fx:id="btnFavoris" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Favoris"/>
-                        <Pane prefHeight="50.0" mouseTransparent="true"/>
-                        <Button fx:id="btnProfil" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Mon Profil"/>
-                        <Button fx:id="btnLogout" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Deconnexion"/>
-                    </children>
-                </VBox>
-
-            </AnchorPane>
+            <fx:include fx:id="clientSidebar" source="ClientSidebar.fxml"/>
         </left>
 
         <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="AS_NEEDED">
                 <content>
-                    <VBox fx:id="contentArea" spacing="40.0">
-                        <padding>
-                            <Insets top="40.0" right="50.0" bottom="50.0" left="50.0"/>
-                        </padding>
-
-                        <HBox fx:id="headerBox" alignment="CENTER_LEFT" spacing="20.0">
-                            <VBox>
-                                <Label fx:id="welcomeLabel" styleClass="text-header" text="Bonjour, Voyageur"/>
-                                <Label fx:id="subtitleLabel" styleClass="text-sub" text="Decouvrez nos meilleurs hotels"/>
-                            </VBox>
-                        </HBox>
-
-                        <VBox fx:id="searchPanel" alignment="CENTER" spacing="25.0" styleClass="glass-panel">
-                            <padding>
-                                <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
-                            </padding>
-                            <Label fx:id="searchTitle" styleClass="hero-title" text="Ou voulez-vous aller ?"/>
-                            <HBox alignment="CENTER_LEFT" spacing="15.0" prefHeight="70.0" styleClass="search-bar-liquid">
-                                <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                    <Label styleClass="search-label" text="Rechercher"/>
-                                    <TextField fx:id="searchField" promptText="Rechercher..." styleClass="search-field" onKeyReleased="#handleSearch"/>
-                                </VBox>
-                                <Pane prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;"/>
-                                <VBox fx:id="filterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES">
-                                    <Label fx:id="filterLabel" styleClass="search-label" text="Etoiles"/>
-                                    <ComboBox fx:id="starsFilterCombo" promptText="Etoiles" styleClass="search-field" prefWidth="150.0" onAction="#handleFilter"/>
-                                    <ComboBox fx:id="hotelFilterCombo" promptText="Filtrer par hotel" styleClass="search-field" prefWidth="180.0" onAction="#handleFilter" visible="false" managed="false"/>
-                                </VBox>
-                                <Pane fx:id="roomFilterSeparator" prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;" visible="false" managed="false"/>
-                                <VBox fx:id="roomTypeFilterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES" visible="false" managed="false">
-                                    <Label fx:id="roomTypeFilterLabel" styleClass="search-label" text="Type"/>
-                                    <ComboBox fx:id="roomTypeFilterCombo" promptText="Type de chambre" styleClass="search-field" prefWidth="140.0" onAction="#handleFilter"/>
-                                </VBox>
-                                <VBox fx:id="roomStatusFilterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES" visible="false" managed="false">
-                                    <Label fx:id="roomStatusFilterLabel" styleClass="search-label" text="Statut"/>
-                                    <ComboBox fx:id="roomStatusFilterCombo" promptText="Statut" styleClass="search-field" prefWidth="130.0" onAction="#handleFilter"/>
-                                </VBox>
-                                <Button onAction="#handleSearch" prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher"/>
-                            </HBox>
-                        </VBox>
-
-                        <Label fx:id="sectionTitle" styleClass="section-title" text="Hotels Disponibles"/>
-                        <FlowPane fx:id="hotelsContainer" alignment="TOP_CENTER" hgap="24.0" vgap="24.0" prefWrapLength="960.0" styleClass="cards-grid"/>
-
-                    </VBox>
+                    <fx:include fx:id="clientContent" source="ClientHotelView.fxml"/>
                 </content>
             </ScrollPane>
         </center>
-
     </BorderPane>
 </StackPane>
-

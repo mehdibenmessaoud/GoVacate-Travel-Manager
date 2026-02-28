@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="contentArea" spacing="40.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets top="40.0" right="50.0" bottom="50.0" left="50.0"/>
+    </padding>
+
+    <HBox fx:id="headerBox" alignment="CENTER_LEFT" spacing="20.0">
+        <VBox>
+            <Label fx:id="welcomeLabel" styleClass="text-header" text="Bonjour, Voyageur"/>
+            <Label fx:id="subtitleLabel" styleClass="text-sub" text="Decouvrez nos meilleurs hotels"/>
+        </VBox>
+    </HBox>
+
+    <VBox fx:id="searchPanel" alignment="CENTER" spacing="25.0" styleClass="glass-panel">
+        <padding>
+            <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
+        </padding>
+        <Label fx:id="searchTitle" styleClass="hero-title" text="Ou voulez-vous aller ?"/>
+        <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="15.0" styleClass="search-bar-liquid">
+            <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label styleClass="search-label" text="Rechercher"/>
+                <TextField fx:id="searchField" promptText="Rechercher..." styleClass="search-field"/>
+            </VBox>
+            <Pane prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;"/>
+            <VBox fx:id="filterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES">
+                <Label fx:id="filterLabel" styleClass="search-label" text="Etoiles"/>
+                <ComboBox fx:id="starsFilterCombo" prefWidth="150.0" promptText="Etoiles" styleClass="search-field"/>
+                <ComboBox fx:id="hotelFilterCombo" managed="false" prefWidth="180.0" promptText="Filtrer par hotel" styleClass="search-field" visible="false"/>
+            </VBox>
+            <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;" visible="false"/>
+            <VBox fx:id="roomTypeFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false" HBox.hgrow="SOMETIMES">
+                <Label fx:id="roomTypeFilterLabel" styleClass="search-label" text="Type"/>
+                <ComboBox fx:id="roomTypeFilterCombo" prefWidth="140.0" promptText="Type de chambre" styleClass="search-field"/>
+            </VBox>
+            <VBox fx:id="roomStatusFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false" HBox.hgrow="SOMETIMES">
+                <Label fx:id="roomStatusFilterLabel" styleClass="search-label" text="Statut"/>
+                <ComboBox fx:id="roomStatusFilterCombo" prefWidth="130.0" promptText="Statut" styleClass="search-field"/>
+            </VBox>
+            <Button fx:id="searchButton" prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher"/>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="api-toolbar-liquid">
+            <Label styleClass="api-toolbar-title" text="API"/>
+            <Button fx:id="amadeusApiButton" prefHeight="42.0" prefWidth="160.0" styleClass="btn-orange-glow" text="Amadeus API"/>
+            <Button fx:id="openStreetMapApiButton" prefHeight="42.0" prefWidth="190.0" styleClass="btn-orange-glow" text="OpenStreetMap API"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="apiStatusLabel" styleClass="api-status-pill api-status-idle" text="Pret pour recherche API"/>
+            <ProgressIndicator fx:id="apiLoadingIndicator" managed="false" maxHeight="20.0" maxWidth="20.0" minHeight="20.0" minWidth="20.0" progress="-1.0" visible="false"/>
+        </HBox>
+    </VBox>
+
+    <Label fx:id="sectionTitle" styleClass="section-title" text="Hotels Disponibles"/>
+    <FlowPane fx:id="hotelsContainer" alignment="TOP_CENTER" hgap="24.0" prefWrapLength="960.0" styleClass="cards-grid" vgap="24.0"/>
+</VBox>

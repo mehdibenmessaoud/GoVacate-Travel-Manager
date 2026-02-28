@@ -1,6 +1,7 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.HotelImage;
+import tn.esprit.projet.API.images.ImagePipelineService;
 import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.sql.*;
@@ -10,9 +11,11 @@ import java.util.List;
 public class HotelImageService implements CRUD<HotelImage> {
 
     private Connection cnx;
+    private final ImagePipelineService imagePipelineService;
 
     public HotelImageService() {
         cnx = MyDBConnexion.getInstance().getConnection();
+        imagePipelineService = new ImagePipelineService();
     }
 
     @Override
@@ -102,5 +105,21 @@ public class HotelImageService implements CRUD<HotelImage> {
             ));
         }
         return images;
+    }
+
+    public HotelImage createWithImagePipeline(String imageInput, int hotelId) throws SQLException {
+        ImagePipelineService.ImageProcessingResult result = imagePipelineService.processImage(imageInput, "hotels", true, true);
+        if (!result.moderationChecked()) {
+            throw new IllegalArgumentException("Verification de securite indisponible. Reessayez dans quelques instants.");
+        }
+        if (!result.safe()) {
+            throw new IllegalArgumentException("Image refusee: contenu non conforme a la politique de la plateforme.");
+        }
+        if (!result.uploadedToCloudinary()) {
+            throw new IllegalArgumentException("Service de stockage cloud temporairement indisponible. Reessayez.");
+        }
+        HotelImage image = new HotelImage(0, result.finalImageUrl(), hotelId);
+        create(image);
+        return image;
     }
 }

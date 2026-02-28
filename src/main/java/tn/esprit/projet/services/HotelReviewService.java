@@ -1,6 +1,7 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.HotelReview;
+import tn.esprit.projet.API.reviews.ReviewIntelligenceService;
 import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.sql.*;
@@ -18,16 +19,29 @@ import java.util.stream.Collectors;
 public class HotelReviewService implements CRUD<HotelReview> {
 
     private final Connection cnx;
+    private final ReviewIntelligenceService reviewIntelligenceService;
 
     public HotelReviewService() {
         cnx = MyDBConnexion.getInstance().getConnection();
+        reviewIntelligenceService = new ReviewIntelligenceService();
     }
 
     @Override
     public void create(HotelReview review) throws SQLException {
+        createWithAiProcessing(review);
+    }
+
+    public ReviewIntelligenceService.ReviewProcessingResult createWithAiProcessing(HotelReview review) throws SQLException {
+        ReviewIntelligenceService.ReviewProcessingResult processing = reviewIntelligenceService.processReview(review.getComment());
+        review.setComment(processing.finalComment());
+        insertReview(review);
+        return processing;
+    }
+
+    private void insertReview(HotelReview review) throws SQLException {
         String sql = "INSERT INTO hotel_review (rating, comment, userId, hotelId, createdAt) VALUES (?, ?, ?, ?, ?)";
 
-        PreparedStatement ps = cnx.prepareStatement(sql);
+        PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         ps.setInt(1, review.getRating());
         ps.setString(2, review.getComment());
@@ -38,6 +52,15 @@ public class HotelReviewService implements CRUD<HotelReview> {
         ps.setTimestamp(5, Timestamp.valueOf(date));
 
         ps.executeUpdate();
+        try (ResultSet keys = ps.getGeneratedKeys()) {
+            if (keys.next()) {
+                review.setId(keys.getInt(1));
+            }
+        }
+    }
+
+    public ReviewIntelligenceService.ReviewProcessingResult previewReviewProcessing(String comment) {
+        return reviewIntelligenceService.processReview(comment);
     }
 
     @Override

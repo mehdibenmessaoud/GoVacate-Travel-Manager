@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane prefWidth="256.0" styleClass="sidebar-root"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+
+    <!-- Brand -->
+    <HBox alignment="CENTER_LEFT" spacing="13.0" styleClass="sidebar-brand"
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+          AnchorPane.topAnchor="0.0">
+        <Pane styleClass="sidebar-logo-pill sidebar-logo-pill-client" prefWidth="42.0" prefHeight="42.0"
+              minWidth="42.0" minHeight="42.0">
+            <Label styleClass="sidebar-logo-label" text="G"
+                   layoutX="0.0" layoutY="0.0"
+                   prefWidth="42.0" prefHeight="42.0"/>
+        </Pane>
+        <VBox spacing="2.0">
+            <Label styleClass="sidebar-app-name" text="GoVacate"/>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                <Circle fill="#FF8210" radius="3.5"/>
+                <Label styleClass="sidebar-role-tag" text="ESPACE CLIENT"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- Separator -->
+    <Pane styleClass="sidebar-sep"
+          AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="18.0"
+          AnchorPane.topAnchor="90.0"/>
+
+    <!-- Sliding active pill -->
+    <Pane fx:id="slidingPane"
+          layoutX="10.0" layoutY="100.0"
+          mouseTransparent="true" pickOnBounds="false"
+          prefHeight="44.0" prefWidth="236.0"
+          styleClass="sidebar-active-pill"/>
+
+    <!-- Navigation -->
+    <VBox fx:id="menuContainer" layoutY="100.0" spacing="2.0"
+          AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+
+        <Label styleClass="sidebar-section-header" text="EXPLORER">
+            <VBox.margin><Insets top="10.0" bottom="4.0" left="6.0"/></VBox.margin>
+        </Label>
+
+        <Button fx:id="btnHotels"
+                prefHeight="44.0" maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-nav-btn"
+                text="  &#x1F3E8;   H&#xF4;tels"/>
+
+        <Button fx:id="btnChambres"
+                prefHeight="44.0" maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-nav-btn"
+                text="  &#x1F6CF;   Chambres"/>
+
+        <Button fx:id="btnReservations"
+                prefHeight="44.0" maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-nav-btn"
+                text="  &#x1F4C5;   R&#xE9;servations"/>
+
+        <Pane prefHeight="10.0" mouseTransparent="true"/>
+        <Pane styleClass="sidebar-sep"/>
+        <Pane prefHeight="6.0" mouseTransparent="true"/>
+
+        <Label styleClass="sidebar-section-header" text="MON COMPTE">
+            <VBox.margin><Insets top="4.0" bottom="4.0" left="6.0"/></VBox.margin>
+        </Label>
+
+        <Button fx:id="btnProfil"
+                prefHeight="44.0" maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-nav-btn"
+                text="  &#x1F464;   Mon Profil"/>
+
+        <Button fx:id="btnLogout"
+                prefHeight="44.0" maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-logout-btn"
+                text="  &#x2192;   D&#xE9;connexion"/>
+    </VBox>
+
+    <!-- Footer -->
+    <VBox spacing="2.0"
+          AnchorPane.leftAnchor="20.0" AnchorPane.bottomAnchor="18.0">
+        <Label styleClass="sidebar-footer" text="GoVacate v1.0  &#xB7;  Client"/>
+    </VBox>
+
+</AnchorPane>

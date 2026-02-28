@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;" visible="false"/>
+    <VBox fx:id="roomTypeFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false">
+        <Label fx:id="roomTypeFilterLabel" styleClass="search-label" text="Type"/>
+        <ComboBox fx:id="roomTypeFilterCombo" prefWidth="140.0" promptText="Type de chambre" styleClass="search-field"/>
+    </VBox>
+    <VBox fx:id="roomStatusFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false">
+        <Label fx:id="roomStatusFilterLabel" styleClass="search-label" text="Statut"/>
+        <ComboBox fx:id="roomStatusFilterCombo" prefWidth="130.0" promptText="Statut" styleClass="search-field"/>
+    </VBox>
+</HBox>
