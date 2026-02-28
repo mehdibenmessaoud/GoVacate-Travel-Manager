@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
 
 <StackPane stylesheets="@/css/client_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientRestaurantController">
 
@@ -11,20 +12,29 @@
             <Insets bottom="30.0" left="50.0" right="50.0" top="40.0" />
         </padding>
 
-        <VBox spacing="10.0">
-            <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
-            <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                <Label styleClass="hero-title" text="Gastronomie &amp; Voyage" />
+                <Label styleClass="hero-subtitle" text="Découvrez les meilleures tables ouvertes actuellement et réservez en un clic." />
+            </VBox>
+
+            <Button onAction="#handleOpenLocationSearch" styleClass="location-trigger-button" text="📍 Ma Position">
+                <tooltip><Tooltip text="Définir votre position actuelle pour le calcul d'itinéraire" /></tooltip>
+            </Button>
+
             <Button fx:id="btnSwitchAdmin" onAction="#handleSwitchRole" styleClass="menu-button-special" text="⚙ Switch to Admin" />
-        </VBox>
+        </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="toolbar-glass">
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
             <TextField fx:id="searchField" prefHeight="50.0" promptText="🔍 Rechercher un plat, une ville, un restaurant..." styleClass="modern-input" HBox.hgrow="ALWAYS" />
+
             <MenuButton prefHeight="50.0" prefWidth="200.0" styleClass="menu-button-client" text="⚙️ Filtres &amp; Tri">
                 <items>
                     <MenuItem disable="true" style="-fx-font-weight: bold; -fx-text-fill: #FF8210; -fx-opacity: 1;" text="FILTRER PAR" />
+
                     <CustomMenuItem hideOnClick="false">
                         <content>
                             <VBox spacing="5" style="-fx-padding: 8 12;">
@@ -33,6 +43,7 @@
                             </VBox>
                         </content>
                     </CustomMenuItem>
+
                     <CustomMenuItem hideOnClick="false">
                         <content>
                             <VBox spacing="5" style="-fx-padding: 8 12;">
@@ -41,6 +52,7 @@
                             </VBox>
                         </content>
                     </CustomMenuItem>
+
                     <SeparatorMenuItem />
                     <MenuItem onAction="#handleSortName" text="🔤 Nom (A-Z)" />
                     <MenuItem onAction="#handleSortDate" text="📅 Plus récents" />
@@ -59,9 +71,7 @@
         </ScrollPane>
     </VBox>
 
-    <VBox fx:id="aiPanel" visible="false" maxWidth="380.0" maxHeight="500.0" spacing="15.0"
-          style="-fx-background-color: rgba(30, 30, 30, 0.98); -fx-background-radius: 20; -fx-border-color: #FF8210; -fx-border-width: 1.5; -fx-border-radius: 20;"
-          StackPane.alignment="BOTTOM_RIGHT">
+    <VBox fx:id="aiPanel" maxHeight="500.0" maxWidth="380.0" spacing="15.0" style="-fx-background-color: rgba(30, 30, 30, 0.98); -fx-background-radius: 20; -fx-border-color: #FF8210; -fx-border-width: 1.5; -fx-border-radius: 20;" visible="false" StackPane.alignment="BOTTOM_RIGHT">
         <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
         <StackPane.margin><Insets bottom="90.0" right="30.0" /></StackPane.margin>
 
@@ -88,18 +98,41 @@
         </VBox>
 
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-            <Label fx:id="aiResponseLabel" style="-fx-text-fill: #ddd; -fx-font-size: 13;" wrapText="true" text="Posez-moi une question sur nos menus !" />
+            <Label fx:id="aiResponseLabel" style="-fx-text-fill: #ddd; -fx-font-size: 13;" text="Posez-moi une question sur nos menus !" wrapText="true" />
         </ScrollPane>
 
-        <Button onAction="#handleResetAI" maxWidth="Infinity" styleClass="btn-reset-ai" text="🔄 Réinitialiser l'IA" />
+        <Button maxWidth="Infinity" onAction="#handleResetAI" styleClass="btn-reset-ai" text="🔄 Réinitialiser l'IA" />
+    </VBox>
+
+    <VBox fx:id="locationSearchOverlay" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.85);" visible="false">
+        <VBox maxHeight="550.0" maxWidth="500.0" spacing="20.0" style="-fx-background-color: #161b22; -fx-background-radius: 25; -fx-border-color: #30363d; -fx-border-radius: 25; -fx-padding: 30;">
+            <HBox alignment="CENTER_LEFT">
+                <Label style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;" text="📍 Ma Position" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleCloseLocationSearch" style="-fx-background-color: transparent; -fx-text-fill: #8b949e; -fx-font-size: 20;" text="✕" />
+            </HBox>
+
+            <VBox spacing="8.0">
+                <Label style="-fx-text-fill: #8b949e; -fx-font-size: 13;" text="Saisissez votre ville ou adresse pour calculer l'itinéraire :" />
+                <TextField fx:id="txtLocationSearch" prefHeight="45.0" promptText="Ex: El Mourouj, Bizerte, Tunis..." styleClass="modern-input" />
+                <ListView fx:id="listLocationResults" managed="false" maxHeight="150.0" styleClass="autocomplete-list" visible="false" />
+            </VBox>
+
+            <StackPane minHeight="200.0" style="-fx-background-color: #0d1117; -fx-background-radius: 15; -fx-border-color: #30363d; -fx-border-style: dashed; -fx-border-radius: 15;" VBox.vgrow="ALWAYS">
+                <Label style="-fx-text-fill: #484f58;" text="Aperçu de la carte (Bientôt disponible)" />
+            </StackPane>
+
+            <Button maxWidth="Infinity" onAction="#handleConfirmLocation" prefHeight="45.0" style="-fx-background-color: #FF8210; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="Confirmer la Position" />
+        </VBox>
     </VBox>
 
     <Button onAction="#toggleAIPanel" prefHeight="60.0" prefWidth="60.0" styleClass="ai-floating-button" text="✨" StackPane.alignment="BOTTOM_RIGHT">
         <StackPane.margin><Insets bottom="20.0" right="30.0" /></StackPane.margin>
     </Button>
 
-    <VBox fx:id="loadingOverlay" alignment="CENTER" spacing="20.0" visible="false" style="-fx-background-color: rgba(0, 0, 0, 0.8);">
+    <VBox fx:id="loadingOverlay" alignment="CENTER" spacing="20.0" style="-fx-background-color: rgba(0, 0, 0, 0.8);" visible="false">
         <ProgressIndicator prefHeight="70.0" prefWidth="70.0" />
-        <Label style="-fx-text-fill: white; -fx-font-size: 16;" text="Le Concierge IA analyse les données..." />
+        <Label style="-fx-text-fill: white; -fx-font-size: 16;" text="Analyse des données..." />
     </VBox>
+
 </StackPane>

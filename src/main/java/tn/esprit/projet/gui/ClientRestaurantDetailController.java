@@ -41,19 +41,42 @@ import java.util.stream.Collectors;
 
 public class ClientRestaurantDetailController {
 
-    @FXML private Label lblName, lblAddress, lblPhone, lblImageCounter, lblRatingValue;
-    @FXML private ImageView mainCarouselImageView;
-    @FXML private HBox thumbnailContainer, paginationContainer, starRatingContainer;
-    @FXML private FlowPane menuFlowPane;
-    @FXML private VBox reviewsContainer;
-    @FXML private TextField txtSearchMenu;
-    @FXML private TextArea txtComment;
-    @FXML private Button btnSubmitReview, btnToggleAutoPlay;
-    @FXML private StackPane carouselContainer;
-    @FXML private ScrollPane rootScrollPane;
+    @FXML
+    private Label lblName, lblAddress, lblPhone, lblImageCounter, lblRatingValue;
+    @FXML
+    private ImageView mainCarouselImageView;
+    @FXML
+    private HBox thumbnailContainer, paginationContainer, starRatingContainer;
+    @FXML
+    private FlowPane menuFlowPane;
+    @FXML
+    private VBox reviewsContainer;
+    @FXML
+    private TextField txtSearchMenu;
+    @FXML
+    private TextArea txtComment;
+    @FXML
+    private Button btnSubmitReview, btnToggleAutoPlay;
+    @FXML
+    private StackPane carouselContainer;
+    @FXML
+    private ScrollPane rootScrollPane;
+
+
+    @FXML
+    private StackPane navigationOverlay;
+    @FXML
+    private Label distLabel;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private Label fullAddressLabel;
+    @FXML
+    private ImageView qrCodeView;
 
     // Translation Components
-    @FXML private ComboBox<String> comboLanguage;
+    @FXML
+    private ComboBox<String> comboLanguage;
     private final Map<String, String> translationCache = new HashMap<>();
 
     private ClientController mainClientController;
@@ -66,6 +89,7 @@ public class ClientRestaurantDetailController {
     private List<Menu> allMenus = new ArrayList<>();
     private int currentIndex = 0;
     private int currentRestaurantId;
+    private Restaurant currentRestaurant;
     private int currentSelectedRating = 5;
     private Timeline autoPlayTimeline;
     private boolean isAutoPlaying = true;
@@ -81,6 +105,11 @@ public class ClientRestaurantDetailController {
     public void setMainClientController(ClientController controller) {
         this.mainClientController = controller;
     }
+
+    private final NavigationService navService = new NavigationService();
+
+    private UserService userService = new UserService();
+    User currentUser = userService.getById(1);
 
     @FXML
     public void initialize() {
@@ -114,6 +143,7 @@ public class ClientRestaurantDetailController {
 
     public void setRestaurantData(Restaurant restaurant) {
         if (restaurant == null) return;
+        this.currentRestaurant = restaurant;
         this.currentRestaurantId = restaurant.getId();
         lblName.setText(restaurant.getName());
         lblAddress.setText("📍 " + restaurant.getAddress());
@@ -317,11 +347,13 @@ public class ClientRestaurantDetailController {
         Image img = new Image(imageList.get(index), 0, 450, true, true, true);
 
         FadeTransition ft = new FadeTransition(Duration.millis(250), mainCarouselImageView);
-        ft.setFromValue(1.0); ft.setToValue(0.2);
+        ft.setFromValue(1.0);
+        ft.setToValue(0.2);
         ft.setOnFinished(e -> {
             mainCarouselImageView.setImage(img);
             FadeTransition fi = new FadeTransition(Duration.millis(250), mainCarouselImageView);
-            fi.setFromValue(0.2); fi.setToValue(1.0);
+            fi.setFromValue(0.2);
+            fi.setToValue(1.0);
             fi.play();
         });
         ft.play();
@@ -339,12 +371,21 @@ public class ClientRestaurantDetailController {
         }
     }
 
-    @FXML private void handleNextImage() { if (!imageList.isEmpty()) displayImage((currentIndex + 1) % imageList.size()); }
-    @FXML private void handlePrevImage() { if (!imageList.isEmpty()) displayImage((currentIndex - 1 + imageList.size()) % imageList.size()); }
+    @FXML
+    private void handleNextImage() {
+        if (!imageList.isEmpty()) displayImage((currentIndex + 1) % imageList.size());
+    }
 
-    @FXML private void toggleAutoPlay() {
+    @FXML
+    private void handlePrevImage() {
+        if (!imageList.isEmpty()) displayImage((currentIndex - 1 + imageList.size()) % imageList.size());
+    }
+
+    @FXML
+    private void toggleAutoPlay() {
         isAutoPlaying = !isAutoPlaying;
-        if (isAutoPlaying) autoPlayTimeline.play(); else autoPlayTimeline.stop();
+        if (isAutoPlaying) autoPlayTimeline.play();
+        else autoPlayTimeline.stop();
         btnToggleAutoPlay.setText(isAutoPlaying ? "⏸" : "▶");
     }
 
@@ -355,7 +396,8 @@ public class ClientRestaurantDetailController {
         if (isAutoPlaying) autoPlayTimeline.play();
     }
 
-    @FXML private void handleFullScreen() {
+    @FXML
+    private void handleFullScreen() {
         if (mainCarouselImageView.getImage() != null) openFullScreenWindow(mainCarouselImageView.getImage());
     }
 
@@ -368,7 +410,9 @@ public class ClientRestaurantDetailController {
         StackPane root = new StackPane(fullView);
         root.setStyle("-fx-background-color: black;");
         Scene scene = new Scene(root);
-        scene.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ESCAPE) stage.close(); });
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) stage.close();
+        });
         root.setOnMouseClicked(e -> stage.close());
         stage.setScene(scene);
         stage.setFullScreen(true);
@@ -403,7 +447,8 @@ public class ClientRestaurantDetailController {
 
         // Clip for rounded corners on the image
         javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(150, 110);
-        clip.setArcWidth(15); clip.setArcHeight(15);
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
         iv.setClip(clip);
 
         try {
@@ -449,7 +494,8 @@ public class ClientRestaurantDetailController {
         return card;
     }
 
-    @FXML private void handleSubmitReview() {
+    @FXML
+    private void handleSubmitReview() {
         String comment = txtComment.getText().trim();
         if (comment.isEmpty()) return;
         try {
@@ -462,7 +508,8 @@ public class ClientRestaurantDetailController {
             rrs.create(rev);
             loadReviews(currentRestaurantId);
             txtComment.clear();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+        }
     }
 
     private void setupStarRating() {
@@ -475,7 +522,7 @@ public class ClientRestaurantDetailController {
                 currentSelectedRating = val;
                 lblRatingValue.setText(val + " / 5");
                 for (int j = 0; j < 5; j++) {
-                    ((Label)starRatingContainer.getChildren().get(j)).setStyle(j < val ?
+                    ((Label) starRatingContainer.getChildren().get(j)).setStyle(j < val ?
                             "-fx-text-fill: #FF8210; -fx-font-size: 30;" : "-fx-text-fill: #444; -fx-font-size: 30;");
                 }
             });
@@ -483,11 +530,15 @@ public class ClientRestaurantDetailController {
         }
     }
 
-    @FXML private void handleReservation() { System.out.println("Reservation triggered."); }
+    @FXML
+    private void handleReservation() {
+        System.out.println("Reservation triggered.");
+    }
 
     private void loadGallery(int id) {
         try {
-            imageList.clear(); thumbnailContainer.getChildren().clear();
+            imageList.clear();
+            thumbnailContainer.getChildren().clear();
             ris.getByRestaurantId(id).forEach(img -> {
                 imageList.add(img.getImageUrl());
                 ImageView thumb = new ImageView(new Image(img.getImageUrl(), 100, 70, true, true));
@@ -496,14 +547,16 @@ public class ClientRestaurantDetailController {
                 thumbnailContainer.getChildren().add(thumb);
             });
             if (!imageList.isEmpty()) displayImage(0);
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+        }
     }
 
     private void loadMenus(int id) {
         try {
             allMenus = ms.getAll().stream().filter(m -> m.getRestaurantId() == id).collect(Collectors.toList());
             applyMenuFilters();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+        }
     }
 
     private void loadReviews(int id) {
@@ -520,7 +573,8 @@ public class ClientRestaurantDetailController {
                 box.getChildren().addAll(rStars, rComment);
                 reviewsContainer.getChildren().add(box);
             });
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+        }
     }
 
     private void translateAllNodes(Parent root, String targetLang) {
@@ -529,25 +583,18 @@ public class ClientRestaurantDetailController {
 
             if (node instanceof Label label) {
                 translateLabel(label, targetLang);
-            }
-
-            else if (node instanceof Button button) {
+            } else if (node instanceof Button button) {
                 translateButton(button, targetLang);
-            }
-
-            else if (node instanceof TextField textField) {
+            } else if (node instanceof TextField textField) {
                 translateTextField(textField, targetLang);
-            }
-
-            else if (node instanceof TextArea textArea) {
+            } else if (node instanceof TextArea textArea) {
                 translateTextArea(textArea, targetLang);
-            }
-
-            else if (node instanceof Parent parent) {
+            } else if (node instanceof Parent parent) {
                 translateAllNodes(parent, targetLang);
             }
         }
     }
+
     private void translateLabel(Label label, String lang) {
 
         String text = label.getText();
@@ -602,5 +649,108 @@ public class ClientRestaurantDetailController {
             String translated = fetchTranslation(original, lang);
             Platform.runLater(() -> area.setPromptText(translated));
         }).start();
+    }
+
+    @FXML
+    private void handleSetDestination() {
+        // 1. Refresh user from DB to get the latest position (lat,lon|Address Name)
+        currentUser = userService.getById(1);
+
+        try {
+            // 2. Clean and Parse Restaurant Coordinates (The Destination)
+            String cleanAddress = currentRestaurant.getAddress().replace("📍", "").trim();
+            String[] rParts = cleanAddress.split(",");
+            double rLat = Double.parseDouble(rParts[0].trim());
+            double rLon = Double.parseDouble(rParts[1].trim());
+
+            String mapUrl;
+
+            // 3. LOGIC CHECK: Is the user position set?
+            if (currentUser == null || currentUser.getPosition() == null || currentUser.getPosition().isEmpty()) {
+
+                // CASE A: Position NOT set -> Use "Current Location" mode
+                mapUrl = "https://www.google.com/maps/dir/?api=1&destination=" + rLat + "," + rLon + "&travelmode=walking";
+
+                distLabel.setText("-- km");
+                timeLabel.setText("Calcul via Mobile");
+                fullAddressLabel.setText("Position non définie (Utilise GPS mobile)");
+                distLabel.setTextFill(javafx.scene.paint.Color.GRAY);
+
+            } else {
+
+                // CASE B: Position IS set -> Extract Coords and Name
+                String dbPosition = currentUser.getPosition();
+                String coordsPart;
+                String namePart;
+
+                // Split the string based on the pipe separator "|"
+                if (dbPosition.contains("|")) {
+                    String[] parts = dbPosition.split("\\|");
+                    coordsPart = parts[0]; // e.g., "36.8,10.1"
+                    namePart = parts[1];   // e.g., "Tunis, Tunisia"
+                } else {
+                    // Fallback for old data format
+                    coordsPart = dbPosition;
+                    namePart = dbPosition;
+                }
+
+                // Parse coordinates for calculation
+                String[] uParts = coordsPart.split(",");
+                double uLat = Double.parseDouble(uParts[0].trim());
+                double uLon = Double.parseDouble(uParts[1].trim());
+
+                // Calculate Distance/Time for the Desktop UI
+                double dist = navService.calculateDistance(uLat, uLon, rLat, rLon);
+                int walkingTime = (int) (dist / 5.0 * 60);
+
+                // URL including the specific origin saved in your DB
+                mapUrl = "https://www.google.com/maps/dir/?api=1&origin=" + uLat + "," + uLon
+                        + "&destination=" + rLat + "," + rLon + "&travelmode=walking";
+
+                // Update UI with calculated stats
+                distLabel.setText(String.format("%.2f km", dist));
+                timeLabel.setText(walkingTime + " min");
+
+                // --- UPDATED LABEL: Use namePart instead of raw coordinates ---
+                fullAddressLabel.setText("Itinéraire de " + namePart + " vers " + currentRestaurant.getName());
+
+                distLabel.setTextFill(dist < 2.0 ? javafx.scene.paint.Color.web("#4CAF50") : javafx.scene.paint.Color.web("#FF8210"));
+            }
+
+            // 4. Generate the QR Code with the chosen URL
+            qrCodeView.setImage(navService.generateQRCode(mapUrl));
+
+            // 5. Show Overlay with Animation
+            navigationOverlay.setVisible(true);
+            javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300), navigationOverlay);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+
+        } catch (Exception e) {
+            System.err.println("Error calculating route: " + e.getMessage());
+            showFallbackNavigation();
+        }
+    }
+
+    private void showFallbackNavigation() {
+        // Fallback: Just search for the restaurant name if coordinates fail
+        try {
+            String encodedName = java.net.URLEncoder.encode(currentRestaurant.getName(), "UTF-8");
+            String mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodedName;
+
+            qrCodeView.setImage(navService.generateQRCode(mapUrl));
+            distLabel.setText("-- km");
+            timeLabel.setText("Voir sur mobile");
+            fullAddressLabel.setText("Localisation de " + currentRestaurant.getName());
+            navigationOverlay.setVisible(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleCloseNavigation() {
+        navigationOverlay.setVisible(false);
     }
 }

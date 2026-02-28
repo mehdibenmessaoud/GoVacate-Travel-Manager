@@ -14,6 +14,7 @@ public class User {
     private String status;  // "actif", "inactif", "en_attente"
     private LocalDateTime lastLogin;  // Dernière connexion
     private LocalDateTime createdAt;  // Date création
+    private String position;
 
     /** Constructeur pour création (inscription, CRUD). */
     public User(String nom, String email, String pass, String tel, LocalDate dateN, int roleId, String status) {
@@ -102,6 +103,9 @@ public class User {
     public boolean isActive() {
         return "actif".equalsIgnoreCase(status);
     }
+
+    public String getPosition() { return position; }
+    public void setPosition(String position) { this.position = position; }
 
     @Override
     public String toString() {

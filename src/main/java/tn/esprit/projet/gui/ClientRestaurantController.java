@@ -1,6 +1,9 @@
 package tn.esprit.projet.gui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,17 +19,21 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.entities.Menu;
-import tn.esprit.projet.services.MenuService;
-import tn.esprit.projet.services.RestaurantService;
-import tn.esprit.projet.services.RestaurantImageService;
-import tn.esprit.projet.services.RestaurantReviewService;
+import tn.esprit.projet.services.*;
 import tn.esprit.projet.test.App;
 import tn.esprit.projet.utils.CuisineWikiService;
 
 
 import javafx.event.ActionEvent;
+import tn.esprit.projet.utils.SessionManager;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +54,10 @@ public class ClientRestaurantController {
     @FXML private ProgressBar aiProgress;
     @FXML private VBox loadingOverlay;
 
+    @FXML private VBox locationSearchOverlay;
+    @FXML private TextField txtLocationSearch;
+    @FXML private ListView<String> listLocationResults;
+
     private final RestaurantService rs = new RestaurantService();
     private final RestaurantImageService ris = new RestaurantImageService();
     private final RestaurantReviewService rrs = new RestaurantReviewService();
@@ -64,9 +75,20 @@ public class ClientRestaurantController {
     private final tn.esprit.projet.services.LocalAIService aiService = new tn.esprit.projet.services.LocalAIService();
     private final javafx.animation.PauseTransition aiAutomationTimer = new javafx.animation.PauseTransition(Duration.seconds(1.5));
     private List<Integer> aiRecommendedRestaurantIds = new ArrayList<>();
+    private Map<String, String> searchResults = new HashMap<>();
+
+    private User currentUser;
+    private UserService userService = new UserService();
+    private Timeline searchThrottle;
+
+
+
 
     @FXML
     public void initialize() {
+
+        currentUser = userService.getById(1);
+
         loadDataFromDatabase();
 
         searchField.textProperty().addListener((obs, old, val) -> applyDeepFilters());
@@ -85,6 +107,24 @@ public class ClientRestaurantController {
                     aiAutomationTimer.stop(); // Cancel the auto-timer
                     runAIWorkflow();          // Run immediately
                 }
+            }
+        });
+
+        txtLocationSearch.textProperty().addListener((obs, old, newVal) -> {
+            if (searchThrottle != null) searchThrottle.stop();
+            searchThrottle = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+                if (newVal.length() > 2) {
+                    fetchAutocomplete(newVal);
+                }
+            }));
+            searchThrottle.play();
+        });
+
+        listLocationResults.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                txtLocationSearch.setText(newVal); // Put the selected name in the box
+                listLocationResults.setVisible(false); // Hide the list
+                listLocationResults.setManaged(false);
             }
         });
     }
@@ -534,5 +574,122 @@ public class ClientRestaurantController {
         aiInputField.setText(btn.getText());
         aiAutomationTimer.stop(); // Add this to prevent double execution
         runAIWorkflow();
+    }
+
+    private void fetchAutocomplete(String query) {
+        new Thread(() -> {
+            try {
+                String url = "https://nominatim.openstreetmap.org/search?format=json&q="
+                        + java.net.URLEncoder.encode(query, "UTF-8");
+
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("User-Agent", "GoVacate-App")
+                        .GET().build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    org.json.JSONArray jsonArray = new org.json.JSONArray(response.body());
+
+                    // Use a temporary map to avoid clearing the main one while the user is clicking
+                    Map<String, String> tempResults = new HashMap<>();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        org.json.JSONObject obj = jsonArray.getJSONObject(i);
+                        tempResults.put(obj.getString("display_name"), obj.getString("lat") + "," + obj.getString("lon"));
+                    }
+
+                    Platform.runLater(() -> {
+                        searchResults.clear();
+                        searchResults.putAll(tempResults); // Update the main map only when ready
+                        listLocationResults.getItems().setAll(searchResults.keySet());
+
+                        boolean hasData = !searchResults.isEmpty();
+                        listLocationResults.setVisible(hasData);
+                        listLocationResults.setManaged(hasData);
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    @FXML
+    private void handleOpenLocationSearch() {
+        locationSearchOverlay.setVisible(true);
+        locationSearchOverlay.setManaged(true);
+        locationSearchOverlay.toFront();
+        txtLocationSearch.requestFocus(); // Focus the text field automatically
+    }
+
+    @FXML
+    private void handleCloseLocationSearch() {
+        locationSearchOverlay.setVisible(false);
+        locationSearchOverlay.setManaged(false);
+        txtLocationSearch.clear();
+        listLocationResults.setVisible(false);
+        listLocationResults.setManaged(false);
+    }
+
+    @FXML
+    private void handleConfirmLocation() {
+        String selected = txtLocationSearch.getText();
+        System.out.println("DEBUG: Confirming position for text: [" + selected + "]");
+
+        if (selected != null && !selected.isEmpty()) {
+            String coords = searchResults.get(selected);
+
+            if (coords != null) {
+                // SUCCESS CASE
+                if (currentUser != null) {
+                    // NEW FORMAT: Storing coordinates and name together in the same column
+                    // Example saved string: "36.8,10.1|Tunis, Tunisia"
+                    String formattedPosition = coords + "|" + selected;
+
+                    currentUser.setPosition(formattedPosition);
+                    userService.updatePosition(currentUser.getId(), formattedPosition);
+
+                    System.out.println("DEBUG: Saved in combined format: " + formattedPosition);
+                }
+                handleCloseLocationSearch();
+                if (aiStatusLabel != null) aiStatusLabel.setText("📍 Position : " + selected);
+            } else {
+                // If the map doesn't have the key, fallback to the first result
+                if (!searchResults.isEmpty()) {
+                    String firstKey = searchResults.keySet().iterator().next();
+                    String firstCoords = searchResults.get(firstKey);
+
+                    // Construct format for the fallback case
+                    String formattedFallback = firstCoords + "|" + firstKey;
+
+                    if (currentUser != null) {
+                        currentUser.setPosition(formattedFallback);
+                        userService.updatePosition(currentUser.getId(), formattedFallback);
+                    }
+
+                    handleCloseLocationSearch();
+                    if (aiStatusLabel != null) aiStatusLabel.setText("📍 Position : " + firstKey);
+                } else {
+                    System.out.println("DEBUG: Key not found in map. Current Map size: " + searchResults.size());
+                    txtLocationSearch.getStyleClass().add("input-error");
+                }
+            }
+        }
+    }
+    private void applyNewPosition(String coords, String label) {
+        if (currentUser != null) {
+            currentUser.setPosition(coords);
+            userService.updatePosition(currentUser.getId(), coords);
+            System.out.println("DEBUG: Position saved: " + coords);
+        }
+
+        handleCloseLocationSearch();
+
+        if (aiStatusLabel != null) {
+            aiStatusLabel.setText("📍 Position réglée : " + label);
+        }
     }
 }

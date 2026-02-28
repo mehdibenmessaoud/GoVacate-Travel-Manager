@@ -692,3 +692,16 @@
 .ai-input-area:focused .content {
     -fx-background-color: #1a1a1a !important;
 }
+
+.nav-popup-card {
+    -fx-background-color: #1a1a1a;
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 130, 16, 0.5);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 20, 0, 0, 10);
+}
+
+.nav-popup-card ImageView {
+    -fx-effect: dropshadow(gaussian, white, 10, 0, 0, 0); /* Makes the QR pop */
+    -fx-border-radius: 10;
+}
