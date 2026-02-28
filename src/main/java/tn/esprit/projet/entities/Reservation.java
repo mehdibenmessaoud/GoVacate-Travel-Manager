@@ -1,5 +1,4 @@
 package tn.esprit.projet.entities;
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,7 +28,7 @@ public class Reservation {
     private LocalDateTime updated_at;
 
     private Long user_id;
-
+    private String type_res;
     // Constructors
     public Reservation() {}
 
@@ -81,7 +80,13 @@ public class Reservation {
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }
+    public String getType_res() {
+        return type_res;
+    }
 
+    public void setType_res(String type_res) {
+        this.type_res = type_res;
+    }
     // equals & hashCode
     @Override
     public boolean equals(Object o) {
@@ -102,4 +107,3 @@ public class Reservation {
         return "Reservation{id=" + id + ", statut=" + statut + ", prix_total=" + prix_total + "}";
     }
 }
-

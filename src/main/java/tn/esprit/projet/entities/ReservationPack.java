@@ -1,7 +1,5 @@
 package tn.esprit.projet.entities;
 
-
-
 import jakarta.persistence.*;
 import java.util.Objects;
 

@@ -1,7 +1,5 @@
 package tn.esprit.projet.entities;
 
-
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -9,7 +7,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "reservation_excursion")
 public class ReservationExcursion {
-
+    private String heure_souhaitee; // Ajout de l'attribut
     public Long getId() {
         return id;
     }
@@ -70,7 +68,15 @@ public class ReservationExcursion {
     private double prix;
 
     public ReservationExcursion() {}
+    // Getter
+    public String getHeure_souhaitee() {
+        return heure_souhaitee;
+    }
 
+    // Setter
+    public void setHeure_souhaitee(String heure_souhaitee) {
+        this.heure_souhaitee = heure_souhaitee;
+    }
     @Override
     public boolean equals(Object o) {
         return o instanceof ReservationExcursion re && Objects.equals(id, re.id);
@@ -81,5 +87,3 @@ public class ReservationExcursion {
         return Objects.hash(id);
     }
 }
-
-

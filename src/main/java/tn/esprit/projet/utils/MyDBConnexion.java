@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyDBConnexion {
-    private final String URL = "jdbc:mysql://localhost:3306/GoVacate";
+    private final String URL = "jdbc:mysql://localhost:3306/GoVacate2";
     private final String USER = "root";
     private final String PASSWORD = "";
     private Connection connection;

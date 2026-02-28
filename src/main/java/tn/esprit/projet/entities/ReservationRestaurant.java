@@ -1,6 +1,5 @@
 package tn.esprit.projet.entities;
 
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -27,7 +26,9 @@ public class ReservationRestaurant {
 
     @Column(name = "prix", nullable = false)
     private double prix;
-
+    // --- AJOUT DU CHAMP HEURE ---
+    @Column(name = "heure_souhaitee", nullable = false)
+    private String heure_souhaitee;
     // --- Constructors ---
     public ReservationRestaurant() {}
 
@@ -42,7 +43,8 @@ public class ReservationRestaurant {
     // --- Getters & Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
+    public String getHeure_souhaitee() { return heure_souhaitee; }
+    public void setHeure_souhaitee(String heure_souhaitee) { this.heure_souhaitee = heure_souhaitee; }
     public Long getReservation_id() { return reservation_id; }
     public void setReservation_id(Long reservation_id) { this.reservation_id = reservation_id; }
 

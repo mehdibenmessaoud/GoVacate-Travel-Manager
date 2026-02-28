@@ -1,5 +1,5 @@
 package tn.esprit.projet.entities;
-
+// Update du 21 février 2026
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -73,3 +73,4 @@ public class Facture {
         return Objects.hash(id);
     }
 }
+
