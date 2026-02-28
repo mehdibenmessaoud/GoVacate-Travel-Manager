@@ -27,7 +27,8 @@ public class PacksContentController implements Initializable {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categoryFilter;
     @FXML private ScrollPane mainContentArea;
-
+    @FXML private StackPane aiChatContainer;
+    private boolean isChatVisible = false;
     private final PackService sp = new PackService();
     private List<Pack> allPacks;
 
@@ -199,5 +200,18 @@ public class PacksContentController implements Initializable {
         }).collect(Collectors.toList());
 
         displayPacks(filtered);
+    }
+
+    @FXML
+    private void toggleAIChat() {
+        isChatVisible = !isChatVisible;
+
+        // On affiche/masque le conteneur
+        aiChatContainer.setVisible(isChatVisible);
+
+        // 'managed' permet au ScrollPane de gauche de prendre toute la place quand le chat est fermé
+        aiChatContainer.setManaged(isChatVisible);
+
+        System.out.println(isChatVisible ? "Assistant IA ouvert" : "Assistant IA fermé");
     }
 }

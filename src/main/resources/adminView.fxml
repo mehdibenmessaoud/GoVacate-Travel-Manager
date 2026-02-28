@@ -39,7 +39,7 @@
                         <Button fx:id="btnDashBoard" onAction="#handleShowDashboard" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Tableau de Bord"/>
 
 
-
+                        <Button onAction="#handleShowUsers" styleClass="liquid-btn" text="👥 Gestion Utilisateurs" maxWidth="Infinity" />
                         <Button fx:id="btnPack" onAction="#handleShowPacks" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Packs"/>
 
 

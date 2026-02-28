@@ -30,6 +30,9 @@ import java.io.IOException;
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import tn.esprit.projet.utils.SceneManager;
+import tn.esprit.projet.utils.SessionManager;
+
 import java.io.IOException;
 
 import java.io.IOException;
@@ -50,6 +53,9 @@ public class ClientPackController implements Initializable {
     @FXML private Button btnExplorerDest; // Bouton "Explorer les Destinations"
 
     @FXML private VBox packContainer;
+
+    @FXML private Pane monPane;
+
     private final PackService sp = new PackService();
     private List<Pack> allPacks;
 
@@ -57,6 +63,7 @@ public class ClientPackController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         // 1. Initialisation des filtres
+        SceneManager.setClientContentPane(rootPane);
         categoryFilter.setItems(FXCollections.observableArrayList("Toutes", "Individual", "Couple", "Familialle"));
         categoryFilter.setValue("Toutes");
 
@@ -339,6 +346,37 @@ public class ClientPackController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleProfileClick() {
+        // On utilise la méthode de chargement dynamique de ton SceneManager
+        SceneManager.loadClientContent("/Profile.fxml");
+    }
+
+
+    @FXML
+    private void handleLogout() {
+        // 1. On vide les données de l'utilisateur
+        SessionManager.clearSession();
+
+        // 2. On redirige vers la page de login
+        SceneManager.switchTo("/Auth.fxml");
+
+        System.out.println("Déconnexion réussie.");
+    }
+
+    @FXML
+    private void handleDashboard(ActionEvent event) {
+        try {
+            // On utilise SceneManager pour charger le contenu du Dashboard
+            // dans la zone centrale de votre application
+            SceneManager.loadClientContent("/ClientDashboard.fxml");
+
+            System.out.println("Affichage du Dashboard client...");
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement du Dashboard : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
 
 }

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.projet.gui.ProfileController"
+            styleClass="profile-scroll"
+            fitToWidth="true"
+            stylesheets="@/css/profile-style.css"
+            prefHeight="750" prefWidth="950">
+
+    <VBox styleClass="profile-container" alignment="TOP_CENTER" spacing="30">
+        <padding>
+            <Insets top="30" right="40" bottom="30" left="40"/>
+        </padding>
+
+        <VBox styleClass="profile-content-wrapper" spacing="25" maxWidth="1000">
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Button text="← Retour au Dashboard" onAction="#handleBack" styleClass="btn-back"/>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="messageLabel" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #FF8210; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <VBox styleClass="profile-header-card">
+                <children>
+                    <Region styleClass="profile-cover-area" prefHeight="140"/>
+
+                    <StackPane>
+                        <VBox alignment="CENTER" spacing="12" styleClass="profile-header-info">
+                            <StackPane styleClass="profile-avatar-container">
+                                <Circle radius="65" styleClass="profile-avatar" />
+                                <Label fx:id="avatarInitials" text="JD" styleClass="profile-avatar-initials"/>
+                                <ImageView fx:id="avatarImage" fitWidth="130" fitHeight="130" visible="false" managed="false"/>
+                                <Button text="📷" styleClass="profile-avatar-edit-btn" onAction="#handleChangeAvatar"
+                                        StackPane.alignment="BOTTOM_RIGHT" />
+                            </StackPane>
+
+                            <VBox alignment="CENTER" spacing="5">
+                                <Label fx:id="lblFullName" text="John Doe" styleClass="profile-fullname"/>
+                                <HBox alignment="CENTER" spacing="10">
+                                    <Label fx:id="lblRole" text="CLIENT" styleClass="profile-role-badge-client"/>
+                                    <Label fx:id="lblMemberSince" text="Membre depuis Janvier 2024" styleClass="profile-email" style="-fx-opacity: 0.7;"/>
+                                </HBox>
+                            </VBox>
+
+                            <HBox alignment="CENTER" spacing="50" style="-fx-padding: 15 0 0 0;">
+                                <VBox alignment="CENTER" styleClass="profile-stat-item">
+                                    <Label fx:id="statReservations" text="12" styleClass="profile-stat-value"/>
+                                    <Label text="Vols" styleClass="profile-stat-label"/>
+                                </VBox>
+                                <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.1;"/>
+                                <VBox alignment="CENTER" styleClass="profile-stat-item">
+                                    <Label fx:id="statFavoris" text="24" styleClass="profile-stat-value"/>
+                                    <Label text="Favoris" styleClass="profile-stat-label"/>
+                                </VBox>
+                                <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.1;"/>
+                                <VBox alignment="CENTER" styleClass="profile-stat-item">
+                                    <Label fx:id="statAvis" text="5" styleClass="profile-stat-value"/>
+                                    <Label text="Avis" styleClass="profile-stat-label"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </StackPane>
+                </children>
+            </VBox>
+
+            <VBox spacing="20">
+                <HBox alignment="CENTER">
+                    <HBox styleClass="profile-tabs" spacing="5">
+                        <Button fx:id="tabInformations" text="📋 Détails du compte"
+                                styleClass="profile-tab-btn profile-tab-btn-active" onAction="#showInformations"/>
+                        <Button fx:id="tabSecurite" text="🔒 Sécurité &amp; Accès"
+                                styleClass="profile-tab-btn" onAction="#showSecurite"/>
+                    </HBox>
+                </HBox>
+
+                <VBox fx:id="cardInformations" styleClass="profile-card" spacing="25">
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Informations Personnelles" styleClass="profile-card-title"/>
+                            <Label text="Mettez à jour vos données pour une meilleure expérience." styleClass="profile-email"/>
+                        </VBox>
+                        <Button fx:id="btnEdit" text="✎ Modifier" styleClass="btn-details-pack" onAction="#toggleEditMode"/>
+                    </HBox>
+
+                    <GridPane vgap="20" hgap="30">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50" />
+                            <ColumnConstraints percentWidth="50" />
+                        </columnConstraints>
+
+                        <VBox spacing="8" GridPane.columnSpan="2" GridPane.rowIndex="0">
+                            <Label text="Nom complet" styleClass="profile-form-label"/>
+                            <StackPane alignment="CENTER_LEFT">
+                                <Label fx:id="lblDisplayFullName" text="John Doe" styleClass="profile-form-field"
+                                       maxWidth="Infinity" style="-fx-background-color: rgba(255,255,255,0.03);"/>
+                                <TextField fx:id="fieldFullName" visible="false" managed="false" styleClass="profile-form-field"/>
+                            </StackPane>
+                        </VBox>
+
+                        <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Adresse Email" styleClass="profile-form-label"/>
+                            <TextField fx:id="fieldEmail" editable="false" styleClass="profile-form-field profile-form-field-readonly"/>
+                        </VBox>
+
+                        <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Numéro de téléphone" styleClass="profile-form-label"/>
+                            <TextField fx:id="fieldTelephone" promptText="+216 -- --- ---" styleClass="profile-form-field"/>
+                        </VBox>
+
+                        <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <Label text="Date de naissance" styleClass="profile-form-label"/>
+                            <DatePicker fx:id="dpDateNaissance" prefWidth="500" styleClass="profile-form-field"/>
+                        </VBox>
+
+                        <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Label text="Vérification" styleClass="profile-form-label"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT"
+                                  style="-fx-background-color: rgba(46, 204, 113, 0.1); -fx-padding: 10 15; -fx-background-radius: 10;">
+                                <Circle radius="5" fill="#2ecc71" />
+                                <Label fx:id="lblStatus" text="Utilisateur Vérifié" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold;"/>
+                            </HBox>
+                        </VBox>
+                    </GridPane>
+
+                    <HBox fx:id="hboxActions" spacing="15" alignment="CENTER_RIGHT" visible="false" managed="false">
+                        <Button text="Annuler" styleClass="btn-back-simple" onAction="#cancelEdit" prefWidth="120"/>
+                        <Button text="Sauvegarder les changements" styleClass="btn-reserve-pack" onAction="#saveProfile" prefWidth="220"/>
+                    </HBox>
+                </VBox>
+
+                <VBox fx:id="cardSecurite" styleClass="profile-card" spacing="25" visible="false" managed="false">
+                    <VBox spacing="5">
+                        <Label text="Réinitialisation du mot de passe" styleClass="profile-card-title"/>
+                        <Label text="Utilisez un mot de passe fort pour protéger votre compte GoVacate." styleClass="profile-email"/>
+                    </VBox>
+
+                    <VBox spacing="20" maxWidth="500">
+                        <VBox spacing="8">
+                            <Label text="Mot de passe actuel" styleClass="profile-form-label"/>
+                            <PasswordField fx:id="currentPasswordField" styleClass="profile-form-field" promptText="••••••••"/>
+                        </VBox>
+                        <Separator prefWidth="200" style="-fx-opacity: 0.1;" />
+                        <VBox spacing="8">
+                            <Label text="Nouveau mot de passe" styleClass="profile-form-label"/>
+                            <PasswordField fx:id="newPasswordField" styleClass="profile-form-field" promptText="Min. 8 caractères"/>
+                        </VBox>
+                        <VBox spacing="8">
+                            <Label text="Confirmer le nouveau mot de passe" styleClass="profile-form-label"/>
+                            <PasswordField fx:id="confirmPasswordField" styleClass="profile-form-field" promptText="Confirmez votre saisie"/>
+                        </VBox>
+                        <Button text="Mettre à jour la sécurité" styleClass="btn-reserve-pack" onAction="#updatePassword" prefWidth="250"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </VBox>
+</ScrollPane>

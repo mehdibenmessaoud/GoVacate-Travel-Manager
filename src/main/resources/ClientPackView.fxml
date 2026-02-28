@@ -26,6 +26,7 @@
                     <Label styleClass="logo-text" text="GoVacate"/>
 
                     <VBox spacing="15.0">
+                        <Button fx:id="btnDashboard" onAction="#handleDashboard" styleClass="liquid-btn, liquid-btn-active" text="Dashboard" prefWidth="210" alignment="CENTER_LEFT"/>
                         <Button fx:id="btnExplorer" onAction="#handleShowPacks" styleClass="liquid-btn, liquid-btn-active" text="Explorer les Packs" prefWidth="210" alignment="CENTER_LEFT"/>
                         <Button fx:id="btnExplorerEx" styleClass="liquid-btn" text="Explorer les Excursions" prefWidth="210" alignment="CENTER_LEFT"/>
                         <Button fx:id="btnExplorerDest" onAction="#handleShowDestinations" styleClass="liquid-btn" text="Explorer les Destinations" prefWidth="210" alignment="CENTER_LEFT"/>
@@ -35,8 +36,18 @@
 
                     <Region VBox.vgrow="ALWAYS" />
                     <VBox spacing="10.0" styleClass="sidebar-footer">
-                        <Button styleClass="liquid-btn" text="Paramètres" prefWidth="210" />
-                        <Button styleClass="liquid-btn, btn-logout" text="Déconnexion" prefWidth="210" />
+                        <Button fx:id="btnProfile" text="Mon Profil" onAction="#handleProfileClick" styleClass="liquid-btn">
+                            <graphic>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnLogout"
+                                text="Déconnexion"
+                                onAction="#handleLogout"
+                                styleClass="liquid-btn, btn-logout">
+                            <graphic>
+                                <Label text="󰗽" style="-fx-font-family: 'Material Design Icons'; -fx-font-size: 18;"/>
+                            </graphic>
+                        </Button>
                     </VBox>
                 </VBox>
 

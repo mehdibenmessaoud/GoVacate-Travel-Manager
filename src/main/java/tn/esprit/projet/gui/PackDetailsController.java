@@ -13,11 +13,14 @@ import javafx.scene.image.ImageView;
 import tn.esprit.projet.entities.Pack;
 import tn.esprit.projet.services.*;
 import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.SceneManager;
+import tn.esprit.projet.utils.SessionManager;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 public class PackDetailsController implements Initializable {
@@ -211,12 +214,29 @@ public class PackDetailsController implements Initializable {
         }).start();
     }
 
+
+
     @FXML
     private void handleBack() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/adminView.fxml"));
-            nameLabel.getScene().setRoot(root);
-        } catch (IOException e) {
+            // 1. On vérifie qui est connecté via le SessionManager
+            if (SessionManager.isAdmin()) {
+                // Si c'est un Admin, on le renvoie vers la table de gestion des excursions
+                // Note : Adaptez le chemin si nécessaire
+                SceneManager.loadClientContent("/PackTable.fxml");
+                System.out.println("Retour vers l'interface Admin.");
+
+            } else if (SessionManager.isClient()) {
+                // Si c'est un Client, on le renvoie vers son Dashboard ou sa liste simplifiée
+                SceneManager.loadClientContent("/ClientPackView.fxml");
+                System.out.println("Retour vers le Dashboard Client.");
+
+            } else {
+                // Sécurité au cas où
+                SceneManager.switchTo("Auth.fxml");
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors du retour dynamique : " + e.getMessage());
             e.printStackTrace();
         }
     }

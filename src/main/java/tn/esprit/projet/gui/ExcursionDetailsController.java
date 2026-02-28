@@ -14,6 +14,7 @@ import tn.esprit.projet.entities.Excursion;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import tn.esprit.projet.services.CurrencyService;
 
@@ -28,6 +29,8 @@ import javafx.application.Platform;
 import org.json.JSONObject; // Assure-toi d'avoir la bibliothèque JSON dans ton projet
 import tn.esprit.projet.services.ExcursionService;
 import tn.esprit.projet.services.WeatherService;
+import tn.esprit.projet.utils.SceneManager;
+import tn.esprit.projet.utils.SessionManager;
 
 
 public class ExcursionDetailsController implements Initializable {
@@ -173,6 +176,8 @@ public class ExcursionDetailsController implements Initializable {
         double dynamicPrice = excursionService.calculateDynamicPrice(e, currentReservations);
         this.currentExcursionPrice = dynamicPrice;
 
+
+
         // 1. Remplissage des textes basiques
         if (nameLabel != null) nameLabel.setText(e.getName());
         if (activiteLabel != null) activiteLabel.setText(e.getActivite());
@@ -223,6 +228,7 @@ public class ExcursionDetailsController implements Initializable {
         } else if (descLabel != null) {
             descLabel.setText("Lieu non défini");
         }
+
 
         // 3. Mise à jour de la conversion monétaire
         if (currencyCombo != null && currencyCombo.getValue() != null) {
@@ -346,18 +352,25 @@ public class ExcursionDetailsController implements Initializable {
     @FXML
     private void handleBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ExcursionTable.fxml"));
-            Parent table = loader.load();
+            // 1. On vérifie qui est connecté via le SessionManager
+            if (SessionManager.isAdmin()) {
+                // Si c'est un Admin, on le renvoie vers la table de gestion des excursions
+                // Note : Adaptez le chemin si nécessaire
+                SceneManager.loadClientContent("/ExcursionTable.fxml");
+                System.out.println("Retour vers l'interface Admin.");
 
-            // On recherche le conteneur principal (mainLayout) pour changer de vue
-            if (nameLabel.getScene() != null) {
-                BorderPane mainLayout = (BorderPane) nameLabel.getScene().lookup("#mainLayout");
-                if (mainLayout != null) {
-                    mainLayout.setCenter(table);
-                }
+            } else if (SessionManager.isClient()) {
+                // Si c'est un Client, on le renvoie vers son Dashboard ou sa liste simplifiée
+                SceneManager.loadClientContent("/ClientDestinationView.fxml");
+                System.out.println("Retour vers le Dashboard Client.");
+
+            } else {
+                // Sécurité au cas où
+                SceneManager.switchTo("Auth.fxml");
             }
-        } catch (IOException e) {
-            System.err.println("Erreur lors du retour à la table : " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erreur lors du retour dynamique : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -390,6 +403,8 @@ public class ExcursionDetailsController implements Initializable {
             }
         }).start();
     }
+
+
 
     private void updateConvertedPrice(String currency) {
         // On vérifie que le prix de l'excursion n'est pas nul

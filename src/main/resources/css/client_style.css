@@ -862,18 +862,25 @@ Circle#avatarPlaceholder { -fx-fill: #e6eef8; -fx-stroke: #d7e9fb; -fx-stroke-wi
     -fx-font-weight: bold;
 }
 
+
+/* --- Conteneur Principal du Chat --- */
 .chat-container {
-    -fx-background-color: rgba(30, 30, 30, 0.85);
-    -fx-background-radius: 20;
+    -fx-background-color: rgba(5, 25, 55, 0.85); /* Bleu nuit translucide */
+    -fx-background-radius: 15;
     -fx-border-color: rgba(255, 255, 255, 0.1);
-    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, 0);
 }
 
+/* --- Header du Chat --- */
 .chat-header {
     -fx-background-color: rgba(255, 255, 255, 0.05);
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.1) transparent;
+    -fx-background-radius: 15 15 0 0;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 0 1 0;
 }
 
+/* --- Zone de défilement (Messages) --- */
 .chat-scroll {
     -fx-background: transparent;
     -fx-background-color: transparent;
@@ -882,6 +889,88 @@ Circle#avatarPlaceholder { -fx-fill: #e6eef8; -fx-stroke: #d7e9fb; -fx-stroke-wi
 .chat-scroll .viewport {
     -fx-background-color: transparent;
 }
+
+/* Personnalisation de la barre de défilement */
+.chat-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 6;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 10;
+}
+
+/* --- Zone de saisie (Bas) --- */
+.chat-input-area {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 0 0 15 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1 0 0 0;
+}
+
+.modern-textfield {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #adb5bd;
+    -fx-padding: 0 15 0 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+}
+
+.modern-textfield:focused {
+    -fx-border-color: #FF8210; /* Orange lors du clic */
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Bulles de Message (À ajouter dynamiquement en Java) --- */
+.user-bubble {
+    -fx-background-color: #FF8210; /* Orange dynamique */
+    -fx-background-radius: 15 15 0 15;
+    -fx-padding: 10 15;
+    -fx-text-fill: white;
+    -fx-font-size: 13;
+    -fx-max-width: 300;
+}
+
+.ai-bubble {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15 15 15 0;
+    -fx-padding: 10 15;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13;
+    -fx-max-width: 300;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 15 15 15 0;
+}
+
+/* --- Bouton Envoyer --- */
+.btn-orange-glow {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: #ff9431;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* Bouton Icone (Poubelle) */
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-text-fill: #adb5bd;
+    -fx-font-size: 18;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-text-fill: #e74c3c; /* Rouge au survol */
+}
+
 
 /* Style pour les messages de l'IA */
 .message-ai {
@@ -917,9 +1006,9 @@ Circle#avatarPlaceholder { -fx-fill: #e6eef8; -fx-stroke: #d7e9fb; -fx-stroke-wi
     -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 15, 0, 0, 8);
     -fx-transition: 0.3s;
 }
-
 .chat-fab:hover {
     -fx-scale-x: 1.15;
     -fx-scale-y: 1.15;
     -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.6), 20, 0, 0, 10);
 }
+

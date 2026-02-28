@@ -411,6 +411,19 @@ public class Admin2Controller implements Initializable {
         }
     }
 
+    @FXML
+    private void handleShowUsers() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/UserManagement.fxml"));
+            Parent view = loader.load();
+            mainLayout.setCenter(view); // mainLayout est ton BorderPane principal
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
 
 
