@@ -32,3 +32,4 @@ public class Role {
         return nomRole;
     }
 }
+

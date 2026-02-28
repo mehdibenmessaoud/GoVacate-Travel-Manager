@@ -1,1 +1,2 @@
-ID:123|Client: aa|19:02|vendredi, 27 févr.
+123|CLIENT|Mohamed Test|aaaa|01:49|samedi, 28 févr.
+123|ADMIN|Moez Admin|aa|01:51|samedi, 28 févr.

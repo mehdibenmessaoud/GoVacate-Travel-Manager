@@ -14,13 +14,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
-import org.java_websocket.WebSocket;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import tn.esprit.projet.entities.Reservation;
 import tn.esprit.projet.services.ReservationServiceImpl;
-import tn.esprit.projet.utils.ChatServer;
+import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
@@ -30,19 +33,25 @@ public class GoVacateControllor implements Initializable {
     @FXML private Pane slidingPane;
     @FXML private Button btnExplorer, btnVoyages, btnMessages;
     @FXML private ScrollPane explorerView, adminChatScrollPane;
-    @FXML private VBox reservationView, supportView, adminChatMessageContainer;
+    @FXML private VBox reservationView, supportView, adminChatMessageContainer, inboxClientList;
+    @FXML private Label chatHeaderLabel;
+
+    // Table & Columns
     @FXML private TableView<Reservation> tableMesReservations;
     @FXML private TableColumn<Reservation, String> colUserId, colType, colDate;
     @FXML private TableColumn<Reservation, Object> colStatut;
     @FXML private TableColumn<Reservation, Double> colPrix;
     @FXML private TableColumn<Reservation, Void> colAction;
+
+    // Filters & Chat Input
     @FXML private TextField txtSearch, adminChatInput;
     @FXML private ComboBox<String> comboStatut;
 
     private Button currentActiveBtn = null;
     private final ReservationServiceImpl reservationService = new ReservationServiceImpl();
-    private ChatServer chatServer;
-    private static final String HISTORY_FILE = "chat_history.txt";
+    private WebSocketClient webSocketClient;
+    private String lastActiveClientId = null;
+    private String lastProcessedMessage = "";
 
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMM");
@@ -51,223 +60,108 @@ public class GoVacateControllor implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupFilters();
+        connectToChatServer();
 
         if (adminChatMessageContainer != null) {
             adminChatMessageContainer.heightProperty().addListener((obs, old, newVal) ->
                     adminChatScrollPane.setVvalue(1.0));
         }
 
-        startChatServer();
         slidingPane.setMouseTransparent(true);
-
         Platform.runLater(() -> {
-            if (btnExplorer != null) {
-                slidingPane.setTranslateY(btnExplorer.getLayoutY());
-                currentActiveBtn = btnExplorer;
-            }
+            showExplorer(); // Vue par défaut au démarrage
         });
     }
 
     // ==========================================
-    // MODERN TABLE DESIGN LOGIC
+    // 1. TABLE DESIGN & LOGIC
     // ==========================================
-
     private void setupTable() {
+        if (tableMesReservations == null) return;
+
         colUserId.setCellValueFactory(new PropertyValueFactory<>("commentaire_client"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type_res"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
         colPrix.setCellValueFactory(new PropertyValueFactory<>("prix_total"));
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        // 1. Price Column Formatting
         colPrix.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Double price, boolean empty) {
+            @Override protected void updateItem(Double price, boolean empty) {
                 super.updateItem(price, empty);
                 if (empty || price == null) setText(null);
-                else {
-                    setText(String.format("%.2f €", price));
-                    setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
-                }
+                else { setText(String.format("%.2f €", price)); setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;"); }
             }
         });
 
-        // 2. Status Badges
         colStatut.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Object item, boolean empty) {
+            @Override protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
+                if (empty || item == null) setGraphic(null);
+                else {
                     String val = item.toString().toUpperCase();
-                    Label badge = new Label(val);
-                    badge.setPrefWidth(100);
-                    badge.setAlignment(Pos.CENTER);
-                    String baseStyle = "-fx-padding: 5 10; -fx-background-radius: 15; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;";
-
-                    if (val.contains("CONFIRMEE")) badge.setStyle(baseStyle + "-fx-background-color: #27ae60;");
-                    else if (val.contains("ATTENTE")) badge.setStyle(baseStyle + "-fx-background-color: #f39c12;");
-                    else badge.setStyle(baseStyle + "-fx-background-color: #e74c3c;");
-
-                    setGraphic(badge);
-                    setAlignment(Pos.CENTER);
+                    Label badge = new Label(val); badge.setPrefWidth(100); badge.setAlignment(Pos.CENTER);
+                    String style = "-fx-padding: 5 10; -fx-background-radius: 15; -fx-text-fill: white; -fx-font-weight: bold;";
+                    if (val.contains("CONFIRMEE")) badge.setStyle(style + "-fx-background-color: #27ae60;");
+                    else if (val.contains("ATTENTE")) badge.setStyle(style + "-fx-background-color: #f39c12;");
+                    else badge.setStyle(style + "-fx-background-color: #e74c3c;");
+                    setGraphic(badge); setAlignment(Pos.CENTER);
                 }
             }
         });
 
-        // 3. Modern Action Buttons
         colAction.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("Supprimer");
             {
-                btn.setPrefWidth(90);
-                String normalStyle = "-fx-background-color: #34495e; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-weight: bold;";
-                String hoverStyle = "-fx-background-color: #FF4B5C; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-weight: bold;";
-                btn.setStyle(normalStyle);
-                btn.setOnMouseEntered(e -> btn.setStyle(hoverStyle));
-                btn.setOnMouseExited(e -> btn.setStyle(normalStyle));
+                btn.setStyle("-fx-background-color: #34495e; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;");
                 btn.setOnAction(event -> handleDelete(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) setGraphic(null);
-                else { setGraphic(btn); setAlignment(Pos.CENTER); }
+                if (empty) setGraphic(null); else setGraphic(btn);
             }
         });
     }
 
     // ==========================================
-    // CHAT & DATE LOGIC
+    // 2. NAVIGATION & RESERVATIONS
     // ==========================================
-
-    private void startChatServer() {
-        chatServer = new ChatServer(8887) {
-            @Override
-            public void onOpen(WebSocket conn, org.java_websocket.handshake.ClientHandshake handshake) {
-                Platform.runLater(() -> addMessageToUI("[Système] Un voyageur a rejoint la session."));
-            }
-            @Override
-            public void onMessage(WebSocket conn, String message) {
-                Platform.runLater(() -> addMessageToUI(message));
-                super.onMessage(conn, message);
-            }
-            @Override public void onClose(WebSocket conn, int code, String reason, boolean rem) {
-                Platform.runLater(() -> addMessageToUI("[Système] Voyageur déconnecté."));
-            }
-            @Override public void onError(WebSocket conn, Exception ex) {}
-        };
-        chatServer.start();
-        Platform.runLater(() -> addMessageToUI("[Système] Serveur de support démarré."));
-        loadChatHistory();
-    }
-
-    private void addMessageToUI(String message) {
-        if (message == null || message.isEmpty()) return;
-        Platform.runLater(() -> {
-            if (message.contains("[EFFACER_TOUT]")) {
-                adminChatMessageContainer.getChildren().clear();
-                return;
-            }
-            String content = message;
-            String displayTime = LocalDateTime.now().format(timeFormatter);
-            String displayDate = LocalDateTime.now().format(dateFormatter);
-
-            if (message.contains("|")) {
-                String[] parts = message.split("\\|");
-                content = parts[0];
-                if (parts.length > 1) displayTime = parts[1];
-                if (parts.length > 2) displayDate = parts[2];
-            }
-
-            checkAndAddDateSeparator(displayDate);
-
-            HBox row = new HBox();
-            VBox bubbleContainer = new VBox(2);
-            boolean isSystem = content.contains("[Système]");
-            String cleanMsg = isSystem ? content : content.replace("Client: ", "").replace("Admin: ", "").replace("ADMIN: ", "");
-
-            Label bubble = new Label(cleanMsg);
-            bubble.setWrapText(true);
-            bubble.setMaxWidth(400);
-
-            if (isSystem) {
-                row.setAlignment(Pos.CENTER);
-                bubble.setStyle("-fx-text-fill: #679AC1; -fx-font-style: italic; -fx-font-size: 12px;");
-            } else if (content.startsWith("Admin:") || content.startsWith("ADMIN:")) {
-                row.setAlignment(Pos.CENTER_RIGHT);
-                bubble.setStyle("-fx-background-color: linear-gradient(to bottom right, #FF8210, #e67e22); -fx-text-fill: white; -fx-padding: 10 15; -fx-background-radius: 15 15 2 15; -fx-font-weight: bold;");
-            } else {
-                row.setAlignment(Pos.CENTER_LEFT);
-                bubble.setStyle("-fx-background-color: #3d3d3d; -fx-text-fill: #ecf0f1; -fx-padding: 10 15; -fx-background-radius: 15 15 15 2;");
-            }
-
-            bubbleContainer.getChildren().add(bubble);
-            if (!isSystem) {
-                Label timeL = new Label(displayTime);
-                timeL.setStyle("-fx-font-size: 9px; -fx-text-fill: #bdc3c7;");
-                bubbleContainer.setAlignment(content.startsWith("Admin") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-                bubbleContainer.getChildren().add(timeL);
-            }
-            row.getChildren().add(bubbleContainer);
-            VBox.setMargin(row, new javafx.geometry.Insets(0, 0, 8, 0));
-            adminChatMessageContainer.getChildren().add(row);
-        });
-    }
-
-    private void checkAndAddDateSeparator(String dateStr) {
-        boolean dateExists = false;
-        for (Node node : adminChatMessageContainer.getChildren()) {
-            if (node instanceof HBox) {
-                HBox hb = (HBox) node;
-                if (!hb.getChildren().isEmpty() && hb.getChildren().get(0) instanceof Label) {
-                    if (dateStr.equals(((Label) hb.getChildren().get(0)).getText())) {
-                        dateExists = true; break;
-                    }
-                }
-            }
-        }
-        if (!dateExists) {
-            Label dl = new Label(dateStr);
-            dl.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: #95a5a6; -fx-padding: 3 12; -fx-background-radius: 10; -fx-font-size: 10px;");
-            HBox dr = new HBox(dl); dr.setAlignment(Pos.CENTER);
-            VBox.setMargin(dr, new javafx.geometry.Insets(15, 0, 10, 0));
-            adminChatMessageContainer.getChildren().add(dr);
-        }
-    }
-
     @FXML
-    private void handleAdminReply() {
-        String msg = adminChatInput.getText().trim();
-        if (!msg.isEmpty()) {
-            LocalDateTime n = LocalDateTime.now();
-            String fullMsg = "Admin: " + msg + "|" + n.format(timeFormatter) + "|" + n.format(dateFormatter);
-            chatServer.broadcast(fullMsg);
-            addMessageToUI(fullMsg);
-            saveMessageToFile(fullMsg);
-            adminChatInput.clear();
-        }
-    }
+    public void showReservations() {
+        // 1. Navigation & Visibility (Kima el l-9dim)
+        hideAllViews();
+        reservationView.setVisible(true);
+        reservationView.setManaged(true);
+        moveBubble(btnVoyages);
 
-    // ==========================================
-    // FILTER & NAVIGATION LOGIC
-    // ==========================================
-
-    @FXML public void showReservations() {
-        hideAllViews(); reservationView.setVisible(true); moveBubble(btnVoyages);
+        // 2. Fetch Data (Ista3mel getAllReservations kima el l-9dim!)
+        // Thabbet elli getAllReservations() maktouba s7i7 fi ReservationServiceImpl
         ObservableList<Reservation> data = FXCollections.observableArrayList(reservationService.getAllReservations());
+
+        // 3. Filtering Logic (Simplified)
         FilteredList<Reservation> filteredData = new FilteredList<>(data, b -> true);
+
+        // Add Listeners ONLY if they exist
         if (txtSearch != null) {
             txtSearch.textProperty().addListener((o, old, nv) -> applyFilter(filteredData));
+        }
+        if (comboStatut != null) {
             comboStatut.valueProperty().addListener((o, old, nv) -> applyFilter(filteredData));
         }
-        tableMesReservations.setItems(new SortedList<>(filteredData));
+
+        // 4. Sorting & Display
+        SortedList<Reservation> sortedData = new SortedList<>(filteredData);
+        if (tableMesReservations != null) {
+            sortedData.comparatorProperty().bind(tableMesReservations.comparatorProperty());
+            tableMesReservations.setItems(sortedData);
+            tableMesReservations.refresh();
+        }
     }
 
     private void applyFilter(FilteredList<Reservation> fd) {
         fd.setPredicate(res -> {
             String t = (txtSearch == null) ? "" : txtSearch.getText().toLowerCase().trim();
             String s = (comboStatut == null) ? "Tous" : comboStatut.getValue();
-            boolean mt = t.isEmpty() || (res.getType_res() != null && res.getType_res().toLowerCase().contains(t));
+            boolean mt = t.isEmpty() || res.getType_res().toLowerCase().contains(t) || String.valueOf(res.getCommentaire_client()).contains(t);
             boolean ms = s.equals("Tous") || (res.getStatut() != null && res.getStatut().toString().equals(s));
             return mt && ms;
         });
@@ -280,45 +174,136 @@ public class GoVacateControllor implements Initializable {
         }
     }
 
-    private void handleDelete(Reservation res) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer la réservation #" + res.getId() + " ?", ButtonType.YES, ButtonType.NO);
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                reservationService.delete(res.getId());
-                showReservations();
+    // ==========================================
+    // 3. CHAT & INBOX LOGIC
+    // ==========================================
+    private void connectToChatServer() {
+        try {
+            webSocketClient = new WebSocketClient(new URI("ws://localhost:8887")) {
+                @Override public void onOpen(ServerHandshake h) { System.out.println("✅ Admin Connected to WebSocket"); }
+                @Override public void onMessage(String m) {
+                    Platform.runLater(() -> {
+                        if (m.equals(lastProcessedMessage)) return;
+                        lastProcessedMessage = m;
+                        String[] p = m.split("\\|");
+                        refreshInbox();
+                        if (p.length >= 4 && p[0].equals(lastActiveClientId)) addMessageToUI(m);
+                    });
+                }
+                @Override public void onClose(int c, String r, boolean rem) {}
+                @Override public void onError(Exception ex) { System.err.println("❌ WS Error: " + ex.getMessage()); }
+            };
+            webSocketClient.connect();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private void refreshInbox() {
+        if (inboxClientList == null) return;
+        inboxClientList.getChildren().clear();
+        String query = "SELECT id, nom FROM user WHERE role_id = 2 AND status = 'actif'";
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                String id = String.valueOf(rs.getInt("id"));
+                String nom = rs.getString("nom");
+                Button btn = new Button(nom + " (#" + id + ")");
+                btn.setMaxWidth(Double.MAX_VALUE);
+                btn.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12;");
+                btn.setOnAction(e -> loadSpecificChat(id));
+                inboxClientList.getChildren().add(btn);
             }
-        });
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    @FXML private void handleClearHistory() {
-        new File(HISTORY_FILE).delete();
+    private void loadSpecificChat(String clientId) {
+        this.lastActiveClientId = clientId;
+        if (chatHeaderLabel != null) chatHeaderLabel.setText("Discussion avec : " + clientId);
         adminChatMessageContainer.getChildren().clear();
-        if (chatServer != null) chatServer.broadcast("[EFFACER_TOUT]");
-        addMessageToUI("[Système] Historique réinitialisé.");
-    }
-
-    @FXML public void showSupport() { hideAllViews(); supportView.setVisible(true); moveBubble(btnMessages); }
-    @FXML private void showExplorer() { hideAllViews(); explorerView.setVisible(true); moveBubble(btnExplorer); }
-    private void hideAllViews() { explorerView.setVisible(false); reservationView.setVisible(false); supportView.setVisible(false); }
-
-    private void moveBubble(Button target) {
-        if (currentActiveBtn == target || target == null) return;
-        TranslateTransition tt = new TranslateTransition(Duration.millis(300), slidingPane);
-        tt.setToY(target.getLayoutY()); tt.play();
-        currentActiveBtn = target;
-    }
-
-    private void saveMessageToFile(String m) {
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(HISTORY_FILE, true)))) { out.println(m); }
-        catch (IOException e) { e.printStackTrace(); }
-    }
-
-    private void loadChatHistory() {
-        File f = new File(HISTORY_FILE);
+        File f = new File("chat_history_user_" + clientId + ".txt");
         if (f.exists()) {
             try (BufferedReader br = new BufferedReader(new FileReader(f))) {
                 String l; while ((l = br.readLine()) != null) addMessageToUI(l);
             } catch (IOException e) { e.printStackTrace(); }
         }
+    }
+
+    @FXML private void handleAdminReply() {
+        String msg = adminChatInput.getText().trim();
+        if (lastActiveClientId == null || msg.isEmpty()) return;
+        String time = LocalDateTime.now().format(timeFormatter);
+        String date = LocalDateTime.now().format(dateFormatter);
+        String payload = lastActiveClientId + "|ADMIN|Admin|" + msg + "|" + time + "|" + date;
+        if (webSocketClient != null && webSocketClient.isOpen()) {
+            webSocketClient.send(payload);
+            adminChatInput.clear();
+        }
+    }
+
+    @FXML private void handleClearHistory() {
+        if (lastActiveClientId != null) {
+            File f = new File("chat_history_user_" + lastActiveClientId + ".txt");
+            if (f.exists()) f.delete();
+            adminChatMessageContainer.getChildren().clear();
+        }
+    }
+
+    private void addMessageToUI(String message) {
+        Platform.runLater(() -> {
+            String[] parts = message.split("\\|");
+            if (parts.length < 6) return;
+            String role = parts[1], name = parts[2], content = parts[3], time = parts[4];
+
+            HBox row = new HBox();
+            VBox v = new VBox(2);
+            Label b = new Label(content);
+            b.setWrapText(true); b.setMaxWidth(400);
+            Label info = new Label(name + " • " + time);
+            info.setStyle("-fx-font-size: 9px; -fx-text-fill: #bdc3c7;");
+
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                row.setAlignment(Pos.CENTER_RIGHT); v.setAlignment(Pos.CENTER_RIGHT);
+                b.setStyle("-fx-background-color: #FF8210; -fx-text-fill: white; -fx-padding: 10 15; -fx-background-radius: 15 15 2 15;");
+            } else {
+                row.setAlignment(Pos.CENTER_LEFT); v.setAlignment(Pos.CENTER_LEFT);
+                b.setStyle("-fx-background-color: #3d3d3d; -fx-text-fill: #ecf0f1; -fx-padding: 10 15; -fx-background-radius: 15 15 15 2;");
+            }
+            v.getChildren().addAll(b, info); row.getChildren().add(v);
+            adminChatMessageContainer.getChildren().add(row);
+        });
+    }
+
+    // ==========================================
+    // UTILS & NAVIGATION
+    // ==========================================
+    @FXML
+    public void showSupport() {
+        hideAllViews();
+        supportView.setVisible(true);
+        supportView.setManaged(true); // 🎯 Zid hadhi
+        moveBubble(btnMessages);
+        refreshInbox();
+    }
+
+    @FXML
+    public void showExplorer() {
+        hideAllViews();
+        explorerView.setVisible(true);
+        explorerView.setManaged(true); // 🎯 Zid hadhi
+        moveBubble(btnExplorer);
+    }
+    private void hideAllViews() {
+        if (explorerView != null) { explorerView.setVisible(false); explorerView.setManaged(false); }
+        if (reservationView != null) { reservationView.setVisible(false); reservationView.setManaged(false); }
+        if (supportView != null) { supportView.setVisible(false); supportView.setManaged(false); }
+    }
+    private void handleDelete(Reservation res) {
+        reservationService.delete(res.getId());
+        showReservations();
+    }
+    private void moveBubble(Button b) {
+        if (b == null || slidingPane == null) return;
+        TranslateTransition tt = new TranslateTransition(Duration.millis(300), slidingPane);
+        tt.setToY(b.getLayoutY()); tt.play(); currentActiveBtn = b;
     }
 }

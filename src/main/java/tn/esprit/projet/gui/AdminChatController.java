@@ -4,95 +4,113 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import tn.esprit.projet.utils.SessionManager; // IMPORTED
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class AdminChatController {
 
-    @FXML private TextArea adminChatDisplay; // L'ID doit être identique dans le FXML
-    @FXML private TextField adminChatInput;   // L'ID doit être identique dans le FXML
+    @FXML private TextArea adminChatDisplay;
+    @FXML private TextField adminChatInput;
 
     private WebSocketClient adminClient;
     private static final String HISTORY_FILE = "chat_history.txt";
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMM");
 
     @FXML
     public void initialize() {
-        // 1. Charger les anciens messages sauvegardés
         loadHistory();
-
-        // 2. Se connecter au serveur de chat
         connectToWebSocket();
     }
 
-    /**
-     * Lit le fichier chat_history.txt et l'affiche dans la zone de texte
-     */
     private void loadHistory() {
         File file = new File(HISTORY_FILE);
         if (file.exists()) {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    adminChatDisplay.appendText(line + "\n");
+                    // We parse the history so the Admin sees "Clean" text, not the | pipes
+                    adminChatDisplay.appendText(formatMessageForDisplay(line) + "\n");
                 }
                 adminChatDisplay.appendText("--- Historique chargé ---\n");
             } catch (IOException e) {
-                System.err.println("Erreur lors du chargement de l'historique : " + e.getMessage());
+                System.err.println("Erreur : " + e.getMessage());
             }
         }
     }
 
     /**
-     * Initialise la connexion WebSocket vers le serveur
+     * Converts "ID|ROLE|NAME|CONTENT|TIME|DATE" into "Name: Content (Time)"
      */
+    private String formatMessageForDisplay(String rawMessage) {
+        if (rawMessage.contains("|")) {
+            String[] parts = rawMessage.split("\\|");
+            if (parts.length >= 5) {
+                String name = parts[2];
+                String content = parts[3];
+                String time = parts[4];
+                return "[" + time + "] " + name + " : " + content;
+            }
+        }
+        return rawMessage;
+    }
+
     private void connectToWebSocket() {
         try {
             adminClient = new WebSocketClient(new URI("ws://localhost:8887")) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
-                    Platform.runLater(() -> adminChatDisplay.appendText("[Système] Connecté au serveur de support.\n"));
+                    Platform.runLater(() -> adminChatDisplay.appendText("[Système] Connecté en tant qu'ADMIN.\n"));
                 }
 
                 @Override
                 public void onMessage(String message) {
-                    // Reçoit les messages du client en temps réel
-                    Platform.runLater(() -> adminChatDisplay.appendText(message + "\n"));
+                    Platform.runLater(() -> adminChatDisplay.appendText(formatMessageForDisplay(message) + "\n"));
                 }
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    Platform.runLater(() -> adminChatDisplay.appendText("[Système] Déconnecté du serveur.\n"));
+                    Platform.runLater(() -> adminChatDisplay.appendText("[Système] Déconnecté.\n"));
                 }
 
                 @Override
                 public void onError(Exception ex) {
-                    System.err.println("Erreur WebSocket Admin : " + ex.getMessage());
+                    System.err.println("Erreur : " + ex.getMessage());
                 }
             };
             adminClient.connect();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        } catch (URISyntaxException e) { e.printStackTrace(); }
     }
 
-    /**
-     * Méthode liée au bouton "Envoyer" ou à la touche Entrée du TextField
-     */
     @FXML
     private void handleAdminSend() {
-        if (adminClient != null && adminClient.isOpen()) {
+        if (adminClient != null && adminClient.isOpen() && SessionManager.isAdmin()) {
             String msg = adminChatInput.getText().trim();
             if (!msg.isEmpty()) {
-                // Envoie le message au serveur (qui l'enregistrera et le diffusera)
-                adminClient.send("ADMIN: " + msg);
+
+                // 1. Get Admin info from Session
+                int id = SessionManager.getCurrentUserId();
+                String name = SessionManager.getCurrentUserName();
+                String role = "ADMIN";
+                String time = LocalDateTime.now().format(timeFormatter);
+                String date = LocalDateTime.now().format(dateFormatter);
+
+                // 2. Build the Protocol: "ID|ROLE|NAME|CONTENT|TIME|DATE"
+                // This ensures the Client can parse the message correctly!
+                String payload = id + "|" + role + "|" + name + "|" + msg + "|" + time + "|" + date;
+
+                adminClient.send(payload);
                 adminChatInput.clear();
             }
         } else {
-            adminChatDisplay.appendText("[Erreur] Connexion perdue avec le serveur.\n");
+            adminChatDisplay.appendText("[Erreur] Accès refusé ou serveur hors ligne.\n");
         }
     }
 }

@@ -1,0 +1,2 @@
+3|CLIENT|client2|aaa|02:04|samedi, 28 févr.
+3|ADMIN|Admin|aa|02:19|samedi, 28 févr.

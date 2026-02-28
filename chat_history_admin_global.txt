@@ -1,0 +1,22 @@
+123|CLIENT|Mohamed Test|aa|01:26|samedi, 28 févr.
+888|CLIENT|Ali Voyageur|aa|01:26|samedi, 28 févr.
+888|CLIENT|Ali Voyageur|wink|01:27|samedi, 28 févr.
+123|CLIENT|Mohamed Test|salem|01:28|samedi, 28 févr.
+123|CLIENT|Mohamed Test|aa|01:28|samedi, 28 févr.
+888|CLIENT|Ali Voyageur|aa|01:33|samedi, 28 févr.
+123|CLIENT|Mohamed Test|aa|01:39|samedi, 28 févr.
+888|CLIENT|Ali Voyageur|romdhanek mabrouk|01:39|samedi, 28 févr.
+123|CLIENT|Mohamed Test|aa|01:44|samedi, 28 févr.
+888|CLIENT|Ali Voyageur|salem|01:45|samedi, 28 févr.
+888|ADMIN|Moez|wink|01:45|samedi, 28 févr.
+123|ADMIN|Moez|wink|01:45|samedi, 28 févr.
+123|ADMIN|Moez|ali|01:46|samedi, 28 févr.
+888|ADMIN|Moez|mohamed|01:46|samedi, 28 févr.
+123|CLIENT|Mohamed Test|aaaa|01:49|samedi, 28 févr.
+123|ADMIN|Moez Admin|aa|01:51|samedi, 28 févr.
+2|CLIENT|test|aa|02:00|samedi, 28 févr.
+2|CLIENT|test|wink|02:00|samedi, 28 févr.
+2|ADMIN|Moez Admin|hani sahbi|02:01|samedi, 28 févr.
+3|CLIENT|client2|aaa|02:04|samedi, 28 févr.
+3|ADMIN|Admin|aa|02:19|samedi, 28 févr.
+2|CLIENT|test|aa|02:35|samedi, 28 févr.

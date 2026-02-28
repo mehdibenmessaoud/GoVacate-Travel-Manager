@@ -9,18 +9,18 @@ import java.util.List;
 
 public class ReservationServiceImpl implements CrudService<Reservation, Long> {
 
-    Connection cnx = MyDBConnexion.getInstance().getConnection();
+    // 🎯 Na7ina el "Connection cnx" mel hna bech dima n-7ellou ka3ba jdida fi kol appel
 
     @Override
     public Reservation create(Reservation r) {
-        try {
-            String sql = """
-                INSERT INTO reservation
-                (statut, date_debut, date_fin, nombre_personnes,
-                 prix_total, commentaire_client, user_id)
-                VALUES (?,?,?,?,?,?,?)
-            """;
-            PreparedStatement ps = cnx.prepareStatement(sql);
+        String sql = """
+            INSERT INTO reservation
+            (statut, date_debut, date_fin, nombre_personnes,
+             prix_total, commentaire_client, user_id)
+            VALUES (?,?,?,?,?,?,?)
+        """;
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, r.getStatut().name());
             ps.setDate(2, Date.valueOf(r.getDate_debut()));
             ps.setDate(3, Date.valueOf(r.getDate_fin()));
@@ -38,13 +38,13 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
 
     @Override
     public Reservation update(Reservation r) {
-        try {
-            String sql = """
-                UPDATE reservation
-                SET statut=?, prix_total=?, commentaire_client=?
-                WHERE id=?
-            """;
-            PreparedStatement ps = cnx.prepareStatement(sql);
+        String sql = """
+            UPDATE reservation
+            SET statut=?, prix_total=?, commentaire_client=?
+            WHERE id=?
+        """;
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, r.getStatut().name());
             ps.setDouble(2, r.getPrix_total());
             ps.setString(3, r.getCommentaire_client());
@@ -59,8 +59,8 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
 
     @Override
     public void delete(Long id) {
-        try {
-            PreparedStatement ps = cnx.prepareStatement("DELETE FROM reservation WHERE id=?");
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement("DELETE FROM reservation WHERE id=?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -70,8 +70,8 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
 
     @Override
     public Reservation findById(Long id) {
-        try {
-            PreparedStatement ps = cnx.prepareStatement("SELECT * FROM reservation WHERE id=?");
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM reservation WHERE id=?")) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -86,8 +86,9 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
     @Override
     public List<Reservation> findAll() {
         List<Reservation> list = new ArrayList<>();
-        try {
-            ResultSet rs = cnx.createStatement().executeQuery("SELECT * FROM reservation");
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM reservation")) {
             while (rs.next()) {
                 list.add(mapResultSetToReservation(rs));
             }
@@ -110,19 +111,24 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
         return r;
     }
 
+    // 🎯 TA METHODE LOGIQUE (Keep it as it is)
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
-        String sql = "SELECT r.*, u.nom FROM reservation r LEFT JOIN utilisateur u ON r.user_id = u.id";
+        String sql = "SELECT r.*, u.nom FROM reservation r LEFT JOIN user u ON r.user_id = u.id";
 
-        try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
             while (rs.next()) {
                 Reservation r = new Reservation();
                 r.setId(rs.getLong("id"));
                 r.setPrix_total(rs.getDouble("prix_total"));
-                r.setType_res(rs.getString("type_res"));
+
+                // Protection ken el colone type_res mouch mawjoud
+                try { r.setType_res(rs.getString("type_res")); } catch(Exception e) {}
 
                 r.setCommentaire_client(rs.getString("nom") != null ? rs.getString("nom") : "Inconnu");
-
                 r.setUser_id(rs.getLong("user_id"));
 
                 Date d = rs.getDate("date_debut");
@@ -133,13 +139,16 @@ public class ReservationServiceImpl implements CrudService<Reservation, Long> {
 
                 reservations.add(r);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return reservations;
     }
-    public void updateStatus(long id, String newStatus) { // Change 'int' to 'long'
+
+    public void updateStatus(long id, String newStatus) {
         String sql = "UPDATE reservation SET statut = ? WHERE id = ?";
-        // Use the 'cnx' variable already defined at the top of your class
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newStatus);
             ps.setLong(2, id);
             ps.executeUpdate();
