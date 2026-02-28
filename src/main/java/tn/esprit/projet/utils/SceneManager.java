@@ -380,7 +380,7 @@ public class SceneManager {
             switchTo("/AdminView.fxml");
         } else if (SessionManager.isClient()) {
             // À ajuster si ton fichier client est aussi à la racine
-            switchTo("/ClientPackView.fxml");
+            switchTo("/ClientDashboard2.fxml");
         } else {
             switchTo("/Auth.fxml");
         }

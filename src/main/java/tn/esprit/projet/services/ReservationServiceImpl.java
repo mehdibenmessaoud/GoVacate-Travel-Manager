@@ -10,12 +10,12 @@ import java.util.List;
 public class ReservationServiceImpl implements IService<Reservation> {
 
     // ============================================================
-    //      MÉTHODES DE L'INTERFACE IService (MATCHING CRUD)
+    //      MÉTHODES DE L'INTERFACE IService (CRUD)
     // ============================================================
 
     @Override
     public void create(Reservation r) throws SQLException {
-        String sql = "INSERT INTO reservation (statut, date_debut, date_fin, nombre_personnes, prix_total, commentaire_client, user_id) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO reservation (statut, date_debut, date_fin, nombre_personnes, prix_total, commentaire_client, user_id, type_res) VALUES (?,?,?,?,?,?,?,?)";
         try (Connection conn = MyDBConnexion.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, r.getStatut().name());
@@ -25,6 +25,7 @@ public class ReservationServiceImpl implements IService<Reservation> {
             ps.setDouble(5, r.getPrix_total());
             ps.setString(6, r.getCommentaire_client());
             ps.setLong(7, r.getUser_id());
+            ps.setString(8, r.getType_res());
             ps.executeUpdate();
         }
     }
@@ -38,6 +39,24 @@ public class ReservationServiceImpl implements IService<Reservation> {
             while (rs.next()) {
                 list.add(mapResultSetToReservation(rs));
             }
+        }
+        return list;
+    }
+
+    // 🔥 NOUVELLE MÉTHODE: Pour afficher uniquement les réservations du client connecté
+    public List<Reservation> getReservationsByUserId(int userId) {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT * FROM reservation WHERE user_id = ?";
+        try (Connection conn = MyDBConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToReservation(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur getReservationsByUserId: " + e.getMessage());
         }
         return list;
     }
@@ -69,54 +88,52 @@ public class ReservationServiceImpl implements IService<Reservation> {
         try (Connection conn = MyDBConnexion.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM reservation WHERE id=?")) {
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapResultSetToReservation(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToReservation(rs);
+                }
             }
         }
         return null;
     }
 
     // ============================================================
-    //      TES MÉTHODES LOGIQUES (CONCEPT INTACT)
+    //      MÉTHODES LOGIQUES & MAPPING
     // ============================================================
 
     private Reservation mapResultSetToReservation(ResultSet rs) throws SQLException {
         Reservation r = new Reservation();
         r.setId(rs.getLong("id"));
-        r.setStatut(StatutReservation.valueOf(rs.getString("statut")));
+        r.setStatut(StatutReservation.valueOf(rs.getString("statut").toUpperCase()));
         r.setDate_debut(rs.getDate("date_debut").toLocalDate());
         r.setDate_fin(rs.getDate("date_fin").toLocalDate());
         r.setNombre_personnes(rs.getInt("nombre_personnes"));
         r.setPrix_total(rs.getDouble("prix_total"));
         r.setCommentaire_client(rs.getString("commentaire_client"));
         r.setUser_id(rs.getLong("user_id"));
+        try { r.setType_res(rs.getString("type_res")); } catch (Exception e) {}
         return r;
     }
 
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
-        String sql = "SELECT r.*, u.nom FROM reservation r LEFT JOIN user u ON r.user_id = u.id";
+        // Note: l'alias 'utilisateur' correspond à ton erreur SQL précédente
+        String sql = "SELECT r.*, u.nom FROM reservation r LEFT JOIN utilisateur u ON r.user_id = u.id";
 
         try (Connection conn = MyDBConnexion.getInstance().getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                Reservation r = new Reservation();
-                r.setId(rs.getLong("id"));
-                r.setPrix_total(rs.getDouble("prix_total"));
-                try { r.setType_res(rs.getString("type_res")); } catch(Exception e) {}
-                r.setCommentaire_client(rs.getString("nom") != null ? rs.getString("nom") : "Inconnu");
-                r.setUser_id(rs.getLong("user_id"));
-                Date d = rs.getDate("date_debut");
-                if (d != null) r.setDate_debut(d.toLocalDate());
-                String stStr = rs.getString("statut");
-                if (stStr != null) r.setStatut(StatutReservation.valueOf(stStr.toUpperCase()));
+                Reservation r = mapResultSetToReservation(rs);
+                // On utilise le nom de l'utilisateur s'il existe pour le commentaire (Utile pour Admin)
+                if (rs.getString("nom") != null) {
+                    r.setCommentaire_client(rs.getString("nom"));
+                }
                 reservations.add(r);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ SQL Error in getAllReservations: " + e.getMessage());
         }
         return reservations;
     }

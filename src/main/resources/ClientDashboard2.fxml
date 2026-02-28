@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<StackPane fx:id="rootPane" prefHeight="800.0" prefWidth="1250.0" style="-fx-background-color: #1a1f2b;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientDashboardController2">
+
+    <BorderPane>
+        <left>
+            <VBox prefWidth="280.0" spacing="10" style="-fx-background-color: #242b3d; -fx-background-radius: 0 40 40 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 0);">
+                <padding><Insets bottom="30" left="25" right="25" top="40" /></padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <StackPane>
+                        <Circle fill="#00d2ff" radius="15.0" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="G" textFill="WHITE" />
+                    </StackPane>
+                    <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" text="GoVacate" />
+                </HBox>
+
+                <Separator opacity="0.1">
+                    <VBox.margin><Insets bottom="20" top="10" /></VBox.margin>
+                </Separator>
+
+                <VBox spacing="12" VBox.vgrow="ALWAYS">
+                    <Button alignment="BASELINE_LEFT" onAction="#showExplorer" prefHeight="55.0" prefWidth="230.0" styleClass="sidebar-btn" text="🚀  Explorer les Packs" />
+                    <Button alignment="BASELINE_LEFT" onAction="#showExcursions" prefHeight="55.0" prefWidth="230.0" styleClass="sidebar-btn" text="🏞️  Les Excursions" />
+                    <Button alignment="BASELINE_LEFT" onAction="#showReservations" prefHeight="55.0" prefWidth="230.0" styleClass="sidebar-btn" text="📅  Mes Réservations" />
+                    <Button alignment="BASELINE_LEFT" onAction="#showFactures" prefHeight="55.0" prefWidth="230.0" styleClass="sidebar-btn" text="📄  Mes Factures" />
+
+                    <Button alignment="BASELINE_LEFT" onAction="#showChat" prefHeight="55.0" prefWidth="230.0" styleClass="sidebar-btn" text="🎧  Support Technique" />
+                </VBox>
+
+                <Button onAction="#handleLogout" prefHeight="50.0" prefWidth="230.0" styleClass="logout-btn" text="Déconnexion" />
+            </VBox>
+        </left>
+
+        <center>
+            <StackPane>
+                <padding><Insets bottom="25" left="30" right="30" top="25" /></padding>
+
+                <ScrollPane fx:id="explorerView" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <VBox spacing="40">
+                        <padding><Insets bottom="40" left="10" right="10" top="20" /></padding>
+                        <VBox spacing="8">
+                            <Label style="-fx-text-fill: #00d2ff; -fx-font-weight: bold; -fx-letter-spacing: 2;" text="DESTINATIONS DE RÊVE" />
+                            <Label style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: 900;" text="Nos Meilleurs Packs" />
+                        </VBox>
+                        <FlowPane fx:id="packsContainer" hgap="30" prefWrapLength="900.0" vgap="30" />
+                    </VBox>
+                </ScrollPane>
+
+                <VBox fx:id="contentArea" spacing="20" visible="false" />
+            </StackPane>
+        </center>
+    </BorderPane>
+</StackPane>

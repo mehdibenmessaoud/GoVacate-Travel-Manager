@@ -15,7 +15,6 @@ import tn.esprit.projet.entities.Reservation;
 import tn.esprit.projet.entities.ReservationExcursion;
 import tn.esprit.projet.entities.StatutReservation;
 import tn.esprit.projet.services.ReservationExcursionServiceImpl;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import javafx.scene.layout.VBox;
@@ -29,22 +28,24 @@ public class ExcursionBookingController {
     @FXML private Button btnValider;
     @FXML private Button btnAnnuler;
 
-    // Persist theme state
+    private Excursion selectedExcursion;
     private static boolean isDarkMode = true;
-
     private final ReservationExcursionServiceImpl service = new ReservationExcursionServiceImpl();
     private Reservation reservationModif = null;
 
+    public void setExcursionData(Excursion exc) {
+        this.selectedExcursion = exc;
+        if (exc != null) {
+            txtPrixUnitaire.setText(String.valueOf(exc.getPrice()));
+        }
+    }
+
     @FXML
     public void initialize() {
-        // Fix: Apply theme immediately to prevent white screen
         Platform.runLater(() -> {
-            if (btnValider.getScene() != null) {
-                applyTheme(btnValider.getScene());
-            }
+            if (btnValider.getScene() != null) applyTheme(btnValider.getScene());
         });
 
-        // --- KEPT: Your Original Logic ---
         ObservableList<String> hours = FXCollections.observableArrayList();
         for (int h = 8; h <= 19; h++) {
             hours.add(String.format("%02d:00", h));
@@ -57,79 +58,50 @@ public class ExcursionBookingController {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 setDisable(empty || date.isBefore(LocalDate.now()));
-                if (date.isBefore(LocalDate.now())) {
-                    setStyle("-fx-background-color: #2a2a2a; -fx-text-fill: #555555;");
-                }
             }
         });
-
-        try {
-            Excursion exc = service.findExcursionById(1);
-            if (exc != null) {
-                txtPrixUnitaire.setText(String.valueOf(exc.getPrice()));
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur chargement prix: " + e.getMessage());
-        }
     }
 
-    // --- ADDED: Theme Toggle Logic ---
+    // 🔥 Added: To fix the FXML LoadException
     @FXML
     void toggleTheme(ActionEvent event) {
         isDarkMode = !isDarkMode;
         applyTheme(((Node) event.getSource()).getScene());
     }
 
-    private void applyTheme(Scene scene) {
-        scene.getStylesheets().clear();
-        scene.getStylesheets().add(getClass().getResource("/css/booking_style.css").toExternalForm());
-        if (!isDarkMode) {
-            scene.getStylesheets().add(getClass().getResource("/css/light-mode.css").toExternalForm());
-        }
-    }
-
-    // --- KEPT: Your Original Methods ---
-
-    public void initModif(Reservation res) {
-        this.reservationModif = res;
-        if (btnAnnuler != null) {
-            btnAnnuler.setVisible(true);
-            btnAnnuler.setManaged(true);
-        }
-        if (res.getDate_debut() != null) {
-            dateExc.setValue(res.getDate_debut());
-        }
-        int nb = res.getNombre_personnes();
-        try {
-            ReservationExcursion re = service.findByReservationId(res.getId());
-            if (re != null) {
-                if (nb <= 0) nb = re.getNombre_personnes();
-                comboHeure.setValue(re.getHeure_souhaitee());
-                if (nb > 0) {
-                    txtPrixUnitaire.setText(String.format("%.2f", re.getPrix() / nb));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        txtPersonnes.setText(String.valueOf(nb));
-        if (btnValider != null) btnValider.setText("METTRE À JOUR");
+    // 🔥 Added: To fix the FXML handleBack reference
+    @FXML
+    void handleBack(ActionEvent event) {
+        redirectToMesReservations(event);
     }
 
     @FXML
     void handleReserverExcursion(ActionEvent event) {
         try {
-            Excursion exc = service.findExcursionById(1);
-            String heure = comboHeure.getValue();
+            if (selectedExcursion == null) {
+                showAlert("Erreur", "Aucune excursion sélectionnée.");
+                return;
+            }
 
+            // 🔥 FIX: Jib el ID mel SessionManager bech ma yetplontach el SQL
+            long currentUserId;
+            if (tn.esprit.projet.utils.SessionManager.isLoggedIn()) {
+                currentUserId = (long) tn.esprit.projet.utils.SessionManager.getCurrentUserId();
+            } else {
+                // Ken mafammach session (test), khaliha 6 khaterha mawjouda f-el base mte3ek
+                currentUserId = 6L;
+                System.out.println("⚠️ Session vide, utilisation de l'ID par défaut: 6L");
+            }
+
+            String heure = comboHeure.getValue();
             if (dateExc.getValue() == null || txtPersonnes.getText().isEmpty() || heure == null) {
-                showAlert("Champs manquants", "Veuillez remplir la date, l'heure et le nombre de personnes.");
+                showAlert("Champs manquants", "Veuillez remplir tous les champs.");
                 return;
             }
 
             int nb = Integer.parseInt(txtPersonnes.getText());
             LocalDate date = dateExc.getValue();
-            double total = nb * exc.getPrice();
+            double total = nb * selectedExcursion.getPrice();
 
             Reservation res = (reservationModif != null) ? reservationModif : new Reservation();
             res.setType_res("EXCURSION");
@@ -137,10 +109,10 @@ public class ExcursionBookingController {
             res.setDate_debut(date);
             res.setPrix_total(total);
             res.setNombre_personnes(nb);
-            res.setUser_id(1L);
+            res.setUser_id(currentUserId); // 🔥 ID Dynamique tawa
 
             ReservationExcursion re = new ReservationExcursion();
-            re.setExcursion_id((long) exc.getId());
+            re.setExcursion_id((long) selectedExcursion.getId());
             re.setDate_excursion(date);
             re.setHeure_souhaitee(heure);
             re.setNombre_personnes(nb);
@@ -150,39 +122,43 @@ public class ExcursionBookingController {
                 service.createFullExcursion(res, re);
                 showAlert("Succès", "Réservation enregistrée !");
             } else {
-                re.setId(reservationModif.getId());
+                // Cas de modification
+                re.setReservation_id(reservationModif.getId());
                 service.updateFullExcursion(res, re);
                 showAlert("Succès", "Mise à jour réussie !");
             }
+
             redirectToMesReservations(event);
+
         } catch (NumberFormatException e) {
             showAlert("Erreur", "Le nombre de personnes doit être un chiffre.");
         } catch (Exception e) {
             e.printStackTrace();
+            showAlert("Erreur SQL", "Vérifiez la connexion ou l'ID utilisateur.");
         }
-    }
-
-    @FXML
-    void handleBack(ActionEvent event) {
-        redirectToMesReservations(event);
     }
 
     private void redirectToMesReservations(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
             Scene scene = ((Node) event.getSource()).getScene();
-            applyTheme(scene); // Maintain theme
-
-            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
+            // Try to find contentArea in the Dashboard
+            VBox contentArea = (VBox) scene.lookup("#contentArea");
             if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(root);
+                contentArea.getChildren().setAll(root);
             } else {
-                Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
-                scene.setRoot(dashboard);
+                scene.setRoot(root);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace(); }
+    }
+
+    private void applyTheme(Scene scene) {
+        if (scene.getStylesheets() == null) return;
+        scene.getStylesheets().clear();
+        String style = getClass().getResource("/css/booking_style.css").toExternalForm();
+        scene.getStylesheets().add(style);
+        if (!isDarkMode) {
+            scene.getStylesheets().add(getClass().getResource("/css/light-mode.css").toExternalForm());
         }
     }
 

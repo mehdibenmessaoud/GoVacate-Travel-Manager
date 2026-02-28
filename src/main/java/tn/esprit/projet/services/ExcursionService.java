@@ -42,6 +42,12 @@ public class ExcursionService implements IService<Excursion> {
     @Override
     public List<Excursion> getAll() throws SQLException {
         List<Excursion> excursions = new ArrayList<>();
+
+        // 🔥 Correction pour éviter le "Connection Closed"
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = MyDBConnexion.getInstance().getConnection();
+        }
+
         String query = "SELECT e.*, d.ville AS destination_name FROM Excursion e JOIN Destination d ON e.locationId = d.id";
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
@@ -51,7 +57,6 @@ public class ExcursionService implements IService<Excursion> {
         }
         return excursions;
     }
-
     // --- LA MÉTHODE QUE J'AVAIS OUBLIÉE (Réintégrée et corrigée) ---
     public List<Excursion> getByLocation(int locationId) throws SQLException {
         List<Excursion> excursions = new ArrayList<>();

@@ -5,31 +5,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyDBConnexion {
-    private final String URL = "jdbc:mysql://localhost:3306/GoVacate2";
+    private final String URL = "jdbc:mysql://localhost:3306/GoVacate2"; // Thabbet mel esm mta el DB dima
     private final String USER = "root";
     private final String PASSWORD = "";
     private Connection connection;
     private static MyDBConnexion instance;
-    private boolean isConnected = false;
 
     private MyDBConnexion() {
-        try {
-            // Try to establish connection
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            isConnected = true;
-            System.out.println("✓ Connexion établie avec succès à GoVacate!");
-        } catch (ClassNotFoundException e) {
-            System.err.println("✗ Erreur: Driver MySQL non trouvé - " + e.getMessage());
-            isConnected = false;
-        } catch (SQLException e) {
-            System.err.println("✗ Erreur de connexion à la base de données: " + e.getMessage());
-            System.err.println("  Assurez-vous que MySQL est démarré et que la base 'GoVacate' existe");
-            isConnected = false;
-        } catch (Exception e) {
-            System.err.println("✗ Erreur d'initialisation: " + e.getMessage());
-            isConnected = false;
-        }
+        // Le constructeur peut rester vide ou appeler getConnection() une fois
     }
 
     public static MyDBConnexion getInstance() {
@@ -40,36 +23,30 @@ public class MyDBConnexion {
     }
 
     public Connection getConnection() {
+        try {
+            // 🔥 FIX: Ken el connection null walla tsakret (Closed), n-3awdou n-connectiw
+            if (connection == null || connection.isClosed()) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                System.out.println("✅ Connexion (re)établie avec succès !");
+            }
+        } catch (ClassNotFoundException e) {
+            System.err.println("✗ Driver MySQL introuvable: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("✗ Erreur SQL lors de la connexion: " + e.getMessage());
+        }
         return connection;
     }
 
-    public boolean isConnected() {
-        return isConnected && connection != null;
-    }
-
-    public String getConnectionStatus() {
-        if (isConnected) {
-            return "Connecté";
-        } else {
-            return "Déconnecté - Vérifiez la base de données";
-        }
-    }
-
-    public void testConnection() {
-        if (isConnected) {
-            try {
-                if (!connection.isClosed()) {
-                    System.out.println("✓ Test de connexion réussi");
-                } else {
-                    System.out.println("✗ Connexion fermée");
-                    isConnected = false;
-                }
-            } catch (SQLException e) {
-                System.err.println("✗ Test de connexion échoué: " + e.getMessage());
-                isConnected = false;
+    // Méthode de secours pour fermer proprement si besoin
+    public void closeConnection() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("🔌 Connexion fermée proprement.");
             }
-        } else {
-            System.out.println("✗ Pas de connexion active");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

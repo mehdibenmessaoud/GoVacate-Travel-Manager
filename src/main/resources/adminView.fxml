@@ -36,21 +36,24 @@
 
                 <VBox fx:id="menuContainer" layoutY="140.0" spacing="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                     <children>
-                        <Button fx:id="btnDashBoard" onAction="#handleShowDashboard" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Tableau de Bord"/>
+                        <Button fx:id="btnDashBoard" onAction="#handleShowDashboard" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🏠 Tableau de Bord"/>
 
+                        <Button onAction="#handleShowUsers" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="👥 Gestion Utilisateurs" />
 
-                        <Button onAction="#handleShowUsers" styleClass="liquid-btn" text="👥 Gestion Utilisateurs" maxWidth="Infinity" />
-                        <Button fx:id="btnPack" onAction="#handleShowPacks" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Packs"/>
+                        <Button fx:id="btnPack" onAction="#handleShowPacks" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📦 Gestion Packs"/>
 
+                        <Button fx:id="btnDestinations" onAction="#handleShowDestinations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📍 Gestion Destinations"/>
 
-                        <Button fx:id="btnDestinations" onAction="#handleShowDestinations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Destination"/>
+                        <Button fx:id="btnExcursion" onAction="#handleShowExcursions" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🏕️ Gestion Excursions"/>
 
-                        <Button fx:id="btnExcursion" onAction="#handleShowExcursions" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Gestion Excursion"/>
+                        <Button fx:id="btnReservations" onAction="#handleShowReservations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📅 Gestion Réservations"/>
+
+                        <Button fx:id="btnSupport" onAction="#handleShowSupport" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="💬 Support &amp; Chat"/>
 
                         <Pane prefHeight="50.0" mouseTransparent="true"/>
 
-                        <Button fx:id="btnParametres" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Paramètres"/>
-                        <Button fx:id="btnLogout" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="Déconnexion"/>
+                        <Button fx:id="btnParametres" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="⚙️ Paramètres"/>
+                        <Button fx:id="btnLogout" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🚪 Déconnexion"/>
                     </children>
                 </VBox>
             </AnchorPane>

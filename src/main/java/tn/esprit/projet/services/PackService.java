@@ -56,9 +56,15 @@ public class PackService implements IService<Pack> {
     @Override
     public List<Pack> getAll() throws SQLException {
         List<Pack> packs = new ArrayList<>();
-        // MODIFICATION : Ajout de la jointure pour récupérer la ville
+
+        // 🔥 FIX: Thabbet elli el connection labess 3liha 9bel el "createStatement"
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = MyDBConnexion.getInstance().getConnection();
+        }
+
         String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
                 "JOIN destination d ON p.destination_id = d.id";
+
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
@@ -67,7 +73,6 @@ public class PackService implements IService<Pack> {
         }
         return packs;
     }
-
     @Override
     public void update(Pack p) throws SQLException {
         String query = "UPDATE pack SET name=?, description=?, categorie=?, prix=?, duree=?, status=?, date_depart=?, date_arriver=?, imageName=?, destination_id=?, hotel_id=?, excursion_id=? WHERE id=?";
@@ -109,7 +114,11 @@ public class PackService implements IService<Pack> {
 
     @Override
     public Pack getById(int id) throws SQLException {
-        // MODIFICATION : Ajout de la jointure ici aussi
+        // 🔥 Refresh connection
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = MyDBConnexion.getInstance().getConnection();
+        }
+
         String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
                 "JOIN destination d ON p.destination_id = d.id WHERE p.id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {

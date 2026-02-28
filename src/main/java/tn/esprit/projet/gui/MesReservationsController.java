@@ -22,7 +22,7 @@ import javafx.util.Duration;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.scene.Node;
-
+import tn.esprit.projet.utils.SessionManager;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.*;
 
@@ -72,11 +72,20 @@ public class MesReservationsController {
     }
 
     private void setupColumns() {
-        colType.setCellValueFactory(new PropertyValueFactory<>("type_res"));
-        colPrix.setCellValueFactory(new PropertyValueFactory<>("prix_total"));
-        colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("date_debut"));
+        // 🔥 FIX: Mapping direct avec les Getters de l'Entity Reservation
+        colType.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getType_res()));
 
+        colPrix.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getPrix_total()));
+
+        colStatut.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getStatut()));
+
+        colDate.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getDate_debut()));
+
+        // El riga mta el Color Status (Badge)
         colStatut.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Object item, boolean empty) {
@@ -96,6 +105,7 @@ public class MesReservationsController {
             }
         });
 
+        // El riga mta el Date Color
         colDate.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDate date, boolean empty) {
@@ -154,8 +164,17 @@ public class MesReservationsController {
     }
 
     private void switchToPaymentView(String url, String sessionId, Reservation res) {
-        VBox contentArea = (VBox) tableMesReservations.getScene().lookup("#clientReservationView");
-        if (contentArea == null) return;
+        // 🔥 FIX: On cherche d'abord #contentArea (Dashboard 2) sinon on check l'ancien ID
+        VBox contentArea = (VBox) tableMesReservations.getScene().lookup("#contentArea");
+
+        if (contentArea == null) {
+            contentArea = (VBox) tableMesReservations.getScene().lookup("#clientReservationView");
+        }
+
+        if (contentArea == null) {
+            System.err.println("❌ Erreur: Aucun container (contentArea ou clientReservationView) trouvé !");
+            return;
+        }
 
         originalUIElements.clear();
         originalUIElements.addAll(contentArea.getChildren());
@@ -164,18 +183,22 @@ public class MesReservationsController {
         WebEngine engine = webView.getEngine();
         webView.setPrefHeight(750);
 
+        // Style mta el bouton mte3ek kima kén
         Button btnCancel = new Button("← Annuler et revenir");
         btnCancel.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-weight: bold;");
-        btnCancel.setOnAction(e -> restoreOriginalView(contentArea));
+
+        // On utilise une variable finale pour le lambda
+        final VBox finalContainer = contentArea;
+        btnCancel.setOnAction(e -> restoreOriginalView(finalContainer));
 
         engine.locationProperty().addListener((obs, oldUrl, newUrl) -> {
             if (newUrl.contains("/success")) {
                 Platform.runLater(() -> {
-                    restoreOriginalView(contentArea);
+                    restoreOriginalView(finalContainer);
                     verifierStatusStripe(sessionId, res);
                 });
             } else if (newUrl.contains("/cancel")) {
-                Platform.runLater(() -> restoreOriginalView(contentArea));
+                Platform.runLater(() -> restoreOriginalView(finalContainer));
             }
         });
 
@@ -281,10 +304,32 @@ public class MesReservationsController {
     }
 
     private void chargerDonnees() {
-        new Thread(() -> {
-            List<Reservation> list = service.getAllReservations();
-            Platform.runLater(() -> { if (list != null) masterData.setAll(list); });
-        }).start();
+        // 1. Verifi ennou el user m-logui
+        if (SessionManager.isLoggedIn()) {
+            int currentUserId = SessionManager.getCurrentUserId();
+            System.out.println("🔄 Chargement des réservations pour l'ID: " + currentUserId);
+
+            // 2. Travailler en background thread pour ne pas bloquer l'UI
+            new Thread(() -> {
+                try {
+                    // 🔥 FIX: Utiliser la méthode filtrée par UserID
+                    List<Reservation> list = service.getReservationsByUserId(currentUserId);
+
+                    Platform.runLater(() -> {
+                        if (list != null) {
+                            masterData.setAll(list);
+                            tableMesReservations.refresh();
+                            System.out.println("✅ " + list.size() + " réservations trouvées.");
+                        }
+                    });
+                } catch (Exception e) {
+                    System.err.println("❌ Erreur lors du chargement: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }).start();
+        } else {
+            System.err.println("❌ SessionManager: Aucun utilisateur connecté !");
+        }
     }
 
     private void setupTicketColumn() {
@@ -330,11 +375,14 @@ public class MesReservationsController {
             String fxml = res.getType_res().equalsIgnoreCase("RESTAURANT") ? "/RestaurantBookingView.fxml" : "/ExcursionBooking.fxml";
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             Parent root = loader.load();
-            VBox contentArea = (VBox) tableMesReservations.getScene().lookup("#clientReservationView");
+
+            // 🔥 FIX hné zeda: #contentArea
+            VBox contentArea = (VBox) tableMesReservations.getScene().lookup("#contentArea");
+            if (contentArea == null) contentArea = (VBox) tableMesReservations.getScene().lookup("#clientReservationView");
+
             if (contentArea != null) contentArea.getChildren().setAll(root);
         } catch (Exception e) { e.printStackTrace(); }
     }
-
     private void confirmerAnnulation(Reservation res) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez-vous vraiment supprimer cette réservation ?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(response -> {

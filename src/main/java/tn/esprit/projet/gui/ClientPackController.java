@@ -16,24 +16,9 @@ import tn.esprit.projet.services.PackService;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import java.io.IOException;
-
 import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.Parent;
-import javafx.fxml.FXMLLoader;
-import java.io.IOException;
-
-
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import tn.esprit.projet.utils.SceneManager;
 import tn.esprit.projet.utils.SessionManager;
-
-import java.io.IOException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,42 +28,27 @@ import java.util.stream.Collectors;
 
 public class ClientPackController implements Initializable {
 
-    @FXML private StackPane rootPane; // Le StackPane racine défini dans le FXML
+    @FXML private StackPane rootPane;
     @FXML private FlowPane packsContainer;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categoryFilter;
-    @FXML private ScrollPane mainContentArea; // Ajoute cette ligne
-
-    @FXML private Button btnExplorer; // Bouton "Explorer les Packs"
-    @FXML private Button btnExplorerDest; // Bouton "Explorer les Destinations"
-
+    @FXML private ScrollPane mainContentArea;
+    @FXML private Button btnExplorer, btnExplorerDest;
     @FXML private VBox packContainer;
-
     @FXML private Pane monPane;
 
     private final PackService sp = new PackService();
     private List<Pack> allPacks;
 
     @Override
-
     public void initialize(URL location, ResourceBundle resources) {
-        // 1. Initialisation des filtres
         SceneManager.setClientContentPane(rootPane);
         categoryFilter.setItems(FXCollections.observableArrayList("Toutes", "Individual", "Couple", "Familialle"));
         categoryFilter.setValue("Toutes");
 
-        // 2. RENDRE LA RECHERCHE DYNAMIQUE
-        // On ajoute un listener sur le champ de texte
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            handleSearch(); // Se déclenche à chaque lettre tapée
-        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> handleSearch());
+        categoryFilter.valueProperty().addListener((observable, oldValue, newValue) -> handleSearch());
 
-        // On ajoute aussi un listener sur la ComboBox pour que le filtre soit instantané
-        categoryFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
-            handleSearch();
-        });
-
-        // 3. Chargement initial
         loadPacks();
     }
 
@@ -104,7 +74,6 @@ public class ClientPackController implements Initializable {
         card.setPrefWidth(280);
         card.setSpacing(0);
 
-        // --- Header Image ---
         StackPane imageHeader = new StackPane();
         imageHeader.getStyleClass().add("card-image-header");
 
@@ -123,15 +92,12 @@ public class ClientPackController implements Initializable {
         imageView.setFitHeight(160);
         imageView.setPreserveRatio(false);
 
-        // Arrondir les coins supérieurs de l'image
         Rectangle clip = new Rectangle(280, 160);
         clip.setArcWidth(40);
         clip.setArcHeight(40);
         imageView.setClip(clip);
-
         imageHeader.getChildren().add(imageView);
 
-        // --- Contenu des infos ---
         VBox content = new VBox(10);
         content.getStyleClass().add("glass-card");
         content.setPadding(new javafx.geometry.Insets(15));
@@ -145,11 +111,9 @@ public class ClientPackController implements Initializable {
         Label price = new Label(p.getPrix() + " DT");
         price.setStyle("-fx-text-fill: #FF8210; -fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // --- Ligne d'actions ---
         HBox actionBox = new HBox(10);
         actionBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Badge de Statut (Vert ou Rouge)
         Label statusBadge = new Label();
         statusBadge.getStyleClass().add("status-badge");
         String currentStatus = p.getStatus() != null ? p.getStatus().toLowerCase() : "";
@@ -164,219 +128,125 @@ public class ClientPackController implements Initializable {
 
         Button btnDetails = new Button("Détails");
         btnDetails.getStyleClass().add("btn-details-small");
-
-        // ACTION : Afficher les détails sans changer de fenêtre
         btnDetails.setOnAction(event -> showPackDetails(p));
 
         Button btnBook = new Button("Réserver");
         btnBook.getStyleClass().add("btn-reserve-small");
-        if (!currentStatus.equals("disponible")) btnBook.setDisable(true);
+
+        if (!currentStatus.equals("disponible")) {
+            btnBook.setDisable(true);
+        } else {
+            btnBook.setOnAction(event -> handleBookPack(p));
+        }
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         actionBox.getChildren().addAll(statusBadge, spacer, btnDetails, btnBook);
-
         content.getChildren().addAll(category, name, price, actionBox);
         card.getChildren().addAll(imageHeader, content);
 
         return card;
     }
 
-    /**
-     * Change le contenu central pour afficher les détails du pack
-     */
-    private void showPackDetails(Pack p) {
+    // --- FIX: Location is not set solved here ---
+    private void handleBookPack(Pack selectedPack) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PackDetails.fxml"));
-            Parent detailsView = loader.load();
+            // Utilise le path complet depuis les ressources
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reservationpackform.fxml"));
+            Parent bookingView = loader.load();
 
-            PackDetailsController controller = loader.getController();
-            controller.setPackData(p);
+            PackBookingController controller = loader.getController();
+            controller.setPackDataFromEntity(selectedPack);
 
-            // Au lieu de chercher le BorderPane, on remplace directement
-            // le contenu du ScrollPane ou du centre du BorderPane
-            BorderPane bp = (BorderPane) rootPane.getChildren().get(1);
-            bp.setCenter(detailsView);
-
+            BorderPane mainLayout = (BorderPane) rootPane.getScene().lookup("#mainLayout");
+            if (mainLayout != null) {
+                mainLayout.setCenter(bookingView);
+            } else {
+                rootPane.getChildren().setAll(bookingView);
+            }
         } catch (IOException e) {
+            System.err.println("❌ Erreur: Fichier reservationpackform.fxml introuvable. Thabbet fel path!");
             e.printStackTrace();
         }
     }
 
-    /*@FXML
-    private void handleSearch() {
-        String query = searchField.getText().toLowerCase();
-        String cat = categoryFilter.getValue();
+    private void showPackDetails(Pack p) {
+        try {
+            // FIX: Toujours ajouter / devant le nom si le fichier est à la racine des ressources
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PackDetails.fxml"));
+            Parent detailsView = loader.load();
+            PackDetailsController controller = loader.getController();
+            controller.setPackData(p);
 
-        List<Pack> filtered = allPacks.stream().filter(p -> {
-            boolean matchesSearch = p.getName().toLowerCase().contains(query) ||
-                    p.getDescription().toLowerCase().contains(query);
-            boolean matchesCat = (cat == null || cat.equals("Toutes") || p.getCategorie().equals(cat));
-            return matchesSearch && matchesCat;
-        }).collect(Collectors.toList());
+            BorderPane mainLayout = (BorderPane) rootPane.getScene().lookup("#mainLayout");
+            if (mainLayout != null) {
+                mainLayout.setCenter(detailsView);
+            }
+        } catch (IOException e) {
+            System.err.println("❌ Erreur: Fichier PackDetails.fxml introuvable.");
+            e.printStackTrace();
+        }
+    }
 
-        displayPacks(filtered);
-    }*/
     @FXML
     private void handleSearch() {
-        // On récupère le texte, même s'il est vide
         String query = (searchField.getText() == null) ? "" : searchField.getText().toLowerCase().trim();
         String cat = categoryFilter.getValue();
-
         if (allPacks == null) return;
 
         List<Pack> filtered = allPacks.stream().filter(p -> {
             boolean matchesSearch = p.getName().toLowerCase().contains(query) ||
                     p.getDescription().toLowerCase().contains(query);
-
             boolean matchesCat = (cat == null || cat.equals("Toutes") || p.getCategorie().equalsIgnoreCase(cat));
-
             return matchesSearch && matchesCat;
         }).collect(Collectors.toList());
 
         displayPacks(filtered);
     }
 
-    /*@FXML
-    private void handleShowPacks() {
-        try {
-            // ... (votre code de chargement actuel)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ClientPackView.fxml"));
-            Parent packView = loader.load();
-            BorderPane loadedBp = (BorderPane) ((StackPane) packView).getChildren().get(1);
-
-            ((BorderPane) rootPane.getChildren().get(1)).setCenter(loadedBp.getCenter());
-            loadPacks();
-
-            // --- GESTION DU STYLE ---
-            btnExplorer.getStyleClass().add("liquid-btn-active"); // On allume Packs
-            btnExplorerDest.getStyleClass().remove("liquid-btn-active"); // On éteint Destinations
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     @FXML
     private void handleShowPacks(ActionEvent event) {
-        try {
-            // On charge UNIQUEMENT le contenu central
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PacksContent.fxml"));
-            Parent view = loader.load();
-
-            // On accède au mainLayout défini dans adminView.fxml
-            // Note: scene.lookup("#mainLayout") fonctionne si l'ID est bien présent
-            BorderPane mainLayout = (BorderPane) rootPane.getScene().lookup("#mainLayout");
-
-            if (mainLayout != null) {
-                mainLayout.setCenter(view);
-            }
-        } catch (IOException e) {
-            System.err.println("Erreur de navigation : " + e.getMessage());
-            e.printStackTrace();
-        }
+        SceneManager.loadClientContent("/PacksContent.fxml");
     }
 
     @FXML
     private void handleShowDestinations() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ClientDestinationView.fxml"));
-            Parent destinationView = loader.load();
-
-            // Ici rootPane existe car on est dans le contrôleur principal
-            BorderPane bp = (BorderPane) rootPane.getChildren().get(1);
-            bp.setCenter(destinationView);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    @FXML
-    private void handleDetails(Pack selectedPack) {
-        try {
-            // 1. Charger le fichier FXML des détails [cite: 20]
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/projet/gui/PackDetails.fxml"));
-            Parent detailsView = loader.load();
-
-            // 2. Récupérer le contrôleur de la vue de détails
-            PackDetailsController controller = loader.getController();
-
-            // 3. Passer les données du pack au nouveau contrôleur
-            controller.setPackData(selectedPack);
-
-            // 4. Accéder au BorderPane principal pour changer le centre
-            // On remonte l'arborescence à partir d'un élément existant (ex: packContainer)
-            StackPane root = (StackPane) packContainer.getScene().getRoot();
-            BorderPane mainLayout = (BorderPane) root.lookup("#mainLayout"); // Utilise l'ID défini dans adminView
-
-            if (mainLayout != null) {
-                mainLayout.setCenter(detailsView);
-            }
-
-        } catch (IOException e) {
-            System.err.println("Erreur lors du chargement des détails : " + e.getMessage());
-            e.printStackTrace();
-        }
+        SceneManager.loadClientContent("/ClientDestinationView.fxml");
     }
 
     @FXML
     private void openAIChat() {
         try {
-            // Chargement du FXML du Chat
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatAI.fxml"));
             Parent root = loader.load();
-
-            // Création d'une nouvelle fenêtre (Stage)
             Stage chatStage = new Stage();
-            chatStage.setTitle("Assistant Intelligent GoVacate");
-
-            // On rend la fenêtre non redimensionnable pour garder le design propre
-            chatStage.setResizable(false);
-
-            // On peut la rendre "toujours au dessus" pour que le client puisse lire et naviguer
-            chatStage.setAlwaysOnTop(true);
-
+            chatStage.setTitle("Assistant GoVacate");
             chatStage.setScene(new Scene(root));
             chatStage.show();
-
         } catch (IOException e) {
-            System.err.println("Erreur lors de l'ouverture du chat IA : " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void handleProfileClick() {
-        // On utilise la méthode de chargement dynamique de ton SceneManager
-        SceneManager.loadClientContent("/Profile.fxml");
-    }
-
-
-    @FXML
-    private void handleLogout() {
-        // 1. On vide les données de l'utilisateur
-        SessionManager.clearSession();
-
-        // 2. On redirige vers la page de login
-        SceneManager.switchTo("/Auth.fxml");
-
-        System.out.println("Déconnexion réussie.");
-    }
-
-    @FXML
-    private void handleDashboard(ActionEvent event) {
+    private void handleShowMesReservations() {
         try {
-            // On utilise SceneManager pour charger le contenu du Dashboard
-            // dans la zone centrale de votre application
-            SceneManager.loadClientContent("/ClientDashboard.fxml");
+            // FIX: Si le fichier est dans le package gui
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Mes Réservations.fxml"));
+            Parent view = loader.load();
 
-            System.out.println("Affichage du Dashboard client...");
-        } catch (Exception e) {
-            System.err.println("Erreur lors du chargement du Dashboard : " + e.getMessage());
+            BorderPane mainLayout = (BorderPane) rootPane.getScene().lookup("#mainLayout");
+            if (mainLayout != null) {
+                mainLayout.setCenter(view);
+            }
+        } catch (IOException e) {
+            System.err.println("❌ Erreur chargement MesReservations: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-
+    @FXML private void handleProfileClick() { SceneManager.loadClientContent("/Profile.fxml"); }
+    @FXML private void handleLogout() { SessionManager.clearSession(); SceneManager.switchTo("/Auth.fxml"); }
+    @FXML private void handleDashboard(ActionEvent event) { SceneManager.loadClientContent("/ClientDashboard.fxml"); }
 }

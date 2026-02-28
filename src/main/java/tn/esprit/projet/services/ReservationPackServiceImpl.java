@@ -119,8 +119,9 @@ public class ReservationPackServiceImpl implements IService<ReservationPack> {
         String sqlRes = "INSERT INTO reservation (prix_total, statut, type_res, date_debut, date_fin, nombre_personnes, commentaire_client, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlPack = "INSERT INTO reservation_pack (reservation_id, pack_id, prix_pack) VALUES (?, ?, ?)";
 
-        try (Connection conn = getConnection()) {
-            conn.setAutoCommit(false);
+        try (Connection conn = MyDBConnexion.getInstance().getConnection()) {
+            conn.setAutoCommit(false); // Mode Transaction pour sécurité
+
             try (PreparedStatement ps1 = conn.prepareStatement(sqlRes, Statement.RETURN_GENERATED_KEYS)) {
                 ps1.setDouble(1, res.getPrix_total());
                 ps1.setString(2, res.getStatut().name());
@@ -143,10 +144,10 @@ public class ReservationPackServiceImpl implements IService<ReservationPack> {
                         }
                     }
                 }
-                conn.commit();
-                System.out.println("✅ Réservation 'Full Pack' réussie !");
+                conn.commit(); // Valider
+                System.out.println("✅ Réservation 'Full Pack' insérée en DB !");
             } catch (SQLException e) {
-                conn.rollback();
+                conn.rollback(); // Annuler si erreur
                 throw e;
             }
         } catch (SQLException e) {

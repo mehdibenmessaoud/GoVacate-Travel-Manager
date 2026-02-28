@@ -495,3 +495,87 @@
     -fx-background-color: rgba(255, 130, 16, 0.1); /* Orange glow léger */
     -fx-border-color: transparent transparent #FF8210 transparent;
 }
+/* Sidebar Buttons */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b949e;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: rgba(0, 210, 255, 0.1);
+    -fx-text-fill: #00d2ff;
+}
+
+/* Logout Button Style */
+.logout-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff4b5c;
+    -fx-border-color: rgba(255, 75, 92, 0.4);
+    -fx-border-radius: 12;
+    -fx-font-weight: bold;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #ff4b5c;
+    -fx-text-fill: white;
+}
+/* Background General */
+.root {
+    -fx-background-color: #1a1f2b;
+}
+
+/* Sidebar Buttons */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #a0a6b5; /* Gris clair */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-padding: 0 0 0 20;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #31394d;
+    -fx-text-fill: #00d2ff;
+}
+
+/* El button elli m-cliqui 3lih (Active) */
+.sidebar-btn:focused {
+    -fx-background-color: #00d2ff;
+    -fx-text-fill: white;
+}
+
+/* Logout Button */
+.logout-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff6b6b;
+    -fx-border-color: rgba(255, 107, 107, 0.3);
+    -fx-border-radius: 12;
+    -fx-font-weight: bold;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #ff6b6b;
+    -fx-text-fill: white;
+}
+/* Nna7iw el blasa el bidha fel akher */
+.table-view .column-header-background .filler {
+    -fx-background-color: transparent;
+}
+
+/* Nna7iw el borders el zaydin elli ya3mlou el blasa l-bidha */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Nna7iw el horizontal scrollbar ken ma3and'hech lzoum */
+.table-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-padding: -10;
+}

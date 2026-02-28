@@ -1,5 +1,5 @@
 package tn.esprit.projet.gui;
-
+import tn.esprit.projet.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +17,7 @@ import tn.esprit.projet.services.ReservationPackServiceImpl;
 import java.io.IOException;
 import java.time.LocalDate;
 import javafx.scene.layout.VBox;
-
+import tn.esprit.projet.utils.SceneManager;
 public class PackBookingController {
 
     @FXML private Label lblPackName, lblDateDepart, lblDateArrivee, lblPrix, lblCategorie;
@@ -81,6 +81,12 @@ public class PackBookingController {
     @FXML
     void handleReserve(ActionEvent event) {
         try {
+            // 1. Verifi ennou el user m-logui
+            if (!SessionManager.isLoggedIn()) {
+                new Alert(Alert.AlertType.ERROR, "Erreur: Vous devez être connecté !").show();
+                return;
+            }
+
             Reservation res = new Reservation();
             res.setType_res("PACK");
             res.setStatut(StatutReservation.EN_ATTENTE);
@@ -89,7 +95,9 @@ public class PackBookingController {
             res.setPrix_total(packPrix);
             res.setNombre_personnes(1);
             res.setCommentaire_client("Pack: " + packName);
-            res.setUser_id(1L);
+
+            // 🔥 FIX DYNAMIQUE: Nakhou el ID melli m-logui tawa
+            res.setUser_id((long) SessionManager.getCurrentUserId());
 
             ReservationPack rp = new ReservationPack();
             rp.setPack_id((long) selectedPackId);
@@ -98,31 +106,41 @@ public class PackBookingController {
             service.createFullPack(res, rp);
             new Alert(Alert.AlertType.INFORMATION, "Réservation effectuée avec succès !").showAndWait();
             redirectToMesReservations(event);
+
         } catch (Exception e) {
             e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Erreur SQL: Vérifiez que votre ID existe en base!").show();
         }
     }
-
     private void redirectToMesReservations(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/Mes Réservations.fxml"));
+            // 1. Nakhou el Scene el 7alia
             Scene scene = ((Node) event.getSource()).getScene();
 
-            applyTheme(scene); // Keep the theme consistent after redirect
+            // 2. Nlawjou 3al "contentArea" mta el ClientDashboard2
+            VBox contentArea = (VBox) scene.lookup("#contentArea");
 
-            VBox contentArea = (VBox) scene.lookup("#clientReservationView");
             if (contentArea != null) {
+                // ✅ Ken a7na déjà fi wast el Dashboard (Success case)
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Mes Réservations.fxml"));
+                Parent root = loader.load();
+
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(root);
+                contentArea.setVisible(true);
+
+                System.out.println("✅ Redirection vers Mes Réservations (Inline) réussie.");
             } else {
-                Parent dashboard = FXMLLoader.load(getClass().getResource("/ClientDashboard.fxml"));
-                scene.setRoot(dashboard);
+                // 🔄 Plan B: Ken el Scene mahich el Dashboard (ex: Popup walla scene okhra)
+                // N-badlou el Scene kemla lel Dashboard w houwa taw i-hezna lel Reservations
+                SceneManager.switchTo("/ClientDashboard2.fxml");
+                // Ba3d el switch, tnejjem t-3ayet l-SceneManager.loadClientContent("/Mes Réservation.fxml")
             }
         } catch (IOException e) {
+            System.err.println("❌ Erreur lors de la redirection: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
     @FXML
     void handleCancel(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
