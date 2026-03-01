@@ -378,15 +378,19 @@ public class UserService implements IService<User> {
     }
 
     public int countUsersByRole(String roleName) {
-        try {
-            String sql = "SELECT count(*) FROM utilisateur u JOIN role r ON u.role_id = r.id WHERE r.nom_role = ?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, roleName);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) return rs.getInt(1);
+        // Conversion du nom en ID numérique correspondant à votre DB
+        int targetId = roleName.equalsIgnoreCase("ADMIN") ? 1 : 2;
+
+        String sql = "SELECT count(*) FROM utilisateur WHERE role_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, targetId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         } catch (SQLException e) {
-            return countUsersByRoleId(roleName.equalsIgnoreCase("ADMIN") ? 1 : 2);
+            LOG.log(Level.WARNING, "Erreur lors du comptage pour le rôle: " + roleName, e);
         }
         return 0;
     }
