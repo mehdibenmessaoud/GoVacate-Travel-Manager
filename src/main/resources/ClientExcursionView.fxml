@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="700.0" prefWidth="900.0" spacing="25.0" styleClass="main-content" stylesheets="@css/client_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ClientExcursionController">
+    <padding>
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+    </padding>
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="25.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleBack" prefHeight="40.0" prefWidth="130.0" styleClass="btn-back" text="← Destinations" />
+                <VBox spacing="5.0">
+                    <children>
+                        <Label fx:id="titleLabel" styleClass="text-header-excursion" text="Excursions disponibles" />
+                        <Label fx:id="subtitleLabel" styleClass="text-sub-main" text="Découvrez les meilleures activités sélectionnées pour vous." />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+            <content>
+                <FlowPane fx:id="excursionContainer" hgap="25.0" prefWrapLength="820.0" styleClass="grid-container" vgap="25.0">
+                    <padding>
+                        <Insets bottom="20.0" left="5.0" right="5.0" top="10.0" />
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>

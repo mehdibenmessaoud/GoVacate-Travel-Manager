@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.Admin2Controller">
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="25.0">
+                <padding>
+                    <Insets bottom="50.0" left="50.0" right="50.0" top="40.0" />
+                </padding>
+
+                <VBox spacing="25.0">
+                    <HBox alignment="CENTER_LEFT" spacing="20.0">
+                        <VBox spacing="3.0">
+                            <Label styleClass="text-header" text="Gestion des Packs" />
+                            <Label styleClass="text-sub" text="Gérez vos offres de voyage et leurs détails" />
+                        </VBox>
+                    </HBox>
+
+                    <VBox alignment="CENTER" spacing="25.0" styleClass="glass-panel">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                        </padding>
+                        <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="15.0" styleClass="search-bar-liquid">
+                            <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                <Label styleClass="search-label" text="Rechercher un pack" />
+                                <TextField fx:id="searchField" onAction="#handleSearch" promptText="Nom ou catégorie..." styleClass="search-field" />
+                            </VBox>
+                            <Button onAction="#handleSearch" prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher" />
+                            <Button onAction="#onAddButtonClicked" prefHeight="50.0" prefWidth="180.0" styleClass="btn-orange-glow" text="+ Ajouter un Pack" />
+                        </HBox>
+                    </VBox>
+
+                    <VBox style="-fx-padding: 10;" styleClass="glass-card" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="packTable" minHeight="300.0" prefHeight="450.0" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="colNom" prefWidth="120.0" text="Nom Pack" />
+                                <TableColumn fx:id="colDesc" prefWidth="200.0" text="Description" />
+                                <TableColumn fx:id="colCategorie" prefWidth="100.0" text="Catégorie" />
+                                <TableColumn fx:id="colPrix" prefWidth="80.0" text="Prix (DT)" />
+                                <TableColumn fx:id="colStatut" prefWidth="100.0" text="Statut" />
+                                <TableColumn fx:id="colActions" prefWidth="280.0" text="Actions" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

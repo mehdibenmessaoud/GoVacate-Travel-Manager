@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="main-content" stylesheets="@css/admin.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ExcursionFormController">
+    <padding>
+        <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+    </padding>
+
+    <VBox maxWidth="800.0" spacing="15.0" styleClass="glass-card" >
+        <children>
+            <Text fx:id="formTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Détails de l'Excursion" />
+
+            <Separator opacity="0.2" prefWidth="200.0" />
+
+            <GridPane hgap="20.0" vgap="15.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                </columnConstraints>
+
+                <children>
+                    <Label text="Nom Excursion :" textFill="WHITE" GridPane.rowIndex="0" />
+                    <TextField fx:id="nameField" promptText="Ex: Safari Désert" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Activité :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <TextField fx:id="activiteField" promptText="Ex: Quad, Randonnée" styleClass="modern-textfield" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                    <Label text="Prix (DT) :" textFill="WHITE" GridPane.rowIndex="1" />
+                    <TextField fx:id="priceField" promptText="0.0" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Durée (Heures) :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <TextField fx:id="durationField" promptText="Ex: 4" styleClass="modern-textfield" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                    <Label text="Participants Max :" textFill="WHITE" GridPane.rowIndex="2" />
+                    <TextField fx:id="participantsField" promptText="Ex: 20" styleClass="modern-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Date Début :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="dateDebutPicker" styleClass="modern-datepicker" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                    <Label text="Date Fin :" textFill="WHITE" GridPane.rowIndex="3" />
+                    <DatePicker fx:id="dateFinPicker" styleClass="modern-datepicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label text="Description :" textFill="WHITE" GridPane.rowIndex="4" />
+                    <TextArea fx:id="descriptionArea" prefHeight="80.0" promptText="Décrivez l'activité..." styleClass="modern-textarea" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+
+                    <Label text="Destination :" textFill="WHITE" GridPane.rowIndex="5" />
+                    <ComboBox fx:id="destinationCombo" prefWidth="250.0" promptText="Sélectionnez..." styleClass="modern-combo" visibleRowCount="5" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                    <Label text="Statut :" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                    <ComboBox fx:id="statusCombo" prefWidth="250.0" styleClass="modern-combo" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+
+                    <Label text="Image :" textFill="WHITE" GridPane.rowIndex="6" />
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
+                        <children>
+                            <TextField fx:id="imagePathField" editable="false"
+                                       prefWidth="300.0" promptText="Aucune image"
+                                       styleClass="modern-textfield" HBox.hgrow="SOMETIMES" />
+
+                            <Button onAction="#handleUploadImage" minWidth="-Infinity"
+                                    styleClass="btn-orange-glow" text="Choisir une image" />
+                        </children>
+                    </HBox>
+                </children>
+            </GridPane>
+
+            <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 0 0 0;">
+                <children>
+                    <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: white; -fx-border-radius: 8;" text="Annuler" />
+                    <Button fx:id="btnEnregistrer" onAction="#handleSave" prefHeight="40.0" prefWidth="180.0" styleClass="btn-orange-glow" text="Enregistrer l'Excursion" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</VBox>

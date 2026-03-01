@@ -1,0 +1,215 @@
+package tn.esprit.projet.services;
+
+import tn.esprit.projet.entities.Pack;
+import tn.esprit.projet.utils.MyDBConnexion;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PackService implements IService<Pack> {
+    private Connection connection;
+
+    public PackService() {
+        this.connection = MyDBConnexion.getInstance().getConnection();
+        if (this.connection == null) {
+            System.err.println("❌ Erreur : Impossible d'établir la connexion SQL dans PackService.");
+        }
+    }
+
+    public PackService(Connection connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public void create(Pack p) throws SQLException {
+        String query = "INSERT INTO pack (name, description, categorie, prix, duree, status, date_depart, date_arriver, imageName, destination_id, hotel_id, excursion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, p.getName());
+            ps.setString(2, p.getDescription());
+            ps.setString(3, p.getCategorie());
+            ps.setDouble(4, p.getPrix());
+            ps.setInt(5, p.getDuree());
+            ps.setString(6, p.getStatus());
+            ps.setDate(7, Date.valueOf(p.getDateDepart()));
+            ps.setDate(8, Date.valueOf(p.getDateArriver()));
+            ps.setString(9, p.getImageName());
+            ps.setInt(10, p.getDestinationId());
+
+            if (p.getHotelId() == -1) {
+                ps.setNull(11, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(11, p.getHotelId());
+            }
+
+            if (p.getExcursionId() == -1) {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(12, p.getExcursionId());
+            }
+
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public List<Pack> getAll() throws SQLException {
+        List<Pack> packs = new ArrayList<>();
+        // MODIFICATION : Ajout de la jointure pour récupérer la ville
+        String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
+                "JOIN destination d ON p.destination_id = d.id";
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+            while (rs.next()) {
+                packs.add(mapResultSetToPack(rs));
+            }
+        }
+        return packs;
+    }
+
+    @Override
+    public void update(Pack p) throws SQLException {
+        String query = "UPDATE pack SET name=?, description=?, categorie=?, prix=?, duree=?, status=?, date_depart=?, date_arriver=?, imageName=?, destination_id=?, hotel_id=?, excursion_id=? WHERE id=?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, p.getName());
+            ps.setString(2, p.getDescription());
+            ps.setString(3, p.getCategorie());
+            ps.setDouble(4, p.getPrix());
+            ps.setInt(5, p.getDuree());
+            ps.setString(6, p.getStatus());
+            ps.setDate(7, Date.valueOf(p.getDateDepart()));
+            ps.setDate(8, Date.valueOf(p.getDateArriver()));
+            ps.setString(9, p.getImageName());
+            ps.setInt(10, p.getDestinationId());
+            if (p.getHotelId() == -1) {
+                ps.setNull(11, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(11, p.getHotelId());
+            }
+
+            if (p.getExcursionId() == -1) {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(12, p.getExcursionId());
+            }
+            ps.setInt(13, p.getId());
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(int id) throws SQLException {
+        String query = "DELETE FROM pack WHERE id=?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public Pack getById(int id) throws SQLException {
+        // MODIFICATION : Ajout de la jointure ici aussi
+        String query = "SELECT p.*, d.ville AS destination_name FROM pack p " +
+                "JOIN destination d ON p.destination_id = d.id WHERE p.id=?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToPack(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Pack mapResultSetToPack(ResultSet rs) throws SQLException {
+        Pack p = new Pack(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getString("categorie"),
+                rs.getDouble("prix"),
+                rs.getInt("duree"),
+                rs.getString("status"),
+                rs.getDate("date_depart").toLocalDate(),
+                rs.getDate("date_arriver").toLocalDate(),
+                rs.getString("imageName"),
+                rs.getInt("destination_id"),
+                rs.getInt("hotel_id"),
+                rs.getInt("excursion_id")
+        );
+
+        // AJOUT : On récupère le nom de la ville pour la météo
+        p.setDestinationName(rs.getString("destination_name"));
+
+        return p;
+    }
+
+    public int getCurrentPackReservations(int packId) {
+        int total = 0;
+        String query = "SELECT COUNT(*) FROM reservation_pack WHERE pack_id = ?";
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, packId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Erreur comptage packs : " + ex.getMessage());
+        }
+        return total;
+    }
+
+    public double calculateDynamicPackPrice(Pack p, int currentReservations) {
+        double finalPrice = p.getPrix();
+
+        // Calcul du temps restant avant la date de fin (date_arriver)
+        if (p.getDateArriver() != null) {
+            long hoursUntilEnd = ChronoUnit.HOURS.between(LocalDateTime.now(), p.getDateArriver().atStartOfDay());
+
+            // CONTRAINTE 1 : Promo si < 15 réservations ET reste moins de 48h
+            if (currentReservations < 15 && hoursUntilEnd <= 48 && hoursUntilEnd > 0) {
+                finalPrice = finalPrice * 0.8; // -20%
+            }
+        }
+
+        // CONTRAINTE 2 : Augmentation si le pack est réservé par 20 personnes
+        if (currentReservations >= 20) {
+            finalPrice = finalPrice * 1.15; // +15% par exemple
+        }
+
+        return finalPrice;
+    }
+
+    //méthode for IA
+    public String getPacksForAI() {
+        StringBuilder context = new StringBuilder();
+        try {
+            // Appeler getAll() et gérer l'exception qu'elle lance
+            List<Pack> packs = getAll();
+
+            if (packs.isEmpty()) {
+                return "Actuellement, il n'y a aucun pack disponible dans la base de données.";
+            }
+
+            context.append("Voici les packs disponibles chez GoVacate :\n");
+            for (Pack p : packs) {
+                // On utilise p.getDestinationName() qui est rempli par ta jointure dans getAll()
+                context.append(String.format("- Pack: %s | Destination: %s | Prix: %.1f DT | Catégorie: %s | Statut: %s\n",
+                        p.getName(),
+                        p.getDestinationName() != null ? p.getDestinationName() : "Inconnue",
+                        p.getPrix(),
+                        p.getCategorie(),
+                        p.getStatus()));
+            }
+        } catch (SQLException e) {
+            // En cas d'erreur SQL, on retourne un message d'erreur poli pour l'IA
+            System.err.println("Erreur lors de la récupération des packs pour l'IA : " + e.getMessage());
+            return "Erreur technique : impossible d'accéder à la liste des packs pour le moment.";
+        }
+        return context.toString();
+    }
+
+
+}

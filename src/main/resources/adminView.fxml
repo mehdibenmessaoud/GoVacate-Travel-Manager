@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1300.0" styleClass="root-pane" stylesheets="@css/admin.css"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.projet.gui.Admin2Controller">
+
+    <Pane styleClass="deep-water-bg">
+        <Circle fill="#FF8210" layoutX="150.0" layoutY="150.0" opacity="0.15" radius="180.0">
+            <effect><GaussianBlur radius="80.0"/></effect>
+        </Circle>
+        <Circle fill="#679AC1" layoutX="1150.0" layoutY="600.0" opacity="0.1" radius="250.0">
+            <effect><GaussianBlur radius="100.0"/></effect>
+        </Circle>
+    </Pane>
+
+    <BorderPane fx:id="mainLayout">
+        <left>
+            <AnchorPane prefWidth="260.0" styleClass="sidebar-liquid">
+                <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="20.0">
+                    <StackPane prefWidth="40" prefHeight="40" style="-fx-background-color: linear-gradient(to bottom right, #FF8210, #FFBD59); -fx-background-radius: 12;">
+                        <Label text="G" style="-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </StackPane>
+                    <VBox spacing="0">
+                        <Label styleClass="logo-text" text="GoVacate"/>
+                        <Label style="-fx-text-fill: #FF8210; -fx-font-size: 10px; -fx-font-weight: bold;" text="ADMINISTRATION"/>
+                    </VBox>
+                </HBox>
+
+                <Pane fx:id="slidingPane" layoutX="20.0" layoutY="140.0" mouseTransparent="true" prefHeight="45.0" prefWidth="220.0" styleClass="sliding-highlight"/>
+
+                <VBox fx:id="menuContainer" layoutY="140.0" spacing="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                    <children>
+                        <Button fx:id="btnDashBoard" onAction="#handleShowDashboard" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🏠 Tableau de Bord"/>
+
+                        <Button onAction="#handleShowUsers" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="👥 Gestion Utilisateurs" />
+
+                        <Button fx:id="btnPack" onAction="#handleShowPacks" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📦 Gestion Packs"/>
+
+                        <Button fx:id="btnDestinations" onAction="#handleShowDestinations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📍 Gestion Destinations"/>
+
+                        <Button fx:id="btnExcursion" onAction="#handleShowExcursions" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🏕️ Gestion Excursions"/>
+
+                        <Button fx:id="btnReservations" onAction="#handleShowReservations" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="📅 Gestion Réservations"/>
+
+                        <Button fx:id="btnSupport" onAction="#handleShowSupport" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="💬 Support &amp; Chat"/>
+
+                        <Pane prefHeight="50.0" mouseTransparent="true"/>
+
+                        <Button fx:id="btnParametres" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="⚙️ Paramètres"/>
+                        <Button fx:id="btnLogout" prefHeight="45.0" prefWidth="220.0" styleClass="liquid-btn" text="🚪 Déconnexion"/>
+                    </children>
+                </VBox>
+            </AnchorPane>
+        </left>
+
+        <center>
+            <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                <VBox spacing="25.0">
+                    <padding><Insets top="40.0" right="50.0" bottom="50.0" left="50.0"/></padding>
+
+                    <VBox spacing="25.0">
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                            <VBox spacing="3.0">
+                                <Label styleClass="text-header" text="Gestion des Packs"/>
+                                <Label styleClass="text-sub" text="Gérez vos offres de voyage et leurs détails"/>
+                            </VBox>
+                        </HBox>
+
+                        <VBox alignment="CENTER" spacing="25.0" styleClass="glass-panel">
+                            <padding><Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/></padding>
+                            <HBox alignment="CENTER_LEFT" spacing="15.0" prefHeight="70.0" styleClass="search-bar-liquid">
+                                <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="search-label" text="Rechercher un pack"/>
+                                    <TextField fx:id="searchField" promptText="Nom ou catégorie..." styleClass="search-field"/>
+                                </VBox>
+                                <Button onAction="#handleSearch" prefHeight="50.0" prefWidth="140.0" styleClass="btn-orange-glow" text="Rechercher"/>
+
+                                <Button onAction="#onAddButtonClicked" prefHeight="50.0" prefWidth="180.0" styleClass="btn-orange-glow" text="+ Ajouter un Pack"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox styleClass="glass-card" style="-fx-padding: 10;" VBox.vgrow="ALWAYS">
+                            <TableView fx:id="packTable" prefHeight="450.0" minHeight="300.0" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                                <columns>
+                                    <TableColumn fx:id="colNom" prefWidth="120.0" text="Nom Pack" />
+                                    <TableColumn fx:id="colDesc" prefWidth="200.0" text="Description" />
+                                    <TableColumn fx:id="colCategorie" prefWidth="100.0" text="Catégorie" />
+                                    <TableColumn fx:id="colPrix" prefWidth="80.0" text="Prix (DT)" />
+                                    <TableColumn fx:id="colStatut" prefWidth="100.0" text="Statut" />
+                                    <TableColumn fx:id="colActions" prefWidth="280.0" text="Actions" />
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+</StackPane>
