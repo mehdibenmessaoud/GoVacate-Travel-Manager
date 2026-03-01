@@ -297,6 +297,11 @@
 /* ── Review card ────────────────────────────────────────────── */
 .review-card { -fx-background-color: rgba(255,255,255,0.04); -fx-background-radius: 14px; -fx-border-color: rgba(255,255,255,0.07); -fx-border-width: 1px; -fx-border-radius: 14px; -fx-padding: 16 20; }
 
+/* ── Review image thumbnails ───────────────────────────────── */
+.review-more-label  { -fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12px; -fx-font-weight: 700; }
+.review-thumb       { -fx-background-color: rgba(0,0,0,0.30); -fx-background-radius: 8; -fx-cursor: hand; }
+.review-thumb-ph    { -fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 10px; -fx-font-weight: 700; }
+
 /* ── OSM result cards (client white style) ──────────────────── */
 .osm-result-card       { -fx-background-color: #ffffff; -fx-background-radius: 18px; -fx-border-radius: 18px; -fx-border-width: 1px; -fx-border-color: #e2e8f0; -fx-effect: dropshadow(gaussian, rgba(15,30,80,0.13), 16, 0, 0, 4); -fx-cursor: hand; }
 .osm-result-card:hover { -fx-translate-y: -5px; -fx-border-color: #93c5fd; -fx-effect: dropshadow(gaussian, rgba(29,78,216,0.22), 24, 0, 0, 8); }
@@ -308,3 +313,187 @@
 
 .fsq-card       { -fx-background-color: #ffffff; -fx-background-radius: 20px; -fx-border-radius: 20px; -fx-border-width: 1px; -fx-border-color: #e9d5ff; -fx-effect: dropshadow(gaussian, rgba(109,40,217,0.12), 18, 0, 0, 5); -fx-cursor: hand; }
 .fsq-card:hover { -fx-translate-y: -5px; -fx-border-color: #a78bfa; -fx-effect: dropshadow(gaussian, rgba(109,40,217,0.28), 26, 0, 0, 8); }
+
+/* ── Empty State ────────────────────────────────────────────── */
+.empty-icon       { -fx-font-size: 48px; }
+.empty-title      { -fx-font-size: 18px; -fx-text-fill: rgba(255,255,255,0.6); }
+.empty-subtitle   { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.4); }
+
+/* ── Gallery Styles ─────────────────────────────────────────── */
+.gallery-main-image       { -fx-cursor: hand; }
+.gallery-main-container   { -fx-background-color: rgba(0,0,0,0.4); -fx-background-radius: 15; }
+.gallery-main-shadow      { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5); }
+.gallery-placeholder      { -fx-font-size: 80px; -fx-text-fill: rgba(255,255,255,0.5); }
+.gallery-placeholder-icon { -fx-font-size: 60px; -fx-text-fill: rgba(255,255,255,0.3); }
+.gallery-placeholder-text { -fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 14px; }
+.gallery-arrow-button     { -fx-background-color: rgba(0,0,0,0.55); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-min-width: 36; -fx-min-height: 36; -fx-cursor: hand; }
+.gallery-thumbnail       { -fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 8; -fx-padding: 3; -fx-cursor: hand; }
+.gallery-thumbnail-hover { -fx-background-color: #FF8210; }
+
+/* ── Room Card Styles ───────────────────────────────────────── */
+.room-type-badge    { -fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 15; -fx-font-size: 11px; }
+.room-price-badge   { -fx-background-color: rgba(255,130,16,0.9); -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 15; -fx-font-size: 11px; -fx-font-weight: bold; }
+.room-title         { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; }
+.room-hotel-label   { -fx-font-size: 12px; -fx-text-fill: #679AC1; }
+
+/* ── Room card info styles ─────────────────────────────────── */
+.room-capacity-label  { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.8); }
+.room-price-label     { -fx-font-size: 12px; -fx-text-fill: #FF8210; -fx-font-weight: bold; }
+.room-details-btn     { -fx-background-color: #679AC1; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-size: 11px; }
+.room-details-btn:hover { -fx-background-color: #7aadd4; }
+.room-book-btn-small  { -fx-font-size: 11px; -fx-padding: 6 12; }
+
+/* ── Room detail page ──────────────────────────────────────── */
+.room-detail-title    { -fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; }
+.room-detail-hotel    { -fx-font-size: 16px; -fx-text-fill: #679AC1; -fx-font-weight: bold; }
+.room-price-box       { -fx-background-color: rgba(255,130,16,0.15); -fx-background-radius: 12; -fx-padding: 15 20; }
+.room-price-title     { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.7); }
+.room-price-value     { -fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #FF8210; }
+.room-detail-status   { -fx-font-size: 14px; -fx-padding: 8 15; }
+.room-book-btn-lg     { -fx-font-size: 16px; -fx-padding: 15 30; -fx-background-radius: 25; }
+.room-card-hover      { -fx-effect: dropshadow(gaussian, rgba(103,154,193,0.5), 20, 0, 0, 5); -fx-scale-x: 1.02; -fx-scale-y: 1.02; }
+
+/* ── Info box (type/capacity) ──────────────────────────────── */
+.room-info-box        { -fx-background-color: rgba(103,154,193,0.2); -fx-background-radius: 10; -fx-padding: 10 15; }
+.room-info-box-label  { -fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.6); }
+.room-info-box-value  { -fx-font-size: 14px; -fx-font-weight: bold; }
+
+/* ── Booking form ──────────────────────────────────────────── */
+.booking-back-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.45);
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.booking-back-btn:hover { -fx-text-fill: #FF8210; }
+
+.booking-eyebrow      { -fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: #FF8210; -fx-letter-spacing: 3px; }
+.booking-page-title   { -fx-font-size: 28px; -fx-font-weight: 800; -fx-text-fill: white; }
+.booking-room-sub     { -fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.40); }
+.booking-accent-line  { -fx-background-color: #FF8210; -fx-background-radius: 2; }
+
+.booking-form-card {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.07);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+}
+.booking-form-section  { -fx-font-size: 9px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.30); -fx-letter-spacing: 2px; }
+.booking-form-sep      { -fx-background-color: rgba(255,255,255,0.06); }
+.booking-form-label    { -fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: rgba(255,255,255,0.65); }
+
+.booking-form-input {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(103,154,193,0.25);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+}
+
+.booking-price-input {
+    -fx-background-color: rgba(255,130,16,0.08);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255,130,16,0.20);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-font-size: 15px;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: 800;
+    -fx-padding: 10 16;
+}
+
+.booking-capacity-hint { -fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.28); }
+
+/* ── Booking summary card ──────────────────────────────────── */
+.booking-summary-card {
+    -fx-background-color: rgba(255,130,16,0.07);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255,130,16,0.18);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+}
+.booking-summary-title  { -fx-font-size: 9px; -fx-font-weight: 800; -fx-text-fill: #FF8210; -fx-letter-spacing: 2px; }
+.booking-summary-sep    { -fx-background-color: rgba(255,130,16,0.15); }
+.booking-summary-room   { -fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white; }
+.booking-summary-type   { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45); }
+.booking-summary-hotel  { -fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.35); }
+.booking-summary-key    { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45); }
+.booking-summary-value  { -fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.75); -fx-font-weight: 700; }
+.booking-total-label    { -fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.45); -fx-font-weight: 600; }
+.booking-total-value    { -fx-font-size: 30px; -fx-font-weight: 800; -fx-text-fill: #FF8210; }
+
+.booking-confirm-btn {
+    -fx-background-color: linear-gradient(to right, #FF8210, #ffaa44);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-padding: 16 60;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,130,16,0.5), 24, 0.2, 0, 4);
+}
+.booking-confirm-btn:hover {
+    -fx-background-color: linear-gradient(to right, #ff9830, #ffbb55);
+    -fx-effect: dropshadow(gaussian, rgba(255,130,16,0.7), 28, 0.25, 0, 5);
+}
+
+.booking-tagline { -fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.22); -fx-padding: 4 0 0 0; }
+
+/* ── Review rating number card ─────────────────────────────── */
+.review-rating-num-card { -fx-font-size: 12px; -fx-text-fill: rgba(255,189,89,0.7); -fx-font-weight: 600; }
+
+/* Reservations page */
+.res-agency-label { -fx-font-size: 12px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.30); }
+.res-page-title { -fx-font-size: 28px; -fx-font-weight: 800; -fx-text-fill: white; }
+.res-count-label { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: rgba(255,255,255,0.58); }
+
+.res-table-wrap {
+    -fx-background-color: rgba(255,255,255,0.045);
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1px;
+    -fx-border-radius: 14px;
+}
+
+.res-col-header { -fx-background-color: rgba(255,255,255,0.02); }
+.res-col-label { -fx-font-size: 12px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.45); }
+.res-header-divider { -fx-background-color: rgba(255,255,255,0.12); }
+.res-row-divider { -fx-background-color: rgba(255,255,255,0.06); }
+
+.res-row { -fx-background-color: transparent; }
+.res-row-hover { -fx-background-color: rgba(103,154,193,0.14); }
+
+.res-room-num { -fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #f4f9ff; }
+.res-room-type { -fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: rgba(255,255,255,0.58); }
+.res-hotel-name { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: rgba(255,255,255,0.90); }
+.res-date-range { -fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: rgba(255,255,255,0.84); }
+.res-nights { -fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: rgba(255,255,255,0.50); }
+.res-price { -fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #FFBD59; }
+
+.res-badge-base {
+    -fx-padding: 4 10;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+}
+.res-badge-pending { -fx-background-color: rgba(255,189,89,0.15); -fx-border-color: rgba(255,189,89,0.35); -fx-border-width: 1px; -fx-text-fill: #ffd690; }
+.res-badge-confirmed { -fx-background-color: rgba(74,222,128,0.14); -fx-border-color: rgba(74,222,128,0.35); -fx-border-width: 1px; -fx-text-fill: #87f0b0; }
+.res-badge-cancelled { -fx-background-color: rgba(248,113,113,0.14); -fx-border-color: rgba(248,113,113,0.34); -fx-border-width: 1px; -fx-text-fill: #ff9f9f; }
+
+.res-confirmed-label { -fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #87f0b0; }
+.res-action-btn {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 8px;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+.res-empty { -fx-font-size: 13px; -fx-font-style: italic; -fx-text-fill: rgba(255,255,255,0.48); -fx-padding: 20 0; }
+
+/* ...existing code... */

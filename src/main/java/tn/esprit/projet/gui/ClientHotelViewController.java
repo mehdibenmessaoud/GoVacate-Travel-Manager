@@ -25,7 +25,7 @@ import java.util.function.Function;
 public class ClientHotelViewController {
 
     private final ClientSharedState        state;
-    private final ClientDialogHelper       dialogs;
+    private final DialogHelper.ClientDialogs       dialogs;
     private final ClientReviewViewController reviewVC;
     private final Function<String, Image>  imageLoader;
     /** Callback: tell ClientController to show the room detail view. */
@@ -33,7 +33,7 @@ public class ClientHotelViewController {
 
     public ClientHotelViewController(
             ClientSharedState        state,
-            ClientDialogHelper       dialogs,
+            DialogHelper.ClientDialogs       dialogs,
             ClientReviewViewController reviewVC,
             Function<String, Image>  imageLoader,
             ClientController         controller
@@ -141,7 +141,7 @@ public class ClientHotelViewController {
         if (!hasImage) {
             VBox ph = createCardImagePlaceholder("Photo a venir", "Aucune image disponible");
             ph.setPrefSize(320, 220); ph.setMaxSize(320, 220);
-            ph.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(255,130,16,0.78), rgba(20,83,130,0.78)); -fx-background-radius: 20 20 0 0; -fx-padding: 10;");
+            ph.getStyleClass().add("hotel-card-placeholder");
             header.getChildren().add(ph);
         }
 
@@ -151,7 +151,7 @@ public class ClientHotelViewController {
         overlay.setMouseTransparent(true);
         header.getChildren().add(overlay);
 
-        Label starsBadge = new Label(ClientUtils.formatStarsWithScore(hotel.getStars()));
+        Label starsBadge = new Label(GuiUtils.formatStarsWithScore(hotel.getStars()));
         starsBadge.getStyleClass().add("card-stars-badge");
         StackPane.setAlignment(starsBadge, Pos.TOP_LEFT);
         StackPane.setMargin(starsBadge, new Insets(10));
@@ -176,16 +176,16 @@ public class ClientHotelViewController {
         desc.setMinHeight(44); desc.setPrefHeight(44); desc.setMaxHeight(44);
         desc.setMaxWidth(286);
         desc.setAlignment(Pos.CENTER);
-        desc.setStyle("-fx-text-alignment: center;");
+        desc.getStyleClass().add("hotel-card-desc-center");
 
         HBox info = new HBox(12);
         info.setAlignment(Pos.CENTER);
 
-        Label stars = new Label(ClientUtils.formatStarsWithScore(hotel.getStars()));
+        Label stars = new Label(GuiUtils.formatStarsWithScore(hotel.getStars()));
         stars.getStyleClass().add("card-rate");
 
-        Label statusBadge = new Label(ClientUtils.getStatusLabel(hotel.getStatus()));
-        statusBadge.getStyleClass().add(ClientUtils.getStatusBadgeClass(hotel.getStatus()));
+        Label statusBadge = new Label(GuiUtils.getStatusLabel(hotel.getStatus()));
+        statusBadge.getStyleClass().add(GuiUtils.getStatusBadgeClass(hotel.getStatus()));
         info.getChildren().addAll(stars, statusBadge);
 
         Region spacer = new Region();
@@ -233,22 +233,32 @@ public class ClientHotelViewController {
         detailsBox.setMaxWidth(1160);
 
         Button backBtn = new Button("Retour aux hotels");
-        backBtn.getStyleClass().add("btn-book");
-        backBtn.setStyle("-fx-background-color: #FF8210; -fx-font-size: 14px; -fx-padding: 12 25;");
+        backBtn.getStyleClass().addAll("btn-book", "hotel-detail-back-btn");
         backBtn.setOnAction(e -> controller.goToHotels());
 
         // Image gallery + info
         HBox mainSection = new HBox(25);
         mainSection.setAlignment(Pos.TOP_LEFT);
 
-        ClientImageGalleryBuilder<HotelImage> galleryBuilder = new ClientImageGalleryBuilder<>(
-                "#FF8210", "H", HotelImage::getImageUrl, imageLoader,
-                url -> dialogs.showImagePreview(url, "Image hotel")
-        );
-
         List<HotelImage> images = List.of();
         try { images = state.hotelImageService.getByHotelId(hotel.getId()); } catch (SQLException ignored) {}
-        VBox imageGallery = galleryBuilder.build(images);
+        StackPane mainImageContainer = new StackPane();
+        mainImageContainer.setPrefSize(520, 330);
+        mainImageContainer.getStyleClass().add("gallery-main-container");
+        HBox thumbnailsContainer = new HBox(10);
+        thumbnailsContainer.setAlignment(Pos.CENTER_LEFT);
+        VBox imageGallery = new VBox(10, mainImageContainer, thumbnailsContainer);
+        imageGallery.setPrefWidth(520);
+        ImageGalleryBuilder.build(
+                images,
+                HotelImage::getImageUrl,
+                mainImageContainer,
+                thumbnailsContainer,
+                "#FF8210",
+                "H",
+                getClass(),
+                url -> dialogs.showImagePreview(url, "Image hotel")
+        );
 
         VBox infoBox = buildHotelInfoBox(hotel);
         mainSection.getChildren().addAll(imageGallery, infoBox);
@@ -267,23 +277,22 @@ public class ClientHotelViewController {
         HBox.setHgrow(infoBox, Priority.ALWAYS);
 
         Label nameLabel = new Label(hotel.getName());
-        nameLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
+        nameLabel.getStyleClass().add("hotel-detail-name");
 
         HBox starsRow = new HBox(12);
         starsRow.setAlignment(Pos.CENTER_LEFT);
-        Label starsLabel = new Label(ClientUtils.renderStarsVisual(hotel.getStars()));
-        starsLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #FFBD59; -fx-font-weight: bold;");
-        Label starsText = new Label("(" + ClientUtils.clampStars(hotel.getStars()) + "/5)");
-        starsText.setStyle("-fx-font-size: 15px; -fx-text-fill: #FFBD59; -fx-font-weight: bold;");
+        Label starsLabel = new Label(GuiUtils.renderStarsVisual(hotel.getStars()));
+        starsLabel.getStyleClass().add("hotel-detail-stars");
+        Label starsText = new Label("(" + GuiUtils.clampStars(hotel.getStars()) + "/5)");
+        starsText.getStyleClass().add("hotel-detail-stars-text");
         starsRow.getChildren().addAll(starsLabel, starsText);
 
         Label descLabel = new Label(hotel.getDescription());
-        descLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: rgba(255,255,255,0.8); -fx-wrap-text: true;");
+        descLabel.getStyleClass().add("hotel-detail-desc");
         descLabel.setWrapText(true);
 
-        Label statusLabel = new Label(ClientUtils.getStatusLabel(hotel.getStatus()));
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
-        statusLabel.getStyleClass().add(ClientUtils.getStatusBadgeClass(hotel.getStatus()));
+        Label statusLabel = new Label(GuiUtils.getStatusLabel(hotel.getStatus()));
+        statusLabel.getStyleClass().addAll("hotel-detail-status", GuiUtils.getStatusBadgeClass(hotel.getStatus()));
 
         infoBox.getChildren().addAll(nameLabel, starsRow, descLabel, statusLabel);
 
@@ -313,10 +322,10 @@ public class ClientHotelViewController {
 
     private VBox createHotelServicesSection(Hotel hotel) {
         VBox section = new VBox(10);
-        section.setStyle("-fx-background-color: rgba(255,255,255,0.03); -fx-background-radius: 15; -fx-padding: 20;");
+        section.getStyleClass().add("hotel-services-section");
 
         Label title = new Label("Services de l'hotel");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.getStyleClass().add("hotel-services-title");
 
         FlowPane servicesPane = new FlowPane();
         servicesPane.setHgap(10);
@@ -325,12 +334,12 @@ public class ClientHotelViewController {
         List<String> services = resolveHotelServices(hotel);
         if (services.isEmpty()) {
             Label empty = new Label("Aucun service configure pour cet hotel.");
-            empty.setStyle("-fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 12px; -fx-font-style: italic;");
+            empty.getStyleClass().add("hotel-service-empty");
             servicesPane.getChildren().add(empty);
         } else {
             for (String service : services) {
                 Label chip = new Label(service);
-                chip.setStyle("-fx-background-color: rgba(103,154,193,0.3); -fx-text-fill: #e8f3ff; -fx-padding: 6 12; -fx-background-radius: 14; -fx-font-size: 12px; -fx-font-weight: 600;");
+                chip.getStyleClass().add("hotel-service-chip");
                 servicesPane.getChildren().add(chip);
             }
         }
@@ -378,9 +387,9 @@ public class ClientHotelViewController {
         guestsSpinner.setPrefWidth(120);
         guestsSpinner.getStyleClass().add("availability-filter");
         guestsSpinner.getEditor().setOnAction(e ->
-                guestsSpinner.getValueFactory().setValue(ClientUtils.parseGuestsInput(guestsSpinner.getEditor().getText())));
+                guestsSpinner.getValueFactory().setValue(GuiUtils.parseGuestsInput(guestsSpinner.getEditor().getText())));
         guestsSpinner.focusedProperty().addListener((obs, was, is) -> {
-            if (!is) guestsSpinner.getValueFactory().setValue(ClientUtils.parseGuestsInput(guestsSpinner.getEditor().getText()));
+            if (!is) guestsSpinner.getValueFactory().setValue(GuiUtils.parseGuestsInput(guestsSpinner.getEditor().getText()));
         });
 
         Spinner<Integer> nightsSpinner = new Spinner<>(1, 30, 1);
@@ -388,9 +397,9 @@ public class ClientHotelViewController {
         nightsSpinner.setPrefWidth(100);
         nightsSpinner.getStyleClass().add("availability-filter");
         nightsSpinner.getEditor().setOnAction(e ->
-                nightsSpinner.getValueFactory().setValue(ClientUtils.parseNightsInput(nightsSpinner.getEditor().getText())));
+                nightsSpinner.getValueFactory().setValue(GuiUtils.parseNightsInput(nightsSpinner.getEditor().getText())));
         nightsSpinner.focusedProperty().addListener((obs, was, is) -> {
-            if (!is) nightsSpinner.getValueFactory().setValue(ClientUtils.parseNightsInput(nightsSpinner.getEditor().getText()));
+            if (!is) nightsSpinner.getValueFactory().setValue(GuiUtils.parseNightsInput(nightsSpinner.getEditor().getText()));
         });
 
         Button resetBtn = new Button("Reinitialiser");
@@ -422,7 +431,7 @@ public class ClientHotelViewController {
 
             if (filtered.isEmpty()) {
                 Label empty = new Label("Aucune chambre ne correspond a vos criteres.");
-                empty.setStyle("-fx-text-fill: rgba(255,255,255,0.65); -fx-font-style: italic;");
+                empty.getStyleClass().add("hotel-service-empty");
                 roomsBox.getChildren().add(empty);
                 return;
             }
@@ -468,7 +477,7 @@ public class ClientHotelViewController {
         status.getStyleClass().add("badge-available");
 
         double total = room.getPricePerNight() * Math.max(1, nights);
-        Label price = new Label(ClientUtils.formatPrice(room.getPricePerNight()) + " DT / nuit | Total: " + ClientUtils.formatPrice(total) + " DT");
+        Label price = new Label(GuiUtils.formatPrice(room.getPricePerNight()) + " DT / nuit | Total: " + GuiUtils.formatPrice(total) + " DT");
         price.getStyleClass().add("availability-room-price");
 
         Button detailsBtn = new Button("Details");
@@ -504,9 +513,9 @@ public class ClientHotelViewController {
         VBox box = new VBox(10);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(50));
-        Label iconLabel  = new Label(icon);   iconLabel.setStyle("-fx-font-size: 48px;");
-        Label titleLabel = new Label(title);  titleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: rgba(255,255,255,0.6);");
-        Label subLabel   = new Label(subtitle); subLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.4);");
+        Label iconLabel  = new Label(icon);   iconLabel.getStyleClass().add("empty-icon");
+        Label titleLabel = new Label(title);  titleLabel.getStyleClass().add("empty-title");
+        Label subLabel   = new Label(subtitle); subLabel.getStyleClass().add("empty-subtitle");
         box.getChildren().addAll(iconLabel, titleLabel, subLabel);
         container.getChildren().add(box);
     }
@@ -554,15 +563,15 @@ public class ClientHotelViewController {
         cb.setCellFactory(list -> new ListCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle("-fx-background-color: #1b456f; -fx-text-fill: #f5fbff;"); }
-                else { setText(item); setStyle("-fx-background-color: #1b456f; -fx-text-fill: #f5fbff; -fx-font-weight: 700;"); }
+                if (empty || item == null) { setText(null); getStyleClass().add("availability-combo-cell"); }
+                else { setText(item); getStyleClass().add("availability-combo-cell-selected"); }
             }
         });
         cb.showingProperty().addListener((obs, was, is) -> {
             if (!is) return;
             Node lv = cb.lookup(".list-view");
             if (lv instanceof ListView<?> listView)
-                listView.setStyle("-fx-background-color: #1b456f; -fx-control-inner-background: #1b456f; -fx-border-color: rgba(173,214,247,0.45); -fx-border-radius: 8;");
+                listView.getStyleClass().add("availability-combo-popup");
         });
     }
 

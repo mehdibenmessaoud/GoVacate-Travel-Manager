@@ -148,16 +148,15 @@ public class AdminApiViewController {
                 Object row = getTableView().getItems().get(getIndex());
                 if (!(row instanceof GeoapifyPlacesApiClient.HotelPlace p) || p.website().isBlank()) {
                     setText("N/A"); setGraphic(null);
-                    setStyle("-fx-text-fill: rgba(255,255,255,0.30); -fx-alignment: CENTER;");
+                    getStyleClass().add("gv-wrap-label");
                     return;
                 }
                 Label link = new Label(p.website());
-                link.setStyle("-fx-text-fill: #38bdf8; -fx-font-size: 11px; -fx-cursor: hand;"
-                        + "-fx-underline: true; -fx-font-weight: 600;");
+                link.getStyleClass().add("gv-link");
                 link.setWrapText(true);
                 link.setMaxWidth(col2.getPrefWidth() - 16);
                 link.setOnMouseClicked(e -> openUrlInBrowser(p.website()));
-                setGraphic(link); setText(null); setStyle("-fx-alignment: CENTER_LEFT;");
+                setGraphic(link); setText(null);
             }
         });
         col2.setCellValueFactory(d -> d.getValue() instanceof GeoapifyPlacesApiClient.HotelPlace o
@@ -172,15 +171,15 @@ public class AdminApiViewController {
                 Object row = getTableView().getItems().get(getIndex());
                 if (!(row instanceof GeoapifyPlacesApiClient.HotelPlace p) || p.website().isBlank()) {
                     setText("N/A"); setGraphic(null);
-                    setStyle("-fx-text-fill: rgba(255,255,255,0.30); -fx-alignment: CENTER;");
+                    getStyleClass().add("gv-wrap-label");
                     return;
                 }
                 Label link = new Label(p.website());
-                link.setStyle("-fx-text-fill: #38bdf8; -fx-font-size: 11px; -fx-cursor: hand; -fx-underline: true; -fx-font-weight: 600;");
+                link.getStyleClass().add("gv-link");
                 link.setWrapText(true);
                 link.setMaxWidth(col2.getPrefWidth() - 16);
                 link.setOnMouseClicked(e -> openUrlInBrowser(p.website()));
-                setGraphic(link); setText(null); setStyle("-fx-alignment: CENTER_LEFT;");
+                setGraphic(link); setText(null);
             }
         });
         col2.setCellValueFactory(d -> d.getValue() instanceof GeoapifyPlacesApiClient.HotelPlace o
@@ -216,7 +215,7 @@ public class AdminApiViewController {
                                 "node", 0, "", "", 1.0);
                         openOpenStreetMapLocation(loc);
                     } else {
-                        AdminDialogHelper.showNotification("Coordonnées indisponibles pour cet hôtel.", "warning", getClass());
+                        DialogHelper.showNotification("Coordonnées indisponibles pour cet hôtel.", "warning", getClass());
                     }
                 });
                 detailBtn.setOnAction(e -> {
@@ -246,19 +245,16 @@ public class AdminApiViewController {
         Label l = new Label(text == null ? "" : text);
         l.setWrapText(true);
         l.setMaxWidth(maxWidth > 0 ? maxWidth : Double.MAX_VALUE);
-        l.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.85); -fx-padding: 4 0;");
+        l.getStyleClass().add("gv-wrap-label");
         return l;
     }
 
     private Button buildActionBtn(String text, String color, String hoverColor) {
         Button b = new Button(text);
-        String base  = "-fx-background-color: " + color + "; -fx-text-fill: white; -fx-font-size: 11px;"
-                + "-fx-font-weight: 700; -fx-background-radius: 8; -fx-padding: 6 12; -fx-cursor: hand;";
-        String hover = "-fx-background-color: " + hoverColor + "; -fx-text-fill: white; -fx-font-size: 11px;"
-                + "-fx-font-weight: 700; -fx-background-radius: 8; -fx-padding: 6 12; -fx-cursor: hand;";
-        b.setStyle(base);
-        b.setOnMouseEntered(e -> b.setStyle(hover));
-        b.setOnMouseExited(e  -> b.setStyle(base));
+        b.getStyleClass().add("gv-res-action-btn");
+        b.setStyle("-fx-background-color: " + color + ";");
+        b.setOnMouseEntered(e -> b.setStyle("-fx-background-color: " + hoverColor + ";"));
+        b.setOnMouseExited(e  -> b.setStyle("-fx-background-color: " + color + ";"));
         return b;
     }
 
@@ -297,33 +293,33 @@ public class AdminApiViewController {
                 new javafx.scene.control.ButtonType("Importer", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(importType, javafx.scene.control.ButtonType.CANCEL);
 
-        javafx.scene.layout.GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        javafx.scene.layout.GridPane grid = DialogHelper.createDialogFormGrid();
 
         javafx.scene.control.TextField nameField = new javafx.scene.control.TextField(place.name());
-        AdminDialogHelper.applyDialogFieldSizing(nameField);
+        DialogHelper.applyDialogFieldSizing(nameField);
 
         javafx.scene.control.TextArea descField =
                 new javafx.scene.control.TextArea(cleanDesc.toString().trim());
         descField.setPrefRowCount(3);
         descField.setWrapText(true);
-        AdminDialogHelper.applyDialogFieldSizing(descField);
+        DialogHelper.applyDialogFieldSizing(descField);
 
         javafx.scene.control.Spinner<Integer> starsSpinner =
                 new javafx.scene.control.Spinner<>(1, 5, 3);
         starsSpinner.setEditable(false);
-        AdminDialogHelper.configureDialogSpinner(starsSpinner, 0);
+        DialogHelper.configureDialogSpinner(starsSpinner, 0);
 
         javafx.scene.control.ComboBox<String> statusCombo = new javafx.scene.control.ComboBox<>(
                 javafx.collections.FXCollections.observableArrayList("AVAILABLE", "OCCUPIED", "MAINTENANCE"));
         statusCombo.setValue("AVAILABLE");
-        AdminDialogHelper.applyDialogFieldSizing(statusCombo);
+        DialogHelper.applyDialogFieldSizing(statusCombo);
 
         // Localisation — existing destinations only, no DB writes
         javafx.scene.control.ComboBox<String> locCombo = new javafx.scene.control.ComboBox<>();
         locCombo.getItems().addAll(locLabels);
         locCombo.setPromptText("Sélectionner une destination");
         locCombo.setValue(bestMatch); // null when no match → user must pick
-        AdminDialogHelper.applyDialogFieldSizing(locCombo);
+        DialogHelper.applyDialogFieldSizing(locCombo);
 
         // ── "➕" button to create a new destination on the fly ─────────────
         // Pre-fill city and country from the Geoapify result (or query as fallback)
@@ -343,7 +339,7 @@ public class AdminApiViewController {
             String hint = (query != null && !query.isBlank()) ? query : place.locationLine();
             hintLabel.setText("⚠ \"" + hint + "\" n'existe pas dans vos destinations — "
                     + "sélectionnez ou créez une destination (➕).");
-            hintLabel.setStyle("-fx-text-fill: #FFA500; -fx-font-size: 11px; -fx-wrap-text: true;");
+            hintLabel.getStyleClass().add("gv-hint-label");
         }
 
         grid.add(new javafx.scene.control.Label("Nom *"),          0, 0); grid.add(nameField,    1, 0);
@@ -357,14 +353,14 @@ public class AdminApiViewController {
         // Use Platform.runLater so lookupButton resolves after dialog is shown.
         javafx.scene.Node importNode = dialog.getDialogPane().lookupButton(importType);
         Runnable syncState = () -> importNode.setDisable(
-                nameField.getText().isBlank() || AdminUtils.isBlank(locCombo.getValue()));
+                nameField.getText().isBlank() || GuiUtils.isBlank(locCombo.getValue()));
         javafx.application.Platform.runLater(syncState); // initial state after show
         nameField.textProperty().addListener((o, old, v) -> syncState.run());
         locCombo.valueProperty().addListener((o, old, v) -> syncState.run());
 
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 440);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 440);
+        DialogHelper.styleDialog(dialog, false, getClass());
         javafx.application.Platform.runLater(nameField::requestFocus);
 
         dialog.setResultConverter(btn -> btn == importType);
@@ -373,8 +369,8 @@ public class AdminApiViewController {
             // Extra guard: if somehow combo is still blank, abort rather than
             // silently saving with the wrong default destination
             String selectedLoc = locCombo.getValue();
-            if (AdminUtils.isBlank(selectedLoc)) {
-                AdminDialogHelper.showNotification(
+            if (GuiUtils.isBlank(selectedLoc)) {
+                DialogHelper.showNotification(
                         "Veuillez sélectionner une destination avant d'importer.", "warning", getClass());
                 return;
             }
@@ -389,11 +385,11 @@ public class AdminApiViewController {
                 // Show notification first (import dialog is already closed, this is safe).
                 // After the user clicks OK, ALL showAndWait calls are fully resolved so
                 // goToHotels() can be called synchronously with no modal state to interfere.
-                AdminDialogHelper.showNotification(
+                DialogHelper.showNotification(
                         "\"" + h.getName() + "\" importé avec succès!", "success", getClass());
                 admin.goToHotels();
             } catch (Exception ex) {
-                AdminDialogHelper.showNotification(
+                DialogHelper.showNotification(
                         "Erreur import: " + ex.getMessage(), "error", getClass());
             }
         });
@@ -461,21 +457,21 @@ public class AdminApiViewController {
         dialog.getDialogPane().getButtonTypes().add(closeType);
 
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(0);
-        root.setStyle("-fx-background-color: #0f1923;");
+        root.getStyleClass().add("gv-detail-dialog-root");
 
         // Header
         javafx.scene.layout.HBox hbar = new javafx.scene.layout.HBox(14);
         hbar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         hbar.setPadding(new Insets(18, 24, 18, 24));
-        hbar.setStyle("-fx-background-color: #141f2e; -fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent; -fx-border-width: 0 0 1 0;");
+        hbar.getStyleClass().add("gv-detail-dialog-header");
         Label iconLbl = new Label("🌍");
-        iconLbl.setStyle("-fx-font-size: 18px; -fx-background-color: rgba(14,165,233,0.18); -fx-background-radius: 50%; -fx-padding: 10; -fx-min-width: 42; -fx-min-height: 42; -fx-alignment: center;");
+        iconLbl.getStyleClass().add("gv-detail-dialog-icon");
         javafx.scene.layout.VBox titleBox = new javafx.scene.layout.VBox(3);
         javafx.scene.layout.HBox.setHgrow(titleBox, Priority.ALWAYS);
         Label titleLbl = new Label(place.name());
-        titleLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: 800; -fx-text-fill: white;");
+        titleLbl.getStyleClass().add("gv-detail-dialog-title");
         Label subLbl = new Label("Geoapify Places API  ·  " + place.categoryLabel());
-        subLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.38);");
+        subLbl.getStyleClass().add("gv-detail-dialog-subtitle");
         titleBox.getChildren().addAll(titleLbl, subLbl);
         hbar.getChildren().addAll(iconLbl, titleBox);
 
@@ -498,9 +494,7 @@ public class AdminApiViewController {
 
         if (place.hasCoords()) {
             Button mapBtn2 = new Button("🗺  Voir sur la carte");
-            mapBtn2.setStyle("-fx-background-color: rgba(14,165,233,0.18); -fx-text-fill: #7dd3fc;"
-                    + "-fx-font-weight: 700; -fx-font-size: 12px; -fx-background-radius: 10; -fx-padding: 10 20;"
-                    + "-fx-border-color: rgba(14,165,233,0.35); -fx-border-radius: 10; -fx-border-width: 1; -fx-cursor: hand;");
+            mapBtn2.getStyleClass().add("gv-detail-map-btn");
             mapBtn2.setOnAction(e -> {
                 dialog.close();
                 NominatimHotelApiClient.LocationSummary loc = new NominatimHotelApiClient.LocationSummary(
@@ -516,7 +510,7 @@ public class AdminApiViewController {
         root.getChildren().addAll(hbar, body);
         javafx.scene.control.DialogPane pane = dialog.getDialogPane();
         pane.setContent(root); pane.setPadding(Insets.EMPTY);
-        pane.setStyle("-fx-padding: 0; -fx-background-color: #0f1923;");
+        pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
         java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
@@ -527,9 +521,7 @@ public class AdminApiViewController {
             javafx.scene.Node closeNode = pane.lookupButton(closeType);
             if (closeNode instanceof Button cb) {
                 cb.setMinWidth(100);
-                cb.setStyle("-fx-background-color: rgba(255,255,255,0.08); -fx-text-fill: rgba(255,255,255,0.80);"
-                        + "-fx-font-weight: 700; -fx-font-size: 13px; -fx-background-radius: 10; -fx-padding: 10 24;"
-                        + "-fx-border-color: rgba(255,255,255,0.13); -fx-border-width: 1; -fx-border-radius: 10; -fx-cursor: hand;");
+                cb.getStyleClass().add("gv-detail-close-btn");
             }
         });
         dialog.showAndWait();
@@ -539,10 +531,10 @@ public class AdminApiViewController {
         javafx.scene.layout.HBox r = new javafx.scene.layout.HBox(0);
         r.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         r.setPadding(new Insets(11, 0, 11, 0));
-        r.setStyle("-fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent; -fx-border-width: 0 0 1 0;");
-        Label ic = new Label(icon); ic.setStyle("-fx-font-size: 14px; -fx-min-width: 26;");
-        Label k  = new Label(key + " :"); k.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.40); -fx-font-weight: 600; -fx-min-width: 110;");
-        Label v  = new Label(value); v.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.85); -fx-font-weight: 600;");
+        r.getStyleClass().add("gv-detail-row");
+        Label ic = new Label(icon); ic.getStyleClass().add("gv-detail-row-icon");
+        Label k  = new Label(key + " :"); k.getStyleClass().add("gv-detail-row-key");
+        Label v  = new Label(value); v.getStyleClass().add("gv-detail-row-value");
         v.setWrapText(true); javafx.scene.layout.HBox.setHgrow(v, Priority.ALWAYS);
         r.getChildren().addAll(ic, k, v);
         return r;
@@ -609,19 +601,19 @@ public class AdminApiViewController {
 
         col1.setCellValueFactory(d -> d.getValue() instanceof NominatimHotelApiClient.LocationSummary o
                 ? new SimpleStringProperty(o.displayName()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col1);
+        DialogHelper.applyPlainTextCellFactory(col1);
         col2.setCellValueFactory(d -> d.getValue() instanceof NominatimHotelApiClient.LocationSummary o
                 ? new SimpleStringProperty(o.lat() == null ? "N/A" : o.lat()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col2);
+        DialogHelper.applyPlainTextCellFactory(col2);
         col3.setCellValueFactory(d -> d.getValue() instanceof NominatimHotelApiClient.LocationSummary o
                 ? new SimpleStringProperty(o.lon() == null ? "N/A" : o.lon()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col3);
+        DialogHelper.applyPlainTextCellFactory(col3);
         col4.setCellValueFactory(d -> d.getValue() instanceof NominatimHotelApiClient.LocationSummary o
                 ? new SimpleStringProperty(o.category().isBlank() ? "N/A" : o.category()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col4);
+        DialogHelper.applyPlainTextCellFactory(col4);
         col5.setCellValueFactory(d -> d.getValue() instanceof NominatimHotelApiClient.LocationSummary o
                 ? new SimpleStringProperty(o.placeType().isBlank() ? "N/A" : o.placeType()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col5);
+        DialogHelper.applyPlainTextCellFactory(col5);
 
         // col6: Map button
         col6.setVisible(true);
@@ -680,7 +672,7 @@ public class AdminApiViewController {
     public void openOpenStreetMapLocation(NominatimHotelApiClient.LocationSummary location) {
         String url = buildOpenStreetMapUrl(location);
         if ("N/A".equals(url)) {
-            AdminDialogHelper.showNotification("Lien OpenStreetMap indisponible pour ce resultat.", "warning", getClass());
+            DialogHelper.showNotification("Lien OpenStreetMap indisponible pour ce resultat.", "warning", getClass());
             return;
         }
         showOpenStreetMapPreviewDialog(location, url);
@@ -696,45 +688,37 @@ public class AdminApiViewController {
         dialog.getDialogPane().getButtonTypes().addAll(openBrowserType, ButtonType.CLOSE);
 
         VBox content = new VBox(0);
-        content.setStyle("-fx-background-color: #0f1923;");
+        content.getStyleClass().add("gv-detail-dialog-content");
 
         String displayName   = location == null ? null : location.displayName();
         String locationTitle = extractLocationTitle(displayName);
-        String fullAddr      = AdminUtils.trimToMaxLength(AdminUtils.formatApiValue(displayName, "N/A"), 100);
-        String coordText     = AdminUtils.formatCoordinates(
+        String fullAddr      = GuiUtils.trimToMaxLength(GuiUtils.formatApiValue(displayName, "N/A"), 100);
+        String coordText     = GuiUtils.formatCoordinates(
                 location == null ? null : location.lat(),
                 location == null ? null : location.lon());
-        Double lat = AdminUtils.parseCoordinate(location == null ? null : location.lat());
-        Double lon = AdminUtils.parseCoordinate(location == null ? null : location.lon());
+        Double lat = GuiUtils.parseCoordinate(location == null ? null : location.lat());
+        Double lon = GuiUtils.parseCoordinate(location == null ? null : location.lon());
 
         // Header bar
         HBox headerBar = new HBox(16);
         headerBar.setAlignment(Pos.CENTER_LEFT);
         headerBar.setPadding(new Insets(16, 20, 16, 20));
-        headerBar.setStyle("-fx-background-color: #141f2e;"
-                + "-fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;"
-                + "-fx-border-width: 0 0 1 0;");
+        headerBar.getStyleClass().add("gv-detail-dialog-header");
 
         Label iconCircle = new Label("P");
-        iconCircle.setStyle("-fx-font-size: 16px;"
-                + "-fx-background-color: rgba(79,209,179,0.12);"
-                + "-fx-background-radius: 50%; -fx-padding: 8;"
-                + "-fx-min-width: 38; -fx-min-height: 38; -fx-alignment: center;");
+        iconCircle.getStyleClass().add("gv-detail-dialog-icon-green");
 
         VBox headerText = new VBox(3);
         HBox.setHgrow(headerText, Priority.ALWAYS);
         Label titleLabel = new Label(locationTitle);
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("gv-detail-dialog-title");
         Label subtitleLbl = new Label(fullAddr);
-        subtitleLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.45);");
+        subtitleLbl.getStyleClass().add("gv-detail-dialog-subtitle");
         subtitleLbl.setWrapText(false);
         headerText.getChildren().addAll(titleLabel, subtitleLbl);
 
         Label coordChip = new Label(coordText);
-        coordChip.setStyle("-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #4fd1b3;"
-                + "-fx-background-color: rgba(79,209,179,0.10);"
-                + "-fx-background-radius: 20; -fx-padding: 6 14;"
-                + "-fx-border-color: rgba(79,209,179,0.28); -fx-border-radius: 20; -fx-border-width: 1;");
+        coordChip.getStyleClass().add("gv-map-coord-chip");
         VBox coordBox = new VBox(coordChip);
         coordBox.setAlignment(Pos.CENTER);
         headerBar.getChildren().addAll(iconCircle, headerText, coordBox);
@@ -743,7 +727,7 @@ public class AdminApiViewController {
         StackPane mapViewport = new StackPane();
         mapViewport.setMinHeight(520);
         mapViewport.setPrefHeight(560);
-        mapViewport.setStyle("-fx-background-color: #1a2a3a;");
+        mapViewport.getStyleClass().add("gv-map-viewport");
         VBox.setVgrow(mapViewport, Priority.ALWAYS);
 
         javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
@@ -752,7 +736,6 @@ public class AdminApiViewController {
         mapViewport.setClip(clip);
 
         Pane tileLayer = new Pane();
-        tileLayer.setStyle("-fx-background-color: transparent;");
         tileLayer.setPickOnBounds(false);
         tileLayer.prefWidthProperty().bind(mapViewport.widthProperty());
         tileLayer.prefHeightProperty().bind(mapViewport.heightProperty());
@@ -761,9 +744,7 @@ public class AdminApiViewController {
 
         Label mapStatusLabel = new Label("Chargement de la carte...");
         mapStatusLabel.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        mapStatusLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"
-                + "-fx-background-color: rgba(15,25,35,0.75);"
-                + "-fx-background-radius: 10; -fx-padding: 10 20;");
+        mapStatusLabel.getStyleClass().add("gv-map-status-label");
         mapStatusLabel.setVisible(false);
         mapStatusLabel.setMouseTransparent(true);
 
@@ -773,32 +754,22 @@ public class AdminApiViewController {
 
         Region zoomSep = new Region();
         zoomSep.setMinHeight(1); zoomSep.setPrefHeight(1); zoomSep.setMaxHeight(1);
-        zoomSep.setStyle("-fx-background-color: rgba(255,255,255,0.13);");
+        zoomSep.getStyleClass().add("gv-map-zoom-sep");
 
         VBox zoomBox = new VBox(0, zoomInBtn, zoomSep, zoomOutBtn);
         zoomBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        zoomBox.setStyle("-fx-background-color: rgba(15,25,35,0.92);"
-                + "-fx-background-radius: 10;"
-                + "-fx-border-color: rgba(255,255,255,0.15);"
-                + "-fx-border-radius: 10; -fx-border-width: 1;"
-                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.60), 14, 0, 0, 3);");
+        zoomBox.getStyleClass().add("gv-map-zoom-box");
         StackPane.setAlignment(zoomBox, Pos.TOP_LEFT);
         StackPane.setMargin(zoomBox, new Insets(14, 0, 0, 14));
 
         zoomLabel.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        zoomLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.85);"
-                + "-fx-background-color: rgba(15,25,35,0.85);"
-                + "-fx-background-radius: 8; -fx-padding: 4 10;"
-                + "-fx-border-color: rgba(255,255,255,0.15); -fx-border-radius: 8; -fx-border-width: 1;"
-                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 6, 0, 0, 2);");
+        zoomLabel.getStyleClass().add("gv-map-zoom-label");
         StackPane.setAlignment(zoomLabel, Pos.BOTTOM_LEFT);
         StackPane.setMargin(zoomLabel, new Insets(0, 0, 12, 14));
 
         Label attribution = new Label("OpenStreetMap contributors");
         attribution.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        attribution.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.55);"
-                + "-fx-background-color: rgba(15,25,35,0.75);"
-                + "-fx-background-radius: 4; -fx-padding: 3 8;");
+        attribution.getStyleClass().add("gv-map-attribution");
         StackPane.setAlignment(attribution, Pos.BOTTOM_RIGHT);
         StackPane.setMargin(attribution, new Insets(0, 10, 10, 0));
 
@@ -808,8 +779,8 @@ public class AdminApiViewController {
 
         // Map state
         final boolean  hasCoords = lat != null && lon != null;
-        final double   tgtLat    = hasCoords ? AdminUtils.clampLatitude(lat)  : 0.0;
-        final double   tgtLon    = hasCoords ? AdminUtils.clampLongitude(lon) : 0.0;
+        final double   tgtLat    = hasCoords ? GuiUtils.clampLatitude(lat)  : 0.0;
+        final double   tgtLon    = hasCoords ? GuiUtils.clampLongitude(lon) : 0.0;
         final double[] cLat      = {tgtLat};
         final double[] cLon      = {tgtLon};
         final int[]    zoom      = {OSM_PREVIEW_INITIAL_ZOOM};
@@ -898,7 +869,7 @@ public class AdminApiViewController {
         pane.setPadding(Insets.EMPTY);
         pane.setMinWidth(860); pane.setPrefWidth(980);
         pane.setMinHeight(680);
-        pane.setStyle("-fx-padding: 0; -fx-background-color: #0f1923;");
+        pane.getStyleClass().add("gv-detail-dialog-pane");
 
         java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
@@ -912,12 +883,7 @@ public class AdminApiViewController {
         if (openBrowserNode instanceof Button openBrowserButton) {
             javafx.application.Platform.runLater(() -> {
                 openBrowserButton.setMinWidth(165);
-                openBrowserButton.setStyle(
-                        "-fx-background-color: linear-gradient(to right, #FF8210, #ffaa44);"
-                                + "-fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 13px;"
-                                + "-fx-background-radius: 10; -fx-padding: 11 24;"
-                                + "-fx-effect: dropshadow(gaussian, rgba(255,130,16,0.40), 12, 0.15, 0, 2);"
-                                + "-fx-cursor: hand;");
+                openBrowserButton.getStyleClass().add("gv-itinerary-btn");
             });
             openBrowserButton.addEventFilter(javafx.event.ActionEvent.ACTION, e -> {
                 openUrlInBrowser(googleMapsUrl);
@@ -928,12 +894,7 @@ public class AdminApiViewController {
         if (closeNode instanceof Button closeButton) {
             javafx.application.Platform.runLater(() -> {
                 closeButton.setMinWidth(110);
-                closeButton.setStyle(
-                        "-fx-background-color: rgba(255,255,255,0.08);"
-                                + "-fx-text-fill: rgba(255,255,255,0.80); -fx-font-weight: 700; -fx-font-size: 13px;"
-                                + "-fx-background-radius: 10; -fx-padding: 11 24;"
-                                + "-fx-border-color: rgba(255,255,255,0.14); -fx-border-width: 1; -fx-border-radius: 10;"
-                                + "-fx-cursor: hand;");
+                closeButton.getStyleClass().add("gv-detail-close-btn");
             });
         }
 
@@ -942,15 +903,7 @@ public class AdminApiViewController {
 
     private Button buildMapControlBtn(String text) {
         Button b = new Button(text);
-        String base  = "-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);"
-                + "-fx-font-weight: 800; -fx-font-size: 15px; -fx-cursor: hand;"
-                + "-fx-min-width: 34; -fx-min-height: 34; -fx-padding: 0;";
-        String hover = "-fx-background-color: rgba(255,255,255,0.10); -fx-text-fill: white;"
-                + "-fx-font-weight: 800; -fx-font-size: 15px; -fx-cursor: hand;"
-                + "-fx-min-width: 34; -fx-min-height: 34; -fx-padding: 0;";
-        b.setStyle(base);
-        b.setOnMouseEntered(e -> b.setStyle(hover));
-        b.setOnMouseExited(e  -> b.setStyle(base));
+        b.getStyleClass().add("gv-map-control-btn");
         return b;
     }
 
@@ -975,8 +928,8 @@ public class AdminApiViewController {
     }
 
     private void handleApiFailure(String provider, Throwable error) {
-        AdminDialogHelper.showNotification(
-                provider + " API: " + AdminUtils.extractErrorMessage(error), "error", getClass());
+        DialogHelper.showNotification(
+                provider + " API: " + GuiUtils.extractErrorMessage(error), "error", getClass());
     }
 
     // -----------------------------------------------------------------------
@@ -1039,32 +992,32 @@ public class AdminApiViewController {
     }
 
     private String extractLocationTitle(String displayName) {
-        String safe = AdminUtils.formatApiValue(displayName, "Lieu inconnu");
+        String safe = GuiUtils.formatApiValue(displayName, "Lieu inconnu");
         String[] seg = safe.split(",");
         if (seg.length == 0) return safe;
-        return AdminUtils.trimToMaxLength(seg[0].trim(), 36);
+        return GuiUtils.trimToMaxLength(seg[0].trim(), 36);
     }
 
     private void openUrlInBrowser(String url) {
         try {
             if (!Desktop.isDesktopSupported()
                     || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                AdminDialogHelper.showNotification("Ouverture navigateur non supportee.", "warning", getClass());
+                DialogHelper.showNotification("Ouverture navigateur non supportee.", "warning", getClass());
                 return;
             }
             Desktop.getDesktop().browse(URI.create(url));
         } catch (Exception e) {
-            AdminDialogHelper.showNotification(
-                    "Impossible d'ouvrir la carte: " + AdminUtils.extractErrorMessage(e), "error", getClass());
+            DialogHelper.showNotification(
+                    "Impossible d'ouvrir la carte: " + GuiUtils.extractErrorMessage(e), "error", getClass());
         }
     }
 
     private double longitudeToWorldPixelX(double lon, int zoom) {
-        return ((AdminUtils.clampLongitude(lon) + 180.0) / 360.0) * OSM_TILE_SIZE * (double)(1 << zoom);
+        return ((GuiUtils.clampLongitude(lon) + 180.0) / 360.0) * OSM_TILE_SIZE * (double)(1 << zoom);
     }
 
     private double latitudeToWorldPixelY(double lat, int zoom) {
-        double latRad = Math.toRadians(AdminUtils.clampLatitude(lat));
+        double latRad = Math.toRadians(GuiUtils.clampLatitude(lat));
         double ws     = OSM_TILE_SIZE * (double)(1 << zoom);
         return (1.0 - Math.log(Math.tan(Math.PI / 4.0 + latRad / 2.0)) / Math.PI) * ws / 2.0;
     }

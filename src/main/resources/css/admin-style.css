@@ -349,3 +349,100 @@
 .gv-map-preview-title   { -fx-text-fill: #e4f2ff; -fx-font-size: 16px; -fx-font-weight: 800; }
 .gv-map-preview-subtitle { -fx-text-fill: rgba(228,242,255,0.68); -fx-font-size: 12px; -fx-font-weight: 600; }
 .gv-map-attribution     { -fx-text-fill: rgba(228,242,255,0.48); -fx-font-size: 10px; -fx-font-weight: 600; }
+
+/* ── Gallery Styles ─────────────────────────────────────────── */
+.gallery-main-image       { -fx-cursor: hand; }
+.gallery-main-container   { -fx-background-color: rgba(0,0,0,0.4); -fx-background-radius: 15; }
+.gallery-main-shadow      { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5); }
+.gallery-placeholder      { -fx-font-size: 80px; -fx-text-fill: rgba(255,255,255,0.5); }
+.gallery-placeholder-icon { -fx-font-size: 60px; -fx-text-fill: rgba(255,255,255,0.3); }
+.gallery-placeholder-text { -fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 14px; }
+.gallery-arrow-button     { -fx-background-color: rgba(0,0,0,0.55); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-min-width: 36; -fx-min-height: 36; -fx-cursor: hand; }
+.gallery-thumbnail       { -fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 10; -fx-padding: 4; -fx-cursor: hand; }
+.gallery-thumbnail-hover { -fx-background-color: rgba(255,130,16,0.7); }
+
+/* ── Detail badges (admin) ─────────────────────────────────── */
+.detail-stars-score  { -fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #FFBD59; }
+.detail-room-subinfo { -fx-font-size: 14px; -fx-text-fill: #679AC1; }
+.badge-location      { -fx-background-color: rgba(103,154,193,0.3); -fx-text-fill: #679AC1; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-rooms         { -fx-background-color: rgba(255,130,16,0.3); -fx-text-fill: #FF8210; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-services      { -fx-background-color: rgba(40,167,69,0.25); -fx-text-fill: #7ce19b; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-room-type     { -fx-background-color: #679AC1; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-room-price    { -fx-background-color: #FF8210; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-room-capacity { -fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; }
+.badge-font-override { -fx-font-size: 13px; }
+.service-chip        { -fx-background-color: rgba(103,154,193,0.22); -fx-text-fill: #d7ebfb; -fx-padding: 5 12; -fx-background-radius: 14; -fx-font-size: 12px; }
+.service-empty-label { -fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 12px; -fx-font-style: italic; }
+
+/* ── Manage services button ────────────────────────────────── */
+.btn-manage-services {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 8 16;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+.btn-manage-services:hover { -fx-background-color: #34bb55; }
+
+/* ── New destination button ────────────────────────────────── */
+.btn-new-destination {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+.btn-new-destination:hover { -fx-background-color: #1e7e34; }
+
+/* ── Star rating selector ──────────────────────────────────── */
+.star-rating-selector { -fx-font-size: 28px; -fx-cursor: hand; -fx-text-fill: #FFBD59; }
+
+/* ── Reservation badges ────────────────────────────────────── */
+.badge-res-base {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 4 12;
+    -fx-min-width: 90;
+}
+.badge-res-confirmed {
+    -fx-background-color: rgba(74,222,128,0.15);
+    -fx-text-fill: #4ADE80;
+    -fx-border-color: rgba(74,222,128,0.30);
+    -fx-border-width: 1;
+}
+.badge-res-cancelled {
+    -fx-background-color: rgba(248,113,113,0.15);
+    -fx-text-fill: #F87171;
+    -fx-border-color: rgba(248,113,113,0.30);
+    -fx-border-width: 1;
+}
+.badge-res-pending {
+    -fx-background-color: rgba(255,189,89,0.15);
+    -fx-text-fill: #FFBD59;
+    -fx-border-color: rgba(255,189,89,0.30);
+    -fx-border-width: 1;
+}
+
+/* ── Reservation action button ─────────────────────────────── */
+.gv-res-action-btn {
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+/* ── Reservation empty placeholder ─────────────────────────── */
+.gv-res-empty-placeholder {
+    -fx-text-fill: rgba(255,255,255,0.35);
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: center;
+}

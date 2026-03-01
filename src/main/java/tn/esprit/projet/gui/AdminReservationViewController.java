@@ -58,6 +58,10 @@ public class AdminReservationViewController {
         col1.setVisible(true); col2.setVisible(true); col3.setVisible(true);
         col4.setVisible(true); col5.setVisible(true); col6.setVisible(true);
 
+        // Unbind prefWidth — CONSTRAINED_RESIZE_POLICY binds it to the table width
+        for (TableColumn<?, ?> c : new TableColumn<?, ?>[]{col1, col2, col3, col4, col5, col6})
+            c.prefWidthProperty().unbind();
+
         col1.setText("ID Rés.");          col1.setMinWidth(80);  col1.setPrefWidth(80);
         col2.setText("Chambre");          col2.setMinWidth(150); col2.setPrefWidth(160);
         col3.setText("Hôtel");            col3.setMinWidth(200); col3.setPrefWidth(210);
@@ -187,27 +191,23 @@ public class AdminReservationViewController {
     // ═══════════════════════════════════════════════════════════════════════
 
     private Label buildStatusBadge(String status) {
-        String text; String style;
+        String text; String cssVariant;
         switch (status) {
             case "CONFIRMÉE" -> {
-                text  = "Confirmée";
-                style = "-fx-background-color:rgba(40,167,69,0.18);-fx-text-fill:#4ade80;" +
-                        "-fx-border-color:rgba(74,222,128,0.35);-fx-border-width:1;";
+                text = "Confirmée";
+                cssVariant = "badge-res-confirmed";
             }
             case "ANNULÉE" -> {
-                text  = "Annulée";
-                style = "-fx-background-color:rgba(220,53,69,0.15);-fx-text-fill:#f87171;" +
-                        "-fx-border-color:rgba(248,113,113,0.30);-fx-border-width:1;";
+                text = "Annulée";
+                cssVariant = "badge-res-cancelled";
             }
             default -> {
-                text  = "En attente";
-                style = "-fx-background-color:rgba(255,189,89,0.15);-fx-text-fill:#FFBD59;" +
-                        "-fx-border-color:rgba(255,189,89,0.30);-fx-border-width:1;";
+                text = "En attente";
+                cssVariant = "badge-res-pending";
             }
         }
         Label b = new Label(text);
-        b.setStyle(style + "-fx-background-radius:20;-fx-border-radius:20;" +
-                "-fx-font-size:11px;-fx-font-weight:700;-fx-padding:4 12;");
+        b.getStyleClass().addAll("badge-res-base", cssVariant);
         b.setMinWidth(90);
         return b;
     }
@@ -248,37 +248,36 @@ public class AdminReservationViewController {
             updateSubtitle();
             if (boundTable != null) boundTable.refresh();
         } catch (SQLException ex) {
-            AdminDialogHelper.showNotification("Erreur : " + ex.getMessage(), "error", admin.getClass());
+            DialogHelper.showNotification("Erreur : " + ex.getMessage(), "error", admin.getClass());
         }
     }
 
     private void deleteRow(ReservationDetail d) {
-        AdminDialogHelper.confirmDelete("réservation", "ID " + d.id, () -> {
+        DialogHelper.confirmDelete("réservation", "ID " + d.id, () -> {
             try {
                 reservationService.delete(d.id);
                 masterList = masterList.stream().filter(r -> r.id != d.id).collect(Collectors.toList());
                 applyFilter();
                 updateSubtitle();
-                AdminDialogHelper.showNotification("Réservation supprimée.", "success", admin.getClass());
+                DialogHelper.showNotification("Réservation supprimée.", "success", admin.getClass());
             } catch (SQLException ex) {
-                AdminDialogHelper.showNotification("Erreur : " + ex.getMessage(), "error", admin.getClass());
+                DialogHelper.showNotification("Erreur : " + ex.getMessage(), "error", admin.getClass());
             }
         }, admin.getClass());
     }
 
     private Button actionBtn(String label, String bg, String hover) {
         Button btn = new Button(label);
-        String s  = "-fx-background-color:" + bg    + ";-fx-text-fill:white;-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:700;-fx-padding:6 12;-fx-cursor:hand;";
-        String h  = "-fx-background-color:" + hover + ";-fx-text-fill:white;-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:700;-fx-padding:6 12;-fx-cursor:hand;";
-        btn.setStyle(s);
-        btn.setOnMouseEntered(e -> btn.setStyle(h));
-        btn.setOnMouseExited(e  -> btn.setStyle(s));
+        btn.getStyleClass().add("gv-res-action-btn");
+        btn.setStyle("-fx-background-color:" + bg + ";");
+        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color:" + hover + ";"));
+        btn.setOnMouseExited(e  -> btn.setStyle("-fx-background-color:" + bg + ";"));
         return btn;
     }
 
     private Node buildEmptyPlaceholder() {
         Label lbl = new Label("Aucune réservation enregistrée\nLes réservations effectuées côté client apparaîtront ici.");
-        lbl.setStyle("-fx-text-fill:rgba(255,255,255,0.35);-fx-font-size:14px;-fx-alignment:CENTER;-fx-text-alignment:center;");
+        lbl.getStyleClass().add("gv-res-empty-placeholder");
         lbl.setAlignment(Pos.CENTER);
         return lbl;
     }

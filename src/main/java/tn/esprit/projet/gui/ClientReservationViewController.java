@@ -36,6 +36,7 @@ public class ClientReservationViewController {
     public void showReservations() {
         // ── Show & configure the shared search panel (same as Hôtels / Chambres) ──
         controller.showSearchPanel(true);
+        controller.hideApiToolbar(); // Hide the API toolbar (Destination/Ville + Geoapify) — not needed for Reservations
 
         // Configure search panel labels
         javafx.scene.control.Label searchTitle = controller.getSearchTitle();
@@ -72,11 +73,11 @@ public class ClientReservationViewController {
         // Header
         VBox header = new VBox(4);
         Label agency = new Label("TRAVEL AGENCY");
-        agency.setStyle("-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #FF8210; -fx-letter-spacing: 2px;");
+        agency.getStyleClass().add("res-agency-label");
         Label title = new Label("Mes Réservations");
-        title.setStyle("-fx-font-size: 30px; -fx-font-weight: 800; -fx-text-fill: white;");
+        title.getStyleClass().add("res-page-title");
         Label countLabel = new Label(sessionReservations.size() + " réservation(s) trouvée(s)");
-        countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45);");
+        countLabel.getStyleClass().add("res-count-label");
         header.getChildren().addAll(agency, title, countLabel);
 
         // Table — wired to the shared search panel field and status combo
@@ -93,17 +94,7 @@ public class ClientReservationViewController {
     private TextField buildSearchField() {
         TextField f = new TextField();
         f.setPromptText("🔍  Rechercher...");
-        f.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.06);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-prompt-text-fill: rgba(255,255,255,0.35);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(255,255,255,0.10);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-padding: 10 16;" +
-                        "-fx-font-size: 13px;"
-        );
+        f.getStyleClass().add("res-search-field");
         f.setPrefWidth(280);
         return f;
     }
@@ -112,16 +103,7 @@ public class ClientReservationViewController {
         ComboBox<String> cb = new ComboBox<>();
         cb.getItems().addAll("Tous les statuts", "En attente", "Confirmée", "Annulée");
         cb.setValue("Tous les statuts");
-        cb.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.06);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(103,154,193,0.30);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-padding: 0 8;"
-        );
+        cb.getStyleClass().add("res-status-filter");
         cb.setPrefWidth(180);
         return cb;
     }
@@ -131,20 +113,14 @@ public class ClientReservationViewController {
                                        javafx.scene.control.ComboBox<String> statusFilter,
                                        Label countLabel) {
         VBox wrap = new VBox(0);
-        wrap.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.03);" +
-                        "-fx-background-radius: 16;" +
-                        "-fx-border-color: rgba(255,255,255,0.07);" +
-                        "-fx-border-radius: 16;" +
-                        "-fx-border-width: 1;"
-        );
+        wrap.getStyleClass().add("res-table-wrap");
         wrap.setMaxWidth(Double.MAX_VALUE);
 
         wrap.getChildren().add(buildColHeader());
 
         Region headerDiv = new Region();
         headerDiv.setMinHeight(1); headerDiv.setPrefHeight(1); headerDiv.setMaxHeight(1);
-        headerDiv.setStyle("-fx-background-color: rgba(255,255,255,0.07);");
+        headerDiv.getStyleClass().add("res-header-divider");
         wrap.getChildren().add(headerDiv);
 
         VBox rows = new VBox(0);
@@ -193,7 +169,7 @@ public class ClientReservationViewController {
             if (!first) {
                 Region div = new Region();
                 div.setMinHeight(1); div.setPrefHeight(1); div.setMaxHeight(1);
-                div.setStyle("-fx-background-color: rgba(255,255,255,0.04);");
+                div.getStyleClass().add("res-row-divider");
                 div.setMaxWidth(Double.MAX_VALUE);
                 rows.getChildren().add(div);
             }
@@ -204,7 +180,7 @@ public class ClientReservationViewController {
 
         if (rows.getChildren().isEmpty()) {
             Label empty = new Label("Aucune réservation trouvée");
-            empty.setStyle("-fx-text-fill: rgba(255,255,255,0.35); -fx-font-size: 14px; -fx-padding: 40;");
+            empty.getStyleClass().add("res-empty");
             empty.setMaxWidth(Double.MAX_VALUE);
             empty.setAlignment(Pos.CENTER);
             rows.getChildren().add(empty);
@@ -216,7 +192,7 @@ public class ClientReservationViewController {
         HBox row = new HBox(0);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(14, 22, 14, 22));
-        row.setStyle("-fx-background-color: rgba(255,255,255,0.02); -fx-background-radius: 16 16 0 0;");
+        row.getStyleClass().add("res-col-header");
         row.getChildren().addAll(
                 colLabel("CHAMBRE",   170),
                 colLabel("HÔTEL",     200),
@@ -236,56 +212,50 @@ public class ClientReservationViewController {
         // Room cell
         VBox roomCell = new VBox(2);
         Label roomNum = new Label("Ch. " + b.safeRoomNumber());
-        roomNum.setStyle("-fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: white;");
+        roomNum.getStyleClass().add("res-room-num");
         Label roomType = new Label(b.safeRoomType());
-        roomType.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.45);");
+        roomType.getStyleClass().add("res-room-type");
         roomCell.getChildren().addAll(roomNum, roomType);
         roomCell.setMinWidth(170); roomCell.setPrefWidth(170);
 
         // Hotel
         Label hotelLbl = new Label(b.safeHotelName());
-        hotelLbl.setStyle("-fx-font-size: 13px; -fx-text-fill: #8fd2ff; -fx-font-weight: 600;");
+        hotelLbl.getStyleClass().add("res-hotel-name");
         hotelLbl.setWrapText(false);
         hotelLbl.setMinWidth(200); hotelLbl.setPrefWidth(200); hotelLbl.setMaxWidth(200);
 
         // Date cell
         VBox dateCell = new VBox(2);
         Label dateRange = new Label(b.dateRange());
-        dateRange.setStyle("-fx-font-size: 12px; -fx-text-fill: #4fd1b3; -fx-font-weight: 700;");
+        dateRange.getStyleClass().add("res-date-range");
         long nights = b.nights();
         Label nightsLbl = new Label(nights + " nuit" + (nights > 1 ? "s" : ""));
-        nightsLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.40);");
+        nightsLbl.getStyleClass().add("res-nights");
         dateCell.getChildren().addAll(dateRange, nightsLbl);
         dateCell.setMinWidth(200); dateCell.setPrefWidth(200);
 
         // Price
         Label priceLbl = new Label(String.format("%.0f DT", b.prix));
-        priceLbl.setStyle("-fx-font-size: 13px; -fx-font-weight: 800; -fx-text-fill: white;");
+        priceLbl.getStyleClass().add("res-price");
         priceLbl.setMinWidth(110); priceLbl.setPrefWidth(110);
 
         row.getChildren().addAll(roomCell, hotelLbl, dateCell, priceLbl,
                 buildStatusCell(b.status), buildActionCell(b, refresh));
 
-        row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: rgba(255,255,255,0.025);"));
-        row.setOnMouseExited(e  -> row.setStyle(""));
+        row.getStyleClass().add("res-row");
+        row.setOnMouseEntered(e -> { if (!row.getStyleClass().contains("res-row-hover")) row.getStyleClass().add("res-row-hover"); });
+        row.setOnMouseExited(e  -> row.getStyleClass().remove("res-row-hover"));
         return row;
     }
 
     private HBox buildStatusCell(String status) {
-        String style = switch (status) {
-            case "CONFIRMÉE" ->
-                    "-fx-background-color: rgba(34,197,94,0.18); -fx-text-fill: #4ade80;" +
-                            "-fx-border-color: rgba(74,222,128,0.30); -fx-border-width: 1;";
-            case "ANNULÉE" ->
-                    "-fx-background-color: rgba(239,68,68,0.15); -fx-text-fill: #f87171;" +
-                            "-fx-border-color: rgba(248,113,113,0.28); -fx-border-width: 1;";
-            default ->
-                    "-fx-background-color: rgba(255,189,89,0.15); -fx-text-fill: #FFBD59;" +
-                            "-fx-border-color: rgba(255,189,89,0.28); -fx-border-width: 1;";
+        String cssVariant = switch (status) {
+            case "CONFIRMÉE" -> "res-badge-confirmed";
+            case "ANNULÉE"   -> "res-badge-cancelled";
+            default          -> "res-badge-pending";
         };
         Label badge = new Label(status);
-        badge.setStyle(style + "-fx-background-radius: 20; -fx-border-radius: 20;" +
-                "-fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 5 12;");
+        badge.getStyleClass().addAll("res-badge-base", cssVariant);
         HBox cell = new HBox(badge);
         cell.setAlignment(Pos.CENTER_LEFT);
         cell.setMinWidth(120); cell.setPrefWidth(120);
@@ -313,7 +283,7 @@ public class ClientReservationViewController {
             case "CONFIRMÉE" -> {
                 // Confirmed — read-only badge, no actions for client
                 Label confirmed = new Label("Confirmée ✓");
-                confirmed.setStyle("-fx-text-fill: #4ade80; -fx-font-weight: 700; -fx-font-size: 12px;");
+                confirmed.getStyleClass().add("res-confirmed-label");
                 cell.getChildren().add(confirmed);
             }
             default -> { // ANNULÉE
@@ -332,20 +302,16 @@ public class ClientReservationViewController {
 
     private Button actionBtn(String label, String bg, String hoverBg) {
         Button btn = new Button(label);
-        String base  = "-fx-background-color:" + bg + ";-fx-text-fill:white;-fx-background-radius:8;" +
-                "-fx-font-size:11px;-fx-font-weight:700;-fx-padding:6 12;-fx-cursor:hand;";
-        String hover = "-fx-background-color:" + hoverBg + ";-fx-text-fill:white;-fx-background-radius:8;" +
-                "-fx-font-size:11px;-fx-font-weight:700;-fx-padding:6 12;-fx-cursor:hand;";
-        btn.setStyle(base);
-        btn.setOnMouseEntered(e -> btn.setStyle(hover));
-        btn.setOnMouseExited(e  -> btn.setStyle(base));
+        btn.getStyleClass().add("res-action-btn");
+        btn.setStyle("-fx-background-color:" + bg + ";");
+        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color:" + hoverBg + ";"));
+        btn.setOnMouseExited(e  -> btn.setStyle("-fx-background-color:" + bg + ";"));
         return btn;
     }
 
     private Label colLabel(String text, double width) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size:11px;-fx-font-weight:700;" +
-                "-fx-text-fill:rgba(255,255,255,0.45);-fx-letter-spacing:1px;");
+        lbl.getStyleClass().add("res-col-label");
         lbl.setMinWidth(width); lbl.setPrefWidth(width);
         return lbl;
     }

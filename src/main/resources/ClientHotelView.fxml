@@ -36,13 +36,13 @@
                 <Label styleClass="search-label" text="Rechercher"/>
                 <TextField fx:id="searchField" promptText="Ville, hotel, destination..." styleClass="search-field"/>
             </VBox>
-            <Pane prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;"/>
+            <Pane prefWidth="1.0" styleClass="search-separator"/>
             <VBox fx:id="filterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES">
                 <Label fx:id="filterLabel" styleClass="search-label" text="Etoiles"/>
                 <ComboBox fx:id="starsFilterCombo" prefWidth="150.0" promptText="Etoiles" styleClass="search-field"/>
                 <ComboBox fx:id="hotelFilterCombo" managed="false" prefWidth="180.0" promptText="Filtrer par hotel" styleClass="search-field" visible="false"/>
             </VBox>
-            <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;" visible="false"/>
+            <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" styleClass="search-separator" visible="false"/>
             <VBox fx:id="roomTypeFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false" HBox.hgrow="SOMETIMES">
                 <Label fx:id="roomTypeFilterLabel" styleClass="search-label" text="Type"/>
                 <ComboBox fx:id="roomTypeFilterCombo" prefWidth="140.0" promptText="Type de chambre" styleClass="search-field"/>

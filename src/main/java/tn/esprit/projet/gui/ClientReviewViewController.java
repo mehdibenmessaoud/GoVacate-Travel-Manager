@@ -24,12 +24,12 @@ import java.util.function.Function;
 public class ClientReviewViewController {
 
     private final ClientSharedState  state;
-    private final ClientDialogHelper dialogs;
+    private final DialogHelper.ClientDialogs dialogs;
     private final Function<String, Image> imageLoader;
 
     public ClientReviewViewController(
             ClientSharedState  state,
-            ClientDialogHelper dialogs,
+            DialogHelper.ClientDialogs dialogs,
             Function<String, Image> imageLoader
     ) {
         this.state       = state;
@@ -47,14 +47,13 @@ public class ClientReviewViewController {
      */
     public VBox buildReviewsSection(Hotel hotel) {
         VBox section = new VBox(15);
-        section.setStyle("-fx-background-color: rgba(255,255,255,0.03); -fx-background-radius: 15; -fx-padding: 20;");
+        section.getStyleClass().add("review-section");
 
         Label reviewsTitle = new Label("Avis des clients");
-        reviewsTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        reviewsTitle.getStyleClass().add("review-section-title");
 
         Button addReviewBtn = new Button("+ Ajouter un avis");
-        addReviewBtn.getStyleClass().add("btn-orange-glow");
-        addReviewBtn.setStyle("-fx-font-size: 12px; -fx-padding: 8 14; -fx-background-radius: 18;");
+        addReviewBtn.getStyleClass().addAll("btn-orange-glow", "review-add-btn");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -68,7 +67,7 @@ public class ClientReviewViewController {
                 List<HotelReview> reviews = state.hotelReviewService.getReviewsByHotel(hotel.getId());
                 if (reviews.isEmpty()) {
                     Label empty = new Label("Aucun avis pour le moment - Soyez le premier a donner votre avis!");
-                    empty.setStyle("-fx-text-fill: rgba(255,255,255,0.5); -fx-font-style: italic;");
+                    empty.getStyleClass().add("review-empty-label");
                     reviewsBox.getChildren().add(empty);
                 } else {
                     int visibleCount = 0;
@@ -86,13 +85,13 @@ public class ClientReviewViewController {
                     }
                     if (visibleCount == 0) {
                         Label empty = new Label("Aucun avis pour le moment - Soyez le premier a donner votre avis!");
-                        empty.setStyle("-fx-text-fill: rgba(255,255,255,0.5); -fx-font-style: italic;");
+                        empty.getStyleClass().add("review-empty-label");
                         reviewsBox.getChildren().add(empty);
                     }
                 }
             } catch (SQLException e) {
                 Label error = new Label("Erreur de chargement des avis");
-                error.setStyle("-fx-text-fill: #FF8210;");
+                error.getStyleClass().add("review-error-label");
                 reviewsBox.getChildren().add(error);
             }
         };
@@ -132,7 +131,7 @@ public class ClientReviewViewController {
         Label imageLabel   = formLabel("Image (optionnel)");
 
         Label hotelValue = new Label(hotel.getName());
-        hotelValue.setStyle("-fx-text-fill: #FFBD59; -fx-font-size: 14px; -fx-font-weight: 700;");
+        hotelValue.getStyleClass().add("review-hotel-value");
 
         // Star rating widget - click stars or read num/5 label
         final int[] selectedRating = {5};
@@ -140,18 +139,19 @@ public class ClientReviewViewController {
         starRatingBox.setAlignment(Pos.CENTER_LEFT);
         Button[] starBtns = new Button[5];
         Label ratingNumLabel = new Label("5/5");
-        ratingNumLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFBD59; -fx-font-weight: 700; -fx-padding: 0 0 0 10;");
+        ratingNumLabel.getStyleClass().add("review-rating-num");
         // Create buttons first
         for (int i = 0; i < 5; i++) {
             starBtns[i] = new Button("\u2605");
-            starBtns[i].setStyle("-fx-background-color: transparent; -fx-text-fill: #FFBD59; -fx-font-size: 22px; -fx-cursor: hand; -fx-padding: 0 2;");
+            starBtns[i].getStyleClass().add("review-star-btn");
         }
         // Now define refresh (after array is populated)
         Runnable refreshStars = () -> {
             for (int i = 0; i < 5; i++) {
                 boolean filled = i < selectedRating[0];
                 starBtns[i].setText(filled ? "\u2605" : "\u2606");
-                starBtns[i].setStyle("-fx-background-color: transparent; -fx-text-fill: " + (filled ? "#FFBD59" : "rgba(255,255,255,0.28)") + "; -fx-font-size: 22px; -fx-cursor: hand; -fx-padding: 0 2;");
+                starBtns[i].getStyleClass().removeAll("review-star-btn", "review-star-btn-empty");
+                starBtns[i].getStyleClass().add(filled ? "review-star-btn" : "review-star-btn-empty");
             }
             ratingNumLabel.setText(selectedRating[0] + "/5");
         };
@@ -279,7 +279,7 @@ public class ClientReviewViewController {
 
     private HBox buildReviewBox(int rating, String comment, List<HotelReviewImage> reviewImages) {
         HBox box = new HBox(16);
-        box.setStyle("-fx-background-color: rgba(255,255,255,0.04); -fx-background-radius: 14; -fx-padding: 16 20; -fx-border-color: rgba(255,255,255,0.07); -fx-border-width: 1; -fx-border-radius: 14;");
+        box.getStyleClass().add("review-card-box");
         box.setAlignment(Pos.TOP_LEFT);
 
         // Avatar circle with gradient
@@ -287,9 +287,9 @@ public class ClientReviewViewController {
         avatar.setMinSize(44, 44);
         avatar.setPrefSize(44, 44);
         avatar.setMaxSize(44, 44);
-        avatar.setStyle("-fx-background-color: linear-gradient(to bottom right, #FF8210, #e06b00); -fx-background-radius: 22;");
+        avatar.getStyleClass().add("review-avatar");
         Label avatarIcon = new Label("U");
-        avatarIcon.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        avatarIcon.getStyleClass().add("review-avatar-icon");
         avatar.getChildren().add(avatarIcon);
 
         VBox reviewContent = new VBox(8);
@@ -300,13 +300,13 @@ public class ClientReviewViewController {
         ratingRow.setAlignment(Pos.CENTER_LEFT);
         String stars = renderStars(rating);
         Label starsLabel = new Label(stars);
-        starsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFBD59;");
+        starsLabel.getStyleClass().add("review-stars-label");
         Label ratingNum = new Label(rating + "/5");
-        ratingNum.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,189,89,0.7); -fx-font-weight: 600;");
+        ratingNum.getStyleClass().add("review-rating-num-card");
         ratingRow.getChildren().addAll(starsLabel, ratingNum);
 
         Label commentLabel = new Label(comment);
-        commentLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.82); -fx-line-spacing: 2;");
+        commentLabel.getStyleClass().add("card-sub");
         commentLabel.setWrapText(true);
 
         reviewContent.getChildren().addAll(ratingRow, commentLabel);
@@ -323,7 +323,7 @@ public class ClientReviewViewController {
             }
             if (reviewImages.size() > limit) {
                 Label more = new Label("+" + (reviewImages.size() - limit));
-                more.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12px; -fx-font-weight: 700;");
+                more.getStyleClass().add("review-more-label");
                 imagesPane.getChildren().add(more);
             }
             reviewContent.getChildren().add(imagesPane);
@@ -338,7 +338,7 @@ public class ClientReviewViewController {
         thumb.setMinSize(90, 66);
         thumb.setPrefSize(90, 66);
         thumb.setMaxSize(90, 66);
-        thumb.setStyle("-fx-background-color: rgba(0,0,0,0.30); -fx-background-radius: 8; -fx-cursor: hand;");
+        thumb.getStyleClass().add("review-thumb");
 
         Image img = imageLoader.apply(imagePath);
         if (img != null) {
@@ -351,7 +351,7 @@ public class ClientReviewViewController {
             thumb.setOnMouseClicked(e -> dialogs.showImagePreview(imagePath, "Image de l'avis"));
         } else {
             Label ph = new Label("IMG");
-            ph.setStyle("-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 10px; -fx-font-weight: 700;");
+            ph.getStyleClass().add("review-thumb-ph");
             thumb.getChildren().add(ph);
         }
         return thumb;
@@ -378,7 +378,7 @@ public class ClientReviewViewController {
 
     private Label formLabel(String text) {
         Label l = new Label(text);
-        l.setStyle("-fx-text-fill: #eaf3ff; -fx-font-size: 13px; -fx-font-weight: 600;");
+        l.getStyleClass().add("gv-dialog-form-label");
         return l;
     }
 }

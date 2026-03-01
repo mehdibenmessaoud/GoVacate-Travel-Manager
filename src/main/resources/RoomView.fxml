@@ -12,7 +12,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="detailViewSection" managed="false" spacing="25.0" visible="false"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.AdminDetailSectionController">
 
     <Button fx:id="backButton" styleClass="btn-back" text="Retour a la liste"/>
 
@@ -29,7 +30,7 @@
             <Label fx:id="detailSubInfo" styleClass="text-sub"/>
             <HBox fx:id="detailApiRow" alignment="CENTER_LEFT" spacing="8.0"/>
             <FlowPane fx:id="detailBadges" hgap="12.0" vgap="10.0"/>
-            <Label fx:id="detailDesc" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.75); -fx-line-spacing: 3;" wrapText="true"/>
+            <Label fx:id="detailDesc" styleClass="detail-desc-label" wrapText="true"/>
             <FlowPane fx:id="detailActionButtons" alignment="CENTER_LEFT" hgap="12.0" prefWrapLength="620.0" vgap="12.0">
                 <padding>
                     <Insets top="15.0"/>

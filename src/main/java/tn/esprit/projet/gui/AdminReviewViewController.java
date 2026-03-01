@@ -46,22 +46,22 @@ public class AdminReviewViewController {
                                   TableColumn<HotelReview, Void> colReviewActions) {
 
         colReviewRating.setCellValueFactory(data ->
-                new SimpleStringProperty(AdminUtils.renderStars(data.getValue().getRating()) + " (" + data.getValue().getRating() + "/5)"));
+                new SimpleStringProperty(GuiUtils.renderStars(data.getValue().getRating()) + " (" + data.getValue().getRating() + "/5)"));
         colReviewComment.setCellValueFactory(data ->
                 new SimpleStringProperty(maskReviewCommentForDisplay(data.getValue().getComment())));
         colReviewUser.setCellValueFactory(data ->
                 new SimpleStringProperty(state.resolveUserLabel(data.getValue().getUserId())));
 
         colReviewActions.setCellFactory(col -> new TableCell<>() {
-            private final Button hideBtn = AdminDialogHelper.createTableActionButton("Masquer", AdminDialogHelper.BLUE_BTN, AdminDialogHelper.BLUE_BTN_HOVER, 90);
-            private final Button deleteBtn = AdminDialogHelper.createTableActionButton("Supprimer", AdminDialogHelper.RED_BTN, AdminDialogHelper.RED_BTN_HOVER, 96);
+            private final Button hideBtn = DialogHelper.createTableActionButton("Masquer", "gv-btn-blue", 90);
+            private final Button deleteBtn = DialogHelper.createTableActionButton("Supprimer", "gv-btn-red", 96);
             private final HBox box = new HBox(8, hideBtn, deleteBtn);
             {
                 hideBtn.setTooltip(new Tooltip("Masquer cet avis"));
                 deleteBtn.setTooltip(new Tooltip("Supprimer cet avis"));
                 box.setAlignment(Pos.CENTER);
                 hideBtn.setOnAction(e -> moderateReview(getTableView().getItems().get(getIndex())));
-                deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("avis", "", () -> handleDeleteReview(getTableView().getItems().get(getIndex())), getClass()));
+                deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("avis", "", () -> handleDeleteReview(getTableView().getItems().get(getIndex())), getClass()));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -88,7 +88,7 @@ public class AdminReviewViewController {
 
     public void showAddReviewDialog(int hotelId, TableView<HotelReview> reviewsTable) {
         if (hotelId <= 0) {
-            AdminDialogHelper.showNotification("Selectionnez d'abord un hotel.", "warning", getClass()); return;
+            DialogHelper.showNotification("Selectionnez d'abord un hotel.", "warning", getClass()); return;
         }
         Dialog<HotelReview> dialog = createReviewDialog(null);
         dialog.showAndWait().ifPresent(r -> {
@@ -101,11 +101,11 @@ public class AdminReviewViewController {
                 String message = processing.moderated()
                         ? "Avis ajoute et masque automatiquement par moderation." + sentimentSuffix
                         : "Avis ajoute!" + sentimentSuffix;
-                AdminDialogHelper.showNotification(message, "success", getClass());
+                DialogHelper.showNotification(message, "success", getClass());
             } catch (SQLException e) {
-                AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
+                DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
             } catch (RuntimeException e) {
-                AdminDialogHelper.showNotification("Erreur inattendue: " + e.getMessage(), "error", getClass());
+                DialogHelper.showNotification("Erreur inattendue: " + e.getMessage(), "error", getClass());
             }
         });
     }
@@ -116,7 +116,7 @@ public class AdminReviewViewController {
         ButtonType saveBtn = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
 
         // Star rating selector
         javafx.scene.layout.HBox starsBox = new javafx.scene.layout.HBox(8);
@@ -126,7 +126,7 @@ public class AdminReviewViewController {
         for (int i = 0; i < 5; i++) {
             final int r = i + 1;
             stars[i] = new Label(r <= rating[0] ? "\u2605" : "\u2606");
-            stars[i].setStyle("-fx-font-size: 28px; -fx-cursor: hand; -fx-text-fill: #FFBD59;");
+            stars[i].getStyleClass().add("star-rating-selector");
             stars[i].setOnMouseClicked(e -> {
                 rating[0] = r;
                 for (int j = 0; j < 5; j++) stars[j].setText(j < r ? "\u2605" : "\u2606");
@@ -137,7 +137,7 @@ public class AdminReviewViewController {
         TextArea commentField = new TextArea(review != null ? review.getComment() : "");
         commentField.setPromptText("Commentaire de l'utilisateur");
         commentField.setPrefRowCount(4); commentField.setWrapText(true); commentField.setPrefHeight(108);
-        AdminDialogHelper.applyDialogFieldSizing(commentField);
+        DialogHelper.applyDialogFieldSizing(commentField);
 
         var userOptions = state.loadReviewUserOptions();
         if (review != null && review.getUserId() > 0
@@ -147,7 +147,7 @@ public class AdminReviewViewController {
         userOptions.sort(java.util.Comparator.comparingInt(AdminSharedState.ReviewUserOption::id));
 
         ComboBox<AdminSharedState.ReviewUserOption> userCombo = new ComboBox<>(FXCollections.observableArrayList(userOptions));
-        AdminDialogHelper.applyDialogFieldSizing(userCombo);
+        DialogHelper.applyDialogFieldSizing(userCombo);
         userCombo.setPromptText("Selectionner un utilisateur");
         userCombo.setVisibleRowCount(Math.min(10, Math.max(3, userOptions.size())));
 
@@ -163,16 +163,16 @@ public class AdminReviewViewController {
 
         if (userOptions.isEmpty()) {
             Label warning = new Label("Aucun utilisateur detecte. Creez d'abord un utilisateur.");
-            warning.setStyle("-fx-text-fill: #FF8210; -fx-font-size: 12px;"); warning.setWrapText(true);
+            warning.getStyleClass().add("gv-warning-text"); warning.setWrapText(true);
             grid.add(warning, 1, 3);
         }
 
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 400);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 400);
+        DialogHelper.styleDialog(dialog, false, getClass());
 
         Node saveButtonNode = dialog.getDialogPane().lookupButton(saveBtn);
-        Runnable validate = () -> saveButtonNode.setDisable(AdminUtils.isBlank(commentField.getText()) || userCombo.getValue() == null);
+        Runnable validate = () -> saveButtonNode.setDisable(GuiUtils.isBlank(commentField.getText()) || userCombo.getValue() == null);
         validate.run();
         commentField.textProperty().addListener((obs, oldValue, newValue) -> validate.run());
         userCombo.valueProperty().addListener((obs, oldValue, newValue) -> validate.run());
@@ -181,7 +181,7 @@ public class AdminReviewViewController {
             if (btn != saveBtn) return null;
             var selectedUser = userCombo.getValue();
             return selectedUser == null ? null
-                    : new HotelReview(0, rating[0], AdminUtils.trimToEmpty(commentField.getText()), selectedUser.id(), 0);
+                    : new HotelReview(0, rating[0], GuiUtils.trimToEmpty(commentField.getText()), selectedUser.id(), 0);
         });
         return dialog;
     }
@@ -196,7 +196,7 @@ public class AdminReviewViewController {
         dialog.setTitle("Masquer l'avis");
         dialog.setHeaderText("Masquer cet avis client ?");
         dialog.setContentText("Motif (optionnel):");
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.styleDialog(dialog, false, getClass());
         dialog.showAndWait().ifPresent(reason -> {
             try {
                 String trimmedReason = reason == null ? "" : reason.trim();
@@ -209,9 +209,9 @@ public class AdminReviewViewController {
                 int hotelId = state.getSelectedHotel() != null ? state.getSelectedHotel().getId() : review.getHotelId();
                 // Trigger a refresh in the controller via a simple callback
                 admin.reloadReviews(hotelId);
-                AdminDialogHelper.showNotification("Avis masque avec succes!", "success", getClass());
+                DialogHelper.showNotification("Avis masque avec succes!", "success", getClass());
             } catch (SQLException e) {
-                AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
+                DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
             }
         });
     }
@@ -221,9 +221,9 @@ public class AdminReviewViewController {
             reviewService.delete(review.getId());
             int hotelId = state.getSelectedHotel() != null ? state.getSelectedHotel().getId() : review.getHotelId();
             admin.reloadReviews(hotelId);
-            AdminDialogHelper.showNotification("Avis supprime!", "success", getClass());
+            DialogHelper.showNotification("Avis supprime!", "success", getClass());
         } catch (SQLException e) {
-            AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
+            DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass());
         }
     }
 

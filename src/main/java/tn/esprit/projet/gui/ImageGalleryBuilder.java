@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -37,6 +38,17 @@ public final class ImageGalleryBuilder {
                                  String hoverColor,
                                  String placeholderIcon,
                                  Class<?> resourceBase) {
+        build(images, urlExtractor, mainContainer, thumbnailsContainer, hoverColor, placeholderIcon, resourceBase, null);
+    }
+
+    public static <T> void build(List<T> images,
+                                 Function<T, String> urlExtractor,
+                                 StackPane mainContainer,
+                                 HBox thumbnailsContainer,
+                                 String hoverColor,
+                                 String placeholderIcon,
+                                 Class<?> resourceBase,
+                                 Consumer<String> onImagePreview) {
         mainContainer.getChildren().clear();
         thumbnailsContainer.getChildren().clear();
 
@@ -51,11 +63,16 @@ public final class ImageGalleryBuilder {
             return;
         }
 
+        final int[] currentIndex = {0};
+
         ImageView mainView = new ImageView();
         applyCoverFit(mainView, firstImg, 520, 330);
+        mainView.setOnMouseClicked(ev -> {
+            if (onImagePreview != null && currentIndex[0] >= 0 && currentIndex[0] < images.size()) {
+                onImagePreview.accept(urlExtractor.apply(images.get(currentIndex[0])));
+            }
+        });
         mainContainer.getChildren().add(mainView);
-
-        final int[] currentIndex = {0};
 
         if (images.size() > 1) {
             Button prevBtn = navButton("<");
@@ -77,9 +94,6 @@ public final class ImageGalleryBuilder {
             mainContainer.getChildren().addAll(prevBtn, nextBtn);
         }
 
-        String normalStyle = "-fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 10; -fx-padding: 4; -fx-cursor: hand;";
-        String hoverStyle = "-fx-background-color: " + hoverColor + "; -fx-background-radius: 10; -fx-padding: 4; -fx-cursor: hand;";
-
         for (int i = 0; i < images.size(); i++) {
             final int idx = i;
             Image thumbImg = ImageLoader.load(urlExtractor.apply(images.get(i)), resourceBase);
@@ -87,9 +101,9 @@ public final class ImageGalleryBuilder {
             ImageView thumb = new ImageView(thumbImg);
             thumb.setFitWidth(104); thumb.setFitHeight(70); thumb.setPreserveRatio(false);
             StackPane thumbBox = new StackPane(thumb);
-            thumbBox.setStyle(normalStyle);
-            thumbBox.setOnMouseEntered(ev -> thumbBox.setStyle(hoverStyle));
-            thumbBox.setOnMouseExited(ev -> thumbBox.setStyle(normalStyle));
+            thumbBox.getStyleClass().add("gallery-thumbnail");
+            thumbBox.setOnMouseEntered(ev -> thumbBox.getStyleClass().add("gallery-thumbnail-hover"));
+            thumbBox.setOnMouseExited(ev -> thumbBox.getStyleClass().remove("gallery-thumbnail-hover"));
             thumbBox.setOnMouseClicked(ev -> {
                 currentIndex[0] = idx;
                 Image newImg = ImageLoader.load(urlExtractor.apply(images.get(idx)), resourceBase);
@@ -103,20 +117,24 @@ public final class ImageGalleryBuilder {
         VBox placeholder = new VBox(15);
         placeholder.setAlignment(Pos.CENTER);
         Label iconLabel = new Label(icon);
-        iconLabel.setStyle("-fx-font-size: 60px; -fx-text-fill: rgba(255,255,255,0.3);");
+        iconLabel.getStyleClass().add("gallery-placeholder-icon");
         Label textLabel = new Label("Aucune image disponible");
-        textLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 14px;");
+        textLabel.getStyleClass().add("gallery-placeholder-text");
         placeholder.getChildren().addAll(iconLabel, textLabel);
         mainContainer.getChildren().add(placeholder);
     }
 
     private static void applyCoverFit(ImageView view, Image image, double w, double h) {
-        view.setFitWidth(w); view.setFitHeight(h); view.setPreserveRatio(false); view.setSmooth(true); view.setImage(image);
+        view.setFitWidth(w);
+        view.setFitHeight(h);
+        view.setPreserveRatio(false);
+        view.setSmooth(true);
+        view.setImage(image);
     }
 
     private static Button navButton(String label) {
         Button btn = new Button(label);
-        btn.setStyle("-fx-background-color: rgba(0,0,0,0.55); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-min-width: 36; -fx-min-height: 36; -fx-cursor: hand;");
+        btn.getStyleClass().add("gallery-arrow-button");
         return btn;
     }
 }

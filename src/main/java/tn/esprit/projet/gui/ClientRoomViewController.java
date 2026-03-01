@@ -22,13 +22,13 @@ import java.util.function.Function;
 public class ClientRoomViewController {
 
     private final ClientSharedState  state;
-    private final ClientDialogHelper dialogs;
+    private final DialogHelper.ClientDialogs dialogs;
     private final Function<String, Image> imageLoader;
     private final ClientController   controller;
 
     public ClientRoomViewController(
             ClientSharedState  state,
-            ClientDialogHelper dialogs,
+            DialogHelper.ClientDialogs dialogs,
             Function<String, Image> imageLoader,
             ClientController   controller
     ) {
@@ -118,13 +118,13 @@ public class ClientRoomViewController {
         } catch (SQLException ignored) {}
 
         Label typeLabel = new Label(room.getRoomType());
-        typeLabel.setStyle("-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 15; -fx-font-size: 11px;");
+        typeLabel.getStyleClass().add("room-type-badge");
         StackPane.setAlignment(typeLabel, Pos.TOP_LEFT);
         StackPane.setMargin(typeLabel, new Insets(10));
         header.getChildren().add(typeLabel);
 
         Label priceBadge = new Label(room.getPricePerNight() + " DT");
-        priceBadge.setStyle("-fx-background-color: rgba(255,130,16,0.9); -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 15; -fx-font-size: 11px; -fx-font-weight: bold;");
+        priceBadge.getStyleClass().add("room-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10));
         header.getChildren().add(priceBadge);
@@ -134,33 +134,32 @@ public class ClientRoomViewController {
         glass.setPadding(new Insets(12));
 
         Label title = new Label("Chambre " + room.getRoomNumber());
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.getStyleClass().add("room-title");
 
         Label hotelLabel = new Label(hotelName);
-        hotelLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #679AC1;");
+        hotelLabel.getStyleClass().add("room-hotel-label");
 
         HBox info = new HBox(15);
         info.setAlignment(Pos.CENTER_LEFT);
         Label capacity    = new Label(room.getCapacity() + " pers.");
-        capacity.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.8);");
+        capacity.getStyleClass().add("room-capacity-label");
         Label priceLabel  = new Label(room.getPricePerNight() + " DT/nuit");
-        priceLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #FF8210; -fx-font-weight: bold;");
+        priceLabel.getStyleClass().add("room-price-label");
         info.getChildren().addAll(capacity, priceLabel);
 
         HBox statusRow = new HBox(8);
         statusRow.setAlignment(Pos.CENTER);
         statusRow.setPadding(new Insets(5, 0, 0, 0));
 
-        Label status = new Label(ClientUtils.getStatusLabel(room.getStatus()));
-        status.getStyleClass().add(ClientUtils.getStatusBadgeClass(room.getStatus()));
+        Label status = new Label(GuiUtils.getStatusLabel(room.getStatus()));
+        status.getStyleClass().add(GuiUtils.getStatusBadgeClass(room.getStatus()));
 
         Button detailsBtn = new Button("Details");
-        detailsBtn.setStyle("-fx-background-color: #679AC1; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-size: 11px;");
+        detailsBtn.getStyleClass().add("room-details-btn");
         detailsBtn.setOnAction(e -> controller.showRoomDetails(room, hotelName));
 
         Button bookBtn = new Button("Réserver");
-        bookBtn.getStyleClass().add("btn-book");
-        bookBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 12;");
+        bookBtn.getStyleClass().addAll("btn-book", "room-book-btn-small");
         boolean available = "AVAILABLE".equals(room.getStatus());
         bookBtn.setDisable(!available);
         if (available) bookBtn.setOnAction(e -> showBookingForm(room, hotelName));
@@ -173,8 +172,8 @@ public class ClientRoomViewController {
         content.getChildren().addAll(header, glass);
         card.getChildren().add(content);
 
-        card.setOnMouseEntered(e -> card.setStyle("-fx-effect: dropshadow(gaussian, rgba(103,154,193,0.5), 20, 0, 0, 5); -fx-scale-x: 1.02; -fx-scale-y: 1.02;"));
-        card.setOnMouseExited(e  -> card.setStyle("-fx-effect: none; -fx-scale-x: 1; -fx-scale-y: 1;"));
+        card.setOnMouseEntered(e -> { if (!card.getStyleClass().contains("room-card-hover")) card.getStyleClass().add("room-card-hover"); });
+        card.setOnMouseExited(e  -> card.getStyleClass().remove("room-card-hover"));
         card.setOnMouseClicked(e -> { if (e.getClickCount() == 2) controller.showRoomDetails(room, hotelName); });
 
         return card;
@@ -195,21 +194,32 @@ public class ClientRoomViewController {
         detailsBox.setMaxWidth(1160);
 
         Button backBtn = new Button("Retour aux chambres");
-        backBtn.getStyleClass().add("btn-book");
-        backBtn.setStyle("-fx-background-color: #FF8210; -fx-font-size: 14px; -fx-padding: 12 25;");
+        backBtn.getStyleClass().addAll("btn-book", "hotel-detail-back-btn");
         backBtn.setOnAction(e -> controller.goToRooms());
 
         HBox mainSection = new HBox(25);
         mainSection.setAlignment(Pos.TOP_LEFT);
 
         // Gallery
-        ClientImageGalleryBuilder<RoomImage> galleryBuilder = new ClientImageGalleryBuilder<>(
-                "#679AC1", "R", RoomImage::getImageUrl, imageLoader,
-                url -> dialogs.showImagePreview(url, "Image chambre")
-        );
         List<RoomImage> images = List.of();
         try { images = state.roomImageService.getByRoomId(room.getId()); } catch (SQLException ignored) {}
-        VBox imageGallery = galleryBuilder.build(images);
+        StackPane mainImageContainer = new StackPane();
+        mainImageContainer.setPrefSize(520, 330);
+        mainImageContainer.getStyleClass().add("gallery-main-container");
+        HBox thumbnailsContainer = new HBox(10);
+        thumbnailsContainer.setAlignment(Pos.CENTER_LEFT);
+        VBox imageGallery = new VBox(10, mainImageContainer, thumbnailsContainer);
+        imageGallery.setPrefWidth(520);
+        ImageGalleryBuilder.build(
+                images,
+                RoomImage::getImageUrl,
+                mainImageContainer,
+                thumbnailsContainer,
+                "#679AC1",
+                "R",
+                getClass(),
+                url -> dialogs.showImagePreview(url, "Image chambre")
+        );
 
         // Info box
         VBox infoBox = new VBox(15);
@@ -217,12 +227,12 @@ public class ClientRoomViewController {
         HBox.setHgrow(infoBox, Priority.ALWAYS);
 
         Label roomTitle = new Label("Chambre " + room.getRoomNumber());
-        roomTitle.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
+        roomTitle.getStyleClass().add("room-detail-title");
 
         HBox hotelRow = new HBox(10);
         hotelRow.setAlignment(Pos.CENTER_LEFT);
         Label hotelLabel = new Label(hotelName);
-        hotelLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #679AC1; -fx-font-weight: bold;");
+        hotelLabel.getStyleClass().add("room-detail-hotel");
         hotelRow.getChildren().add(hotelLabel);
 
         HBox featuresRow = new HBox(15);
@@ -233,20 +243,18 @@ public class ClientRoomViewController {
         featuresRow.getChildren().addAll(typeBox, capacityBox);
 
         VBox priceBox = new VBox(3);
-        priceBox.setStyle("-fx-background-color: rgba(255,130,16,0.15); -fx-background-radius: 12; -fx-padding: 15 20;");
+        priceBox.getStyleClass().add("room-price-box");
         Label priceTitle = new Label("Prix par nuit");
-        priceTitle.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.7);");
+        priceTitle.getStyleClass().add("room-price-title");
         Label priceValue = new Label(room.getPricePerNight() + " DT");
-        priceValue.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #FF8210;");
+        priceValue.getStyleClass().add("room-price-value");
         priceBox.getChildren().addAll(priceTitle, priceValue);
 
-        Label statusLabel = new Label(ClientUtils.getStatusLabel(room.getStatus()));
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
-        statusLabel.getStyleClass().add(ClientUtils.getStatusBadgeClass(room.getStatus()));
+        Label statusLabel = new Label(GuiUtils.getStatusLabel(room.getStatus()));
+        statusLabel.getStyleClass().addAll("room-detail-status", GuiUtils.getStatusBadgeClass(room.getStatus()));
 
         Button bookBtn = new Button("Réserver maintenant");
-        bookBtn.getStyleClass().add("btn-book");
-        bookBtn.setStyle("-fx-font-size: 16px; -fx-padding: 15 30; -fx-background-radius: 25;");
+        bookBtn.getStyleClass().addAll("btn-book", "room-book-btn-lg");
         boolean isAvailable = "AVAILABLE".equals(room.getStatus());
         bookBtn.setDisable(!isAvailable);
         if (isAvailable) bookBtn.setOnAction(e -> showBookingForm(room, hotelName));
@@ -276,27 +284,7 @@ public class ClientRoomViewController {
 
         // ── Back button (top-left) ───────────────────────────────────────────
         Button backBtn = new Button("← Retour");
-        backBtn.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: rgba(255,255,255,0.45);" +
-                        "-fx-font-size: 12px;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 0 0 0 0;"
-        );
-        backBtn.setOnMouseEntered(e -> backBtn.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #FF8210;" +
-                        "-fx-font-size: 12px;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 0 0 0 0;"
-        ));
-        backBtn.setOnMouseExited(e -> backBtn.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: rgba(255,255,255,0.45);" +
-                        "-fx-font-size: 12px;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 0 0 0 0;"
-        ));
+        backBtn.getStyleClass().add("booking-back-btn");
         backBtn.setOnAction(e -> controller.goToRooms());
         HBox backRow = new HBox(backBtn);
         backRow.setPadding(new Insets(0, 0, 24, 0));
@@ -307,27 +295,20 @@ public class ClientRoomViewController {
         header.setPadding(new Insets(0, 0, 28, 0));
 
         Label eyebrow = new Label("HÔTELS & SÉJOURS");
-        eyebrow.setStyle(
-                "-fx-font-size: 10px; -fx-font-weight: 800;" +
-                        "-fx-text-fill: #FF8210; -fx-letter-spacing: 3px;"
-        );
+        eyebrow.getStyleClass().add("booking-eyebrow");
 
         Label pageTitle = new Label("Finaliser votre Réservation");
-        pageTitle.setStyle(
-                "-fx-font-size: 28px; -fx-font-weight: 800; -fx-text-fill: white;"
-        );
+        pageTitle.getStyleClass().add("booking-page-title");
 
         Label roomSub = new Label(
                 "Chambre " + room.getRoomNumber() + "  ·  " + room.getRoomType() + "  ·  " + hotelName
         );
-        roomSub.setStyle(
-                "-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.40);"
-        );
+        roomSub.getStyleClass().add("booking-room-sub");
 
         Region accentLine = new Region();
         accentLine.setPrefWidth(48); accentLine.setPrefHeight(3);
         accentLine.setMaxWidth(48);
-        accentLine.setStyle("-fx-background-color: #FF8210; -fx-background-radius: 2;");
+        accentLine.getStyleClass().add("booking-accent-line");
 
         header.getChildren().addAll(eyebrow, pageTitle, accentLine, roomSub);
 
@@ -338,27 +319,17 @@ public class ClientRoomViewController {
 
         // ════ LEFT: form card ════════════════════════════════════════════════
         VBox formCard = new VBox(20);
-        formCard.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.04);" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-border-color: rgba(255,255,255,0.07);" +
-                        "-fx-border-radius: 18;" +
-                        "-fx-border-width: 1;"
-        );
+        formCard.getStyleClass().add("booking-form-card");
         formCard.setPadding(new Insets(28, 28, 28, 28));
         HBox.setHgrow(formCard, Priority.ALWAYS);
 
         // Section label inside card
         Label formSection = new Label("DÉTAILS DU SÉJOUR");
-        formSection.setStyle(
-                "-fx-font-size: 9px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.30);" +
-                        "-fx-letter-spacing: 2px;"
-        );
+        formSection.getStyleClass().add("booking-form-section");
 
-        // Separator line
         Region formSep = new Region();
         formSep.setPrefHeight(1);
-        formSep.setStyle("-fx-background-color: rgba(255,255,255,0.06);");
+        formSep.getStyleClass().add("booking-form-sep");
 
         // Row 1: Date + Nights
         HBox row1 = new HBox(16);
@@ -367,15 +338,7 @@ public class ClientRoomViewController {
         VBox dateField = buildFormField("📅  Date d'arrivée");
         DatePicker datePicker = new DatePicker(java.time.LocalDate.now().plusDays(1));
         datePicker.setEditable(false);
-        datePicker.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.06);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(103,154,193,0.25);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-text-fill: white;"
-        );
+        datePicker.getStyleClass().add("booking-form-input");
         datePicker.setPrefWidth(220);
         dateField.getChildren().add(datePicker);
         HBox.setHgrow(dateField, Priority.ALWAYS);
@@ -383,16 +346,9 @@ public class ClientRoomViewController {
         VBox nightsField = buildFormField("🌙  Nuits");
         Spinner<Integer> nightsSpinner = new Spinner<>(1, 30, 1);
         nightsSpinner.setEditable(true);
-        nightsSpinner.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.06);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(103,154,193,0.25);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 13px;"
-        );
+        nightsSpinner.getStyleClass().add("booking-form-input");
         nightsSpinner.setPrefWidth(130);
-        nightsSpinner.getEditor().setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
+        nightsSpinner.getEditor().getStyleClass().add("booking-form-input");
         nightsField.getChildren().add(nightsSpinner);
 
         row1.getChildren().addAll(dateField, nightsField);
@@ -404,17 +360,7 @@ public class ClientRoomViewController {
         VBox priceUnitField = buildFormField("💰  Prix / nuit (DT)");
         TextField priceUnit = new TextField(String.valueOf(room.getPricePerNight()));
         priceUnit.setEditable(false);
-        priceUnit.setStyle(
-                "-fx-background-color: rgba(255,130,16,0.08);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(255,130,16,0.20);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 15px;" +
-                        "-fx-text-fill: #FF8210;" +
-                        "-fx-font-weight: 800;" +
-                        "-fx-padding: 10 16;"
-        );
+        priceUnit.getStyleClass().add("booking-price-input");
         priceUnit.setPrefWidth(220);
         priceUnitField.getChildren().add(priceUnit);
         HBox.setHgrow(priceUnitField, Priority.ALWAYS);
@@ -422,18 +368,11 @@ public class ClientRoomViewController {
         VBox capacityField = buildFormField("👥  Personnes");
         Spinner<Integer> capacitySpinner = new Spinner<>(1, Math.max(1, room.getCapacity()), 1);
         capacitySpinner.setEditable(true);
-        capacitySpinner.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.06);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: rgba(103,154,193,0.25);" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 13px;"
-        );
+        capacitySpinner.getStyleClass().add("booking-form-input");
         capacitySpinner.setPrefWidth(130);
-        capacitySpinner.getEditor().setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
+        capacitySpinner.getEditor().getStyleClass().add("booking-form-input");
         Label capacityHint = new Label("Max. " + room.getCapacity() + " pers.");
-        capacityHint.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.28);");
+        capacityHint.getStyleClass().add("booking-capacity-hint");
         capacityField.getChildren().addAll(capacitySpinner, capacityHint);
 
         row2.getChildren().addAll(priceUnitField, capacityField);
@@ -442,13 +381,7 @@ public class ClientRoomViewController {
 
         // ════ RIGHT: summary card ════════════════════════════════════════════
         VBox summaryCard = new VBox(0);
-        summaryCard.setStyle(
-                "-fx-background-color: rgba(255,130,16,0.07);" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-border-color: rgba(255,130,16,0.18);" +
-                        "-fx-border-radius: 18;" +
-                        "-fx-border-width: 1;"
-        );
+        summaryCard.getStyleClass().add("booking-summary-card");
         summaryCard.setPrefWidth(240);
         summaryCard.setMinWidth(220);
         summaryCard.setMaxWidth(260);
@@ -456,24 +389,21 @@ public class ClientRoomViewController {
         summaryCard.setSpacing(0);
 
         Label summaryTitle = new Label("RÉCAPITULATIF");
-        summaryTitle.setStyle(
-                "-fx-font-size: 9px; -fx-font-weight: 800; -fx-text-fill: #FF8210;" +
-                        "-fx-letter-spacing: 2px;"
-        );
+        summaryTitle.getStyleClass().add("booking-summary-title");
 
         Region sumSep1 = new Region();
         sumSep1.setPrefHeight(1);
-        sumSep1.setStyle("-fx-background-color: rgba(255,130,16,0.15);");
+        sumSep1.getStyleClass().add("booking-summary-sep");
         VBox.setMargin(sumSep1, new Insets(10, 0, 16, 0));
 
         // Room info line
         VBox roomInfoBox = new VBox(3);
         Label roomNumLbl = new Label("Chambre " + room.getRoomNumber());
-        roomNumLbl.setStyle("-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;");
+        roomNumLbl.getStyleClass().add("booking-summary-room");
         Label roomTypeLbl = new Label(room.getRoomType());
-        roomTypeLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45);");
+        roomTypeLbl.getStyleClass().add("booking-summary-type");
         Label hotelLbl = new Label(hotelName);
-        hotelLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.35);");
+        hotelLbl.getStyleClass().add("booking-summary-hotel");
         roomInfoBox.getChildren().addAll(roomNumLbl, roomTypeLbl, hotelLbl);
         VBox.setMargin(roomInfoBox, new Insets(0, 0, 18, 0));
 
@@ -484,27 +414,27 @@ public class ClientRoomViewController {
         VBox.setMargin(priceRow, new Insets(0, 0, 8, 0));
 
         Label nightsLabelSummary = new Label("1 nuit");
-        nightsLabelSummary.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45);");
+        nightsLabelSummary.getStyleClass().add("booking-summary-key");
         HBox nightsRowSum = new HBox();
         nightsRowSum.setAlignment(Pos.CENTER_LEFT);
         Label nightsKey = new Label("Durée");
-        nightsKey.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45);");
+        nightsKey.getStyleClass().add("booking-summary-key");
         Region nightsSpacer = new Region(); HBox.setHgrow(nightsSpacer, Priority.ALWAYS);
         nightsRowSum.getChildren().addAll(nightsKey, nightsSpacer, nightsLabelSummary);
         VBox.setMargin(nightsRowSum, new Insets(0, 0, 16, 0));
 
         Region sumSep2 = new Region();
         sumSep2.setPrefHeight(1);
-        sumSep2.setStyle("-fx-background-color: rgba(255,130,16,0.15);");
+        sumSep2.getStyleClass().add("booking-summary-sep");
         VBox.setMargin(sumSep2, new Insets(0, 0, 16, 0));
 
         // Total
         VBox totalBox = new VBox(2);
         totalBox.setAlignment(Pos.CENTER);
         Label totalLabelLbl = new Label("Total estimé");
-        totalLabelLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.45); -fx-font-weight: 600;");
-        Label totalValue = new Label(ClientUtils.formatPrice(totalArr[0]) + " DT");
-        totalValue.setStyle("-fx-font-size: 30px; -fx-font-weight: 800; -fx-text-fill: #FF8210;");
+        totalLabelLbl.getStyleClass().add("booking-total-label");
+        Label totalValue = new Label(GuiUtils.formatPrice(totalArr[0]) + " DT");
+        totalValue.getStyleClass().add("booking-total-value");
         totalBox.getChildren().addAll(totalLabelLbl, totalValue);
         VBox.setMargin(totalBox, new Insets(0, 0, 20, 0));
 
@@ -516,7 +446,7 @@ public class ClientRoomViewController {
         // Live updates from spinners
         nightsSpinner.valueProperty().addListener((obs, o, n) -> {
             totalArr[0] = room.getPricePerNight() * n;
-            totalValue.setText(ClientUtils.formatPrice(totalArr[0]) + " DT");
+            totalValue.setText(GuiUtils.formatPrice(totalArr[0]) + " DT");
             nightsLabelSummary.setText(n + " nuit" + (n > 1 ? "s" : ""));
         });
 
@@ -524,36 +454,34 @@ public class ClientRoomViewController {
 
         // ── Confirm button ──────────────────────────────────────────────────
         Button confirmBtn = new Button("CONFIRMER LA RÉSERVATION");
-        String confirmStyle =
-                "-fx-background-color: linear-gradient(to right, #FF8210, #ffaa44);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: 800;" +
-                        "-fx-background-radius: 30;" +
-                        "-fx-padding: 16 60;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(255,130,16,0.5), 24, 0.2, 0, 4);";
-        String confirmHoverStyle =
-                "-fx-background-color: linear-gradient(to right, #ff9830, #ffbb55);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: 800;" +
-                        "-fx-background-radius: 30;" +
-                        "-fx-padding: 16 60;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(255,130,16,0.7), 28, 0.25, 0, 5);";
-        confirmBtn.setStyle(confirmStyle);
-        confirmBtn.setOnMouseEntered(e -> confirmBtn.setStyle(confirmHoverStyle));
-        confirmBtn.setOnMouseExited(e -> confirmBtn.setStyle(confirmStyle));
+        confirmBtn.getStyleClass().add("booking-confirm-btn");
+        confirmBtn.getStyleClass().add("booking-confirm-btn");
 
         confirmBtn.setOnAction(e -> {
             int nights = nightsSpinner.getValue();
             int nbPersonnes = capacitySpinner.getValue();
             java.time.LocalDate checkIn = datePicker.getValue();
+
+            Integer resolvedHotelId;
+            try {
+                resolvedHotelId = resolveExistingHotelId(room, hotelName);
+            } catch (SQLException ex) {
+                dialogs.showError("Erreur BD", "Impossible de verifier l'hotel de cette chambre : " + ex.getMessage());
+                return;
+            }
+            if (resolvedHotelId == null) {
+                dialogs.showError(
+                        "Reservation impossible",
+                        "Cette chambre est liee a un hotel introuvable dans la base.\n" +
+                        "Veuillez recharger les donnees hotels/chambres puis reessayer."
+                );
+                return;
+            }
+
             // Persist to database
             Reservation dbReservation = new Reservation();
             dbReservation.setReservationId(0); // generated in service
-            dbReservation.setHotelId(room.getHotelId());
+            dbReservation.setHotelId(resolvedHotelId);
             dbReservation.setChambreId(room.getId());
             dbReservation.setDateCheckin(checkIn);
             dbReservation.setDateCheckout(checkIn.plusDays(nights));
@@ -567,12 +495,6 @@ public class ClientRoomViewController {
                 return;
             }
 
-            // Also keep in-memory store for the current session
-            ClientBookingStore.Booking booking = new ClientBookingStore.Booking(
-                    room.getRoomNumber(), room.getRoomType(), hotelName,
-                    room.getPricePerNight(), nights, checkIn);
-            ClientBookingStore.getInstance().add(booking);
-
             // Show success then go to reservations
             dialogs.showInfo("Réservation confirmée",
                     "Votre réservation a été enregistrée !\n\n" +
@@ -583,10 +505,7 @@ public class ClientRoomViewController {
         });
 
         Label tagLine = new Label("Annulation flexible · Paiement sécurisé · Confirmation immédiate");
-        tagLine.setStyle(
-                "-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.22);" +
-                        "-fx-padding: 4 0 0 0;"
-        );
+        tagLine.getStyleClass().add("booking-tagline");
 
         // Centered button wrapper
         HBox btnRow = new HBox(confirmBtn);
@@ -604,10 +523,10 @@ public class ClientRoomViewController {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
         Label k = new Label(key);
-        k.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45);");
+        k.getStyleClass().add("booking-summary-key");
         Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
         Label v = new Label(value);
-        v.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.75); -fx-font-weight: 700;");
+        v.getStyleClass().add("booking-summary-value");
         row.getChildren().addAll(k, sp, v);
         return row;
     }
@@ -615,7 +534,7 @@ public class ClientRoomViewController {
     private VBox buildFormField(String labelText) {
         VBox field = new VBox(8);
         Label lbl = new Label(labelText);
-        lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: rgba(255,255,255,0.65);");
+        lbl.getStyleClass().add("booking-form-label");
         field.getChildren().add(lbl);
         return field;
     }
@@ -626,11 +545,12 @@ public class ClientRoomViewController {
 
     private VBox styledInfoBox(String labelText, String valueText, String valueColor) {
         VBox box = new VBox(3);
-        box.setStyle("-fx-background-color: rgba(103,154,193,0.2); -fx-background-radius: 10; -fx-padding: 10 15;");
+        box.getStyleClass().add("room-info-box");
         Label lbl = new Label(labelText);
-        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.6);");
+        lbl.getStyleClass().add("room-info-box-label");
         Label val = new Label(valueText);
-        val.setStyle("-fx-font-size: 14px; -fx-text-fill: " + valueColor + "; -fx-font-weight: bold;");
+        val.getStyleClass().add("room-info-box-value");
+        val.setStyle("-fx-text-fill: " + valueColor + ";");
         box.getChildren().addAll(lbl, val);
         return box;
     }
@@ -641,6 +561,38 @@ public class ClientRoomViewController {
                 .map(Hotel::getName)
                 .findFirst()
                 .orElse("Hotel #" + hotelId);
+    }
+
+    /**
+     * Ensures the reservation uses a hotel id that actually exists in table `hotel`.
+     * This protects booking inserts from FK failures when a room references stale data.
+     */
+    private Integer resolveExistingHotelId(Room room, String hotelName) throws SQLException {
+        if (room == null || state.hotelService == null) return null;
+
+        int roomHotelId = room.getHotelId();
+        if (roomHotelId > 0 && state.hotelService.getById(roomHotelId) != null) {
+            return roomHotelId;
+        }
+
+        // Refresh from DB in case the in-memory room object is stale.
+        if (state.roomService != null) {
+            Room fresh = state.roomService.getById(room.getId());
+            if (fresh != null && fresh.getHotelId() > 0 && state.hotelService.getById(fresh.getHotelId()) != null) {
+                return fresh.getHotelId();
+            }
+        }
+
+        // Last fallback: match by hotel name displayed in the UI.
+        if (hotelName != null && !hotelName.isBlank()) {
+            String normalized = hotelName.trim();
+            for (Hotel h : state.hotelService.getAll()) {
+                if (h.getName() != null && h.getName().trim().equalsIgnoreCase(normalized)) {
+                    return h.getId();
+                }
+            }
+        }
+        return null;
     }
 
     public void setupHotelFilterCombo(ComboBox<String> combo) {
@@ -665,9 +617,9 @@ public class ClientRoomViewController {
         VBox box = new VBox(10);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(50));
-        Label iconLabel  = new Label(icon);   iconLabel.setStyle("-fx-font-size: 48px;");
-        Label titleLabel = new Label(title);  titleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: rgba(255,255,255,0.6);");
-        Label subLabel   = new Label(subtitle); subLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.4);");
+        Label iconLabel  = new Label(icon);   iconLabel.getStyleClass().add("empty-icon");
+        Label titleLabel = new Label(title);  titleLabel.getStyleClass().add("empty-title");
+        Label subLabel   = new Label(subtitle); subLabel.getStyleClass().add("empty-subtitle");
         box.getChildren().addAll(iconLabel, titleLabel, subLabel);
         container.getChildren().add(box);
     }

@@ -36,9 +36,9 @@ import java.util.ResourceBundle;
  *
  * Shared infrastructure:
  *  {@link ClientSharedState}         - services, destination cache
- *  {@link ClientDialogHelper}        - styled dialogs
- *  {@link ClientImageGalleryBuilder} - generic image gallery
- *  {@link ClientUtils}               - pure static utilities
+ *  {@link DialogHelper.ClientDialogs}        - styled dialogs
+ *  {@link ImageGalleryBuilder}       - generic image gallery
+ *  {@link GuiUtils}               - pure static utilities
  */
 public class ClientController implements Initializable {
 
@@ -91,7 +91,7 @@ public class ClientController implements Initializable {
 
     // â”€â”€ Sub-controllers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private ClientSharedState         sharedState;
-    private ClientDialogHelper        dialogHelper;
+    private DialogHelper.ClientDialogs        dialogHelper;
     private ClientHotelViewController hotelVC;
     private ClientRoomViewController  roomVC;
     private ClientReviewViewController reviewVC;
@@ -122,7 +122,7 @@ public class ClientController implements Initializable {
         sharedState  = new ClientSharedState();
         sharedState.initServices();
 
-        dialogHelper = new ClientDialogHelper(getClass(), this::loadImage);
+        dialogHelper = new DialogHelper.ClientDialogs(getClass(), this::loadImage);
         reviewVC     = new ClientReviewViewController(sharedState, dialogHelper, this::loadImage);
         hotelVC      = new ClientHotelViewController(sharedState, dialogHelper, reviewVC, this::loadImage, this);
         roomVC       = new ClientRoomViewController(sharedState, dialogHelper, this::loadImage, this);
@@ -496,9 +496,9 @@ public class ClientController implements Initializable {
         VBox box = new VBox(10);
         box.setAlignment(javafx.geometry.Pos.CENTER);
         box.setPadding(new javafx.geometry.Insets(50));
-        Label iconL  = new Label(icon);  iconL.setStyle("-fx-font-size: 48px;");
-        Label titleL = new Label(title); titleL.setStyle("-fx-font-size: 18px; -fx-text-fill: rgba(255,255,255,0.6);");
-        Label subL   = new Label(subtitle); subL.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.4);");
+        Label iconL  = new Label(icon);  iconL.getStyleClass().add("empty-icon");
+        Label titleL = new Label(title); titleL.getStyleClass().add("empty-title");
+        Label subL   = new Label(subtitle); subL.getStyleClass().add("empty-subtitle");
         box.getChildren().addAll(iconL, titleL, subL);
         hotelsContainer.getChildren().add(box);
     }
@@ -726,6 +726,11 @@ public class ClientController implements Initializable {
         searchPanel.setManaged(show);
         headerBox.setVisible(show);
         headerBox.setManaged(show);
+    }
+
+    /** Hide the API toolbar (Destination/Ville + Geoapify button). */
+    public void hideApiToolbar() {
+        if (apiToolbar != null) { apiToolbar.setVisible(false); apiToolbar.setManaged(false); }
     }
 
 

@@ -13,7 +13,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="listViewSection" spacing="25.0"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.AdminListSectionController">
 
     <HBox alignment="CENTER_LEFT" spacing="20.0">
         <VBox spacing="3.0">
@@ -32,13 +33,13 @@
                 <Label styleClass="search-label" text="Rechercher"/>
                 <TextField fx:id="searchField" promptText="Nom, description ou destination..." styleClass="search-field"/>
             </VBox>
-            <Pane prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;"/>
+            <Pane prefWidth="1.0" styleClass="search-separator"/>
             <VBox fx:id="filterContainer" alignment="CENTER_LEFT" HBox.hgrow="SOMETIMES">
                 <Label fx:id="filterLabel" styleClass="search-label" text="Filtrer"/>
                 <ComboBox fx:id="starsFilterCombo" prefWidth="150.0" promptText="Etoiles" styleClass="search-field"/>
                 <ComboBox fx:id="hotelFilterCombo" managed="false" prefWidth="180.0" promptText="Filtrer par hotel" styleClass="search-field" visible="false"/>
             </VBox>
-            <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" style="-fx-background-color: #6C6D6F; -fx-opacity: 0.3;" visible="false"/>
+            <Pane fx:id="roomFilterSeparator" managed="false" prefWidth="1.0" styleClass="search-separator" visible="false"/>
             <VBox fx:id="roomTypeFilterContainer" alignment="CENTER_LEFT" managed="false" visible="false" HBox.hgrow="SOMETIMES">
                 <Label fx:id="roomTypeFilterLabel" styleClass="search-label" text="Type"/>
                 <ComboBox fx:id="roomTypeFilterCombo" prefWidth="140.0" promptText="Type de chambre" styleClass="search-field"/>
@@ -71,9 +72,9 @@
         </VBox>
     </VBox>
 
-    <Label styleClass="section-title" text="Liste d'hotels"/>
+    <Label fx:id="sectionTitle" styleClass="section-title" text="Liste d'hotels"/>
 
-    <VBox style="-fx-padding: 10;" styleClass="glass-card" VBox.vgrow="ALWAYS">
+    <VBox styleClass="glass-card glass-card-padded" VBox.vgrow="ALWAYS">
         <TableView fx:id="mainTable" minHeight="300.0" prefHeight="420.0" styleClass="admin-table" VBox.vgrow="ALWAYS">
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

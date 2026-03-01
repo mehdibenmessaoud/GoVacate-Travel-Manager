@@ -53,7 +53,7 @@ public class ClientApiViewController {
 
     // ── Shared state ──────────────────────────────────────────────────────────
     private final ClientSharedState  state;
-    private final ClientDialogHelper dialogs;
+    private final DialogHelper.ClientDialogs dialogs;
 
     // ── FXML node refs ────────────────────────────────────────────────────────
     private Label             apiStatusLabel;
@@ -76,7 +76,7 @@ public class ClientApiViewController {
     // ── State ─────────────────────────────────────────────────────────────────
     private final Map<String, Image> osmTileCache = new HashMap<>();
 
-    public ClientApiViewController(ClientSharedState state, ClientDialogHelper dialogs) {
+    public ClientApiViewController(ClientSharedState state, DialogHelper.ClientDialogs dialogs) {
         this.state   = state;
         this.dialogs = dialogs;
     }
@@ -170,36 +170,26 @@ public class ClientApiViewController {
         // ── Header (teal gradient) ────────────────────────────────────────
         StackPane header = new StackPane();
         header.setMinHeight(165); header.setPrefHeight(165); header.setMaxHeight(165);
-        header.setStyle("-fx-background-color: linear-gradient(to bottom right, #0c1a26, #0e4460, #0ea5e9);");
+        header.getStyleClass().add("geoapify-card-header");
         applyRoundedClip(header, 20);
 
         // Provider chip
         Label providerChip = new Label("🌍  Geoapify");
-        providerChip.setStyle(
-                "-fx-background-color: rgba(0,0,0,0.42);" +
-                        "-fx-text-fill: #7dd3fc; -fx-font-size: 10px; -fx-font-weight: 800;" +
-                        "-fx-padding: 5 12 5 10; -fx-background-radius: 0 0 10 0;");
+        providerChip.getStyleClass().add("geoapify-provider-chip");
         StackPane.setAlignment(providerChip, Pos.TOP_LEFT);
         header.getChildren().add(providerChip);
 
         // Rank badge
-        String rankBg  = rank == 0 ? "#b45309" : rank == 1 ? "#475569" : rank == 2 ? "#92400e" : "rgba(0,0,0,0.40)";
+        String rankVariant = rank == 0 ? "geoapify-rank-gold" : rank == 1 ? "geoapify-rank-silver" : rank == 2 ? "geoapify-rank-bronze" : "geoapify-rank-default";
         String rankTxt = rank == 0 ? "🥇 #1" : rank == 1 ? "🥈 #2" : rank == 2 ? "🥉 #3" : "#" + (rank + 1);
         Label rankBadge = new Label(rankTxt);
-        rankBadge.setStyle(
-                "-fx-background-color: " + rankBg + ";" +
-                        "-fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: 800;" +
-                        "-fx-padding: 4 10; -fx-background-radius: 0 0 0 10;");
+        rankBadge.getStyleClass().addAll("geoapify-rank-badge", rankVariant);
         StackPane.setAlignment(rankBadge, Pos.TOP_RIGHT);
         header.getChildren().add(rankBadge);
 
         // Category pill (center)
         Label catPill = new Label("🏨 " + place.categoryLabel());
-        catPill.setStyle(
-                "-fx-background-color: rgba(14,165,233,0.30);" +
-                        "-fx-text-fill: #e0f2fe; -fx-font-size: 12px; -fx-font-weight: 700;" +
-                        "-fx-padding: 6 16; -fx-background-radius: 20;" +
-                        "-fx-border-color: rgba(125,211,252,0.40); -fx-border-radius: 20; -fx-border-width: 1;");
+        catPill.getStyleClass().add("geoapify-category-pill");
         StackPane.setAlignment(catPill, Pos.CENTER);
         header.getChildren().add(catPill);
 
@@ -210,15 +200,13 @@ public class ClientApiViewController {
         heroBox.setMouseTransparent(true);
 
         Label heroName = new Label(place.name());
-        heroName.setStyle(
-                "-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.70), 8, 0, 0, 2);");
+        heroName.getStyleClass().add("geoapify-hero-name");
         heroName.setWrapText(true); heroName.setMaxWidth(262);
 
         String location = place.locationLine();
         if (!location.isBlank()) {
             Label locLabel = new Label("📍 " + location);
-            locLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(186,230,253,0.90); -fx-font-weight: 500;");
+            locLabel.getStyleClass().add("geoapify-hero-location");
             heroBox.getChildren().addAll(heroName, locLabel);
         } else {
             heroBox.getChildren().add(heroName);
@@ -228,14 +216,14 @@ public class ClientApiViewController {
 
         // ── Body ─────────────────────────────────────────────────────────
         VBox body = new VBox(0);
-        body.setStyle("-fx-background-color: #ffffff;");
+        body.getStyleClass().add("geoapify-card-body");
         body.setMinWidth(290); body.setPrefWidth(290); body.setMaxWidth(290);
         body.setPadding(new Insets(12, 14, 0, 14));
 
         // Address
         if (!place.address().isBlank()) {
             Label addrLabel = new Label("📍 " + place.address());
-            addrLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #6b7280;");
+            addrLabel.getStyleClass().add("geoapify-addr-label");
             addrLabel.setWrapText(false); addrLabel.setMaxWidth(262);
             body.getChildren().add(addrLabel);
         }
@@ -247,16 +235,13 @@ public class ClientApiViewController {
 
         if (!place.website().isBlank()) {
             Label wLabel = new Label("🌐 Site web");
-            wLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #0369a1;" +
-                    "-fx-background-color: #e0f2fe; -fx-background-radius: 7;" +
-                    "-fx-border-color: #7dd3fc; -fx-border-radius: 7; -fx-border-width: 1;" +
-                    "-fx-padding: 3 9; -fx-cursor: hand;");
+            wLabel.getStyleClass().add("geoapify-website-chip");
             wLabel.setOnMouseClicked(e -> openUrlInBrowser(place.website()));
             chipRow.getChildren().add(wLabel);
         }
         if (!place.phone().isBlank()) {
             Label pLabel = new Label("📞 " + place.phone());
-            pLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: 600; -fx-text-fill: #374151;");
+            pLabel.getStyleClass().add("geoapify-phone-label");
             chipRow.getChildren().add(pLabel);
         }
         if (!chipRow.getChildren().isEmpty()) body.getChildren().add(chipRow);
@@ -264,7 +249,7 @@ public class ClientApiViewController {
         // Opening hours
         if (!place.openingHours().isBlank()) {
             Label hoursLabel = new Label("🕒 " + place.openingHours());
-            hoursLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #059669; -fx-font-weight: 600;");
+            hoursLabel.getStyleClass().add("geoapify-hours-label");
             hoursLabel.setPadding(new Insets(5, 0, 0, 0));
             body.getChildren().add(hoursLabel);
         }
@@ -304,22 +289,19 @@ public class ClientApiViewController {
         dialog.getDialogPane().getButtonTypes().add(closeType);
 
         VBox root = new VBox(0);
-        root.setStyle("-fx-background-color: #0f1923;");
+        root.getStyleClass().add("gv-detail-dialog-root");
 
         HBox hbar = new HBox(14);
         hbar.setAlignment(Pos.CENTER_LEFT);
         hbar.setPadding(new Insets(18, 24, 18, 24));
-        hbar.setStyle("-fx-background-color: #141f2e;" +
-                "-fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;" +
-                "-fx-border-width: 0 0 1 0;");
+        hbar.getStyleClass().add("gv-detail-dialog-header");
         Label iconLbl = new Label("🌍");
-        iconLbl.setStyle("-fx-font-size: 18px; -fx-background-color: rgba(14,165,233,0.18);" +
-                "-fx-background-radius: 50%; -fx-padding: 10; -fx-min-width: 42; -fx-min-height: 42; -fx-alignment: center;");
+        iconLbl.getStyleClass().add("gv-detail-dialog-icon");
         VBox titleBox = new VBox(3); HBox.setHgrow(titleBox, Priority.ALWAYS);
         Label titleLbl = new Label(place.name());
-        titleLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: 800; -fx-text-fill: white;");
+        titleLbl.getStyleClass().add("gv-detail-dialog-title");
         Label subLbl = new Label("Geoapify Places API  ·  " + place.categoryLabel());
-        subLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.38);");
+        subLbl.getStyleClass().add("gv-detail-dialog-subtitle");
         titleBox.getChildren().addAll(titleLbl, subLbl);
         hbar.getChildren().addAll(iconLbl, titleBox);
 
@@ -340,10 +322,7 @@ public class ClientApiViewController {
 
         if (place.hasCoords()) {
             Button mapBtn = new Button("🗺  Voir sur la carte");
-            mapBtn.setStyle("-fx-background-color: rgba(14,165,233,0.18); -fx-text-fill: #7dd3fc;" +
-                    "-fx-font-weight: 700; -fx-font-size: 12px; -fx-background-radius: 10; -fx-padding: 10 20;" +
-                    "-fx-border-color: rgba(14,165,233,0.35); -fx-border-radius: 10; -fx-border-width: 1;" +
-                    "-fx-cursor: hand;");
+            mapBtn.getStyleClass().add("gv-detail-map-btn");
             mapBtn.setOnAction(e -> { dialog.close(); showMapForCoords(place.lat(), place.lon(), place.name()); });
             HBox mapRow = new HBox(mapBtn); mapRow.setPadding(new Insets(14, 0, 0, 0));
             body.getChildren().add(mapRow);
@@ -352,7 +331,7 @@ public class ClientApiViewController {
         root.getChildren().addAll(hbar, body);
         DialogPane pane = dialog.getDialogPane();
         pane.setContent(root); pane.setPadding(Insets.EMPTY);
-        pane.setStyle("-fx-padding: 0; -fx-background-color: #0f1923;");
+        pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
         java.net.URL cssUrl = getClass().getResource("/css/client-style.css");
@@ -378,49 +357,45 @@ public class ClientApiViewController {
     public void showOpenStreetMapPreviewDialog(NominatimHotelApiClient.LocationSummary location,
                                                String fallbackUrl) {
         Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Aperçu carte — " + ClientUtils.extractLocationTitle(location == null ? null : location.displayName()));
+        dialog.setTitle("Aperçu carte — " + GuiUtils.extractLocationTitle(location == null ? null : location.displayName()));
         dialog.setResizable(true);
 
         ButtonType openBrowserType = new ButtonType("🧭  Itinéraires", ButtonBar.ButtonData.LEFT);
         dialog.getDialogPane().getButtonTypes().addAll(openBrowserType, ButtonType.CLOSE);
 
         VBox content = new VBox(0);
-        content.setStyle("-fx-background-color: #0f1923;");
+        content.getStyleClass().add("gv-detail-dialog-content");
 
         String displayName   = location == null ? null : location.displayName();
-        String locationTitle = ClientUtils.extractLocationTitle(displayName);
-        String fullAddr      = ClientUtils.trimToMaxLength(ClientUtils.formatApiValue(displayName, "N/A"), 100);
-        String coordText     = ClientUtils.formatCoordinates(
+        String locationTitle = GuiUtils.extractLocationTitle(displayName);
+        String fullAddr      = GuiUtils.trimToMaxLength(GuiUtils.formatApiValue(displayName, "N/A"), 100);
+        String coordText     = GuiUtils.formatCoordinates(
                 location == null ? null : location.lat(),
                 location == null ? null : location.lon());
-        Double lat = ClientUtils.parseCoordinate(location == null ? null : location.lat());
-        Double lon = ClientUtils.parseCoordinate(location == null ? null : location.lon());
+        Double lat = GuiUtils.parseCoordinate(location == null ? null : location.lat());
+        Double lon = GuiUtils.parseCoordinate(location == null ? null : location.lon());
 
         // Header bar
         HBox headerBar = new HBox(16);
         headerBar.setAlignment(Pos.CENTER_LEFT);
         headerBar.setPadding(new Insets(16, 20, 16, 20));
-        headerBar.setStyle("-fx-background-color: #141f2e;" +
-                "-fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent; -fx-border-width: 0 0 1 0;");
+        headerBar.getStyleClass().add("gv-detail-dialog-header");
         Label iconCircle = new Label("📍");
-        iconCircle.setStyle("-fx-font-size: 16px; -fx-background-color: rgba(79,209,179,0.12);" +
-                "-fx-background-radius: 50%; -fx-padding: 8; -fx-min-width: 38; -fx-min-height: 38; -fx-alignment: center;");
+        iconCircle.getStyleClass().add("gv-detail-dialog-icon-green");
         VBox headerText = new VBox(3); HBox.setHgrow(headerText, Priority.ALWAYS);
         Label titleLabel = new Label(locationTitle);
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("gv-detail-dialog-title");
         Label subtitleLbl = new Label(fullAddr);
-        subtitleLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.45);");
+        subtitleLbl.getStyleClass().add("gv-detail-dialog-subtitle");
         headerText.getChildren().addAll(titleLabel, subtitleLbl);
         Label coordChip = new Label(coordText);
-        coordChip.setStyle("-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #4fd1b3;" +
-                "-fx-background-color: rgba(79,209,179,0.10); -fx-background-radius: 20; -fx-padding: 6 14;" +
-                "-fx-border-color: rgba(79,209,179,0.28); -fx-border-radius: 20; -fx-border-width: 1;");
+        coordChip.getStyleClass().add("gv-map-coord-chip");
         headerBar.getChildren().addAll(iconCircle, headerText, new VBox(coordChip));
 
         // Map viewport
         StackPane mapViewport = new StackPane();
         mapViewport.setMinHeight(520); mapViewport.setPrefHeight(560);
-        mapViewport.setStyle("-fx-background-color: #1a2a3a;");
+        mapViewport.getStyleClass().add("gv-map-viewport");
         VBox.setVgrow(mapViewport, Priority.ALWAYS);
         Rectangle vClip = new Rectangle();
         vClip.widthProperty().bind(mapViewport.widthProperty());
@@ -428,7 +403,6 @@ public class ClientApiViewController {
         mapViewport.setClip(vClip);
 
         Pane tileLayer = new Pane();
-        tileLayer.setStyle("-fx-background-color: transparent;");
         tileLayer.setPickOnBounds(false);
         tileLayer.prefWidthProperty().bind(mapViewport.widthProperty());
         tileLayer.prefHeightProperty().bind(mapViewport.heightProperty());
@@ -436,31 +410,26 @@ public class ClientApiViewController {
 
         Label mapStatusLabel = new Label("Chargement de la carte...");
         mapStatusLabel.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        mapStatusLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);" +
-                "-fx-background-color: rgba(15,25,35,0.75); -fx-background-radius: 10; -fx-padding: 10 20;");
+        mapStatusLabel.getStyleClass().add("gv-map-status-label");
         mapStatusLabel.setVisible(false); mapStatusLabel.setMouseTransparent(true);
 
-        Label zoomLabel = new Label("Z" + ClientUtils.OSM_PREVIEW_INITIAL_ZOOM);
+        Label zoomLabel = new Label("Z" + GuiUtils.OSM_PREVIEW_INITIAL_ZOOM);
         Button zoomInBtn = mapControlBtn("+"), zoomOutBtn = mapControlBtn("−");
         Region zoomSep = new Region();
         zoomSep.setMinHeight(1); zoomSep.setPrefHeight(1); zoomSep.setMaxHeight(1);
-        zoomSep.setStyle("-fx-background-color: rgba(255,255,255,0.13);");
+        zoomSep.getStyleClass().add("gv-map-zoom-sep");
         VBox zoomBox = new VBox(0, zoomInBtn, zoomSep, zoomOutBtn);
         zoomBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        zoomBox.setStyle("-fx-background-color: rgba(15,25,35,0.92); -fx-background-radius: 10;" +
-                "-fx-border-color: rgba(255,255,255,0.15); -fx-border-radius: 10; -fx-border-width: 1;");
+        zoomBox.getStyleClass().add("gv-map-zoom-box");
         StackPane.setAlignment(zoomBox, Pos.TOP_LEFT); StackPane.setMargin(zoomBox, new Insets(14, 0, 0, 14));
 
         zoomLabel.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        zoomLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.85);" +
-                "-fx-background-color: rgba(15,25,35,0.85); -fx-background-radius: 8; -fx-padding: 4 10;" +
-                "-fx-border-color: rgba(255,255,255,0.15); -fx-border-radius: 8; -fx-border-width: 1;");
+        zoomLabel.getStyleClass().add("gv-map-zoom-label");
         StackPane.setAlignment(zoomLabel, Pos.BOTTOM_LEFT); StackPane.setMargin(zoomLabel, new Insets(0, 0, 12, 14));
 
         Label attribution = new Label("© OpenStreetMap contributors");
         attribution.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        attribution.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.55);" +
-                "-fx-background-color: rgba(15,25,35,0.75); -fx-background-radius: 4; -fx-padding: 3 8;");
+        attribution.getStyleClass().add("gv-map-attribution");
         StackPane.setAlignment(attribution, Pos.BOTTOM_RIGHT); StackPane.setMargin(attribution, new Insets(0, 10, 10, 0));
 
         mapViewport.getChildren().addAll(tileLayer, mapStatusLabel, zoomBox, zoomLabel, attribution);
@@ -468,28 +437,28 @@ public class ClientApiViewController {
         content.getChildren().addAll(headerBar, mapViewport);
 
         final boolean hasCoords = lat != null && lon != null;
-        final double targetLat = hasCoords ? ClientUtils.clampLatitude(lat) : 0.0;
-        final double targetLon = hasCoords ? ClientUtils.clampLongitude(lon) : 0.0;
+        final double targetLat = hasCoords ? GuiUtils.clampLatitude(lat) : 0.0;
+        final double targetLon = hasCoords ? GuiUtils.clampLongitude(lon) : 0.0;
         final double[] centerLat = {targetLat}, centerLon = {targetLon};
-        final int[] zoom = {ClientUtils.OSM_PREVIEW_INITIAL_ZOOM};
+        final int[] zoom = {GuiUtils.OSM_PREVIEW_INITIAL_ZOOM};
 
         Runnable renderMap = () -> {
             tileLayer.getChildren().clear();
             if (!hasCoords) { mapStatusLabel.setText("Coordonnées indisponibles."); mapStatusLabel.setVisible(true); return; }
             double w = Math.max(360, mapViewport.getWidth()), h = Math.max(280, mapViewport.getHeight());
             zoomLabel.setText("Z" + zoom[0]);
-            double cx = ClientUtils.longitudeToWorldPixelX(centerLon[0], zoom[0]);
-            double cy = ClientUtils.latitudeToWorldPixelY(centerLat[0], zoom[0]);
+            double cx = GuiUtils.longitudeToWorldPixelX(centerLon[0], zoom[0]);
+            double cy = GuiUtils.latitudeToWorldPixelY(centerLat[0], zoom[0]);
             double tlX = cx - w / 2.0, tlY = cy - h / 2.0;
             int tc = 1 << zoom[0];
-            for (int ty = (int)Math.floor(tlY / ClientUtils.OSM_TILE_SIZE) - 1; ty <= (int)Math.floor((tlY + h) / ClientUtils.OSM_TILE_SIZE) + 1; ty++) {
+            for (int ty = (int)Math.floor(tlY / GuiUtils.OSM_TILE_SIZE) - 1; ty <= (int)Math.floor((tlY + h) / GuiUtils.OSM_TILE_SIZE) + 1; ty++) {
                 if (ty < 0 || ty >= tc) continue;
-                for (int tx = (int)Math.floor(tlX / ClientUtils.OSM_TILE_SIZE) - 1; tx <= (int)Math.floor((tlX + w) / ClientUtils.OSM_TILE_SIZE) + 1; tx++) {
-                    loadTileAsync(zoom[0], ClientUtils.wrapTileIndex(tx, tc), ty, tx * ClientUtils.OSM_TILE_SIZE - tlX, ty * ClientUtils.OSM_TILE_SIZE - tlY, tileLayer);
+                for (int tx = (int)Math.floor(tlX / GuiUtils.OSM_TILE_SIZE) - 1; tx <= (int)Math.floor((tlX + w) / GuiUtils.OSM_TILE_SIZE) + 1; tx++) {
+                    loadTileAsync(zoom[0], GuiUtils.wrapTileIndex(tx, tc), ty, tx * GuiUtils.OSM_TILE_SIZE - tlX, ty * GuiUtils.OSM_TILE_SIZE - tlY, tileLayer);
                 }
             }
-            double mx = ClientUtils.longitudeToWorldPixelX(targetLon, zoom[0]);
-            double my = ClientUtils.latitudeToWorldPixelY(targetLat, zoom[0]);
+            double mx = GuiUtils.longitudeToWorldPixelX(targetLon, zoom[0]);
+            double my = GuiUtils.latitudeToWorldPixelY(targetLat, zoom[0]);
             Node marker = createMapMarker();
             marker.setMouseTransparent(true);
             marker.setLayoutX(mx - tlX - 11); marker.setLayoutY(my - tlY - 31);
@@ -498,13 +467,13 @@ public class ClientApiViewController {
         };
 
         final double[] dragAX = {0}, dragAY = {0}, dragCX = {0}, dragCY = {0};
-        mapViewport.setOnMousePressed(ev -> { if (!hasCoords) return; dragAX[0]=ev.getX(); dragAY[0]=ev.getY(); dragCX[0]=ClientUtils.longitudeToWorldPixelX(centerLon[0],zoom[0]); dragCY[0]=ClientUtils.latitudeToWorldPixelY(centerLat[0],zoom[0]); mapViewport.setCursor(javafx.scene.Cursor.CLOSED_HAND); });
+        mapViewport.setOnMousePressed(ev -> { if (!hasCoords) return; dragAX[0]=ev.getX(); dragAY[0]=ev.getY(); dragCX[0]=GuiUtils.longitudeToWorldPixelX(centerLon[0],zoom[0]); dragCY[0]=GuiUtils.latitudeToWorldPixelY(centerLat[0],zoom[0]); mapViewport.setCursor(javafx.scene.Cursor.CLOSED_HAND); });
         mapViewport.setOnMouseReleased(ev -> mapViewport.setCursor(javafx.scene.Cursor.OPEN_HAND));
-        mapViewport.setOnMouseDragged(ev -> { if (!hasCoords) return; double ws=ClientUtils.OSM_TILE_SIZE*(double)(1<<zoom[0]); centerLon[0]=ClientUtils.worldPixelXToLongitude(ClientUtils.wrapPixelValue(dragCX[0]-(ev.getX()-dragAX[0]),ws),zoom[0]); centerLat[0]=ClientUtils.worldPixelYToLatitude(Math.max(0,Math.min(ws,dragCY[0]-(ev.getY()-dragAY[0]))),zoom[0]); renderMap.run(); });
-        mapViewport.setOnScroll(ev -> { if (!hasCoords) return; if (ev.getDeltaY()>0&&zoom[0]<ClientUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();}else if(ev.getDeltaY()<0&&zoom[0]>ClientUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} ev.consume(); });
+        mapViewport.setOnMouseDragged(ev -> { if (!hasCoords) return; double ws=GuiUtils.OSM_TILE_SIZE*(double)(1<<zoom[0]); centerLon[0]=GuiUtils.worldPixelXToLongitude(GuiUtils.wrapPixelValue(dragCX[0]-(ev.getX()-dragAX[0]),ws),zoom[0]); centerLat[0]=GuiUtils.worldPixelYToLatitude(Math.max(0,Math.min(ws,dragCY[0]-(ev.getY()-dragAY[0]))),zoom[0]); renderMap.run(); });
+        mapViewport.setOnScroll(ev -> { if (!hasCoords) return; if (ev.getDeltaY()>0&&zoom[0]<GuiUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();}else if(ev.getDeltaY()<0&&zoom[0]>GuiUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} ev.consume(); });
         mapViewport.setCursor(javafx.scene.Cursor.OPEN_HAND);
-        zoomInBtn.setOnAction(ev -> { if(zoom[0]<ClientUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();} });
-        zoomOutBtn.setOnAction(ev -> { if(zoom[0]>ClientUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} });
+        zoomInBtn.setOnAction(ev -> { if(zoom[0]<GuiUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();} });
+        zoomOutBtn.setOnAction(ev -> { if(zoom[0]>GuiUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} });
         zoomInBtn.setDisable(!hasCoords); zoomOutBtn.setDisable(!hasCoords);
 
         PauseTransition debounce = new PauseTransition(Duration.millis(120));
@@ -519,7 +488,7 @@ public class ClientApiViewController {
         URL cssUrl = getClass().getResource("/css/client-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
-        pane.getStyleClass().add("gv-map-dialog"); pane.setStyle("-fx-padding: 0;");
+        pane.getStyleClass().addAll("gv-map-dialog", "gv-detail-dialog-pane");
 
         Double latVal = lat, lonVal = lon;
         String googleMapsUrl = (latVal != null && lonVal != null)
@@ -528,7 +497,7 @@ public class ClientApiViewController {
 
         Node openBrowserNode = pane.lookupButton(openBrowserType);
         if (openBrowserNode instanceof Button ob) {
-            Platform.runLater(() -> { ob.setMinWidth(165); ob.setStyle("-fx-background-color: linear-gradient(to right, #FF8210, #ffaa44);" + "-fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 13px; -fx-background-radius: 10; -fx-padding: 11 24; -fx-cursor: hand;"); });
+            Platform.runLater(() -> { ob.setMinWidth(165); ob.getStyleClass().add("gv-itinerary-btn"); });
             ob.addEventFilter(ActionEvent.ACTION, ev -> openUrlInBrowser(googleMapsUrl));
         }
         styleCloseButton(pane.lookupButton(ButtonType.CLOSE));
@@ -543,8 +512,8 @@ public class ClientApiViewController {
         if (cached != null) { tileLayer.getChildren().add(tileImageView(cached, lx, ly)); return; }
         ImageView placeholder = tileImageView(null, lx, ly);
         tileLayer.getChildren().add(placeholder);
-        String url = String.format(Locale.ROOT, ClientUtils.OSM_TILE_URL_TEMPLATE, zoom, tileX, tileY);
-        Image img = new Image(url, ClientUtils.OSM_TILE_SIZE, ClientUtils.OSM_TILE_SIZE, true, true, true);
+        String url = String.format(Locale.ROOT, GuiUtils.OSM_TILE_URL_TEMPLATE, zoom, tileX, tileY);
+        Image img = new Image(url, GuiUtils.OSM_TILE_SIZE, GuiUtils.OSM_TILE_SIZE, true, true, true);
         img.progressProperty().addListener((obs, o, n) -> {
             if (n.doubleValue() >= 1.0 && !img.isError()) {
                 osmTileCache.put(key, img);
@@ -556,7 +525,7 @@ public class ClientApiViewController {
 
     private ImageView tileImageView(Image img, double lx, double ly) {
         ImageView v = new ImageView(img);
-        v.setFitWidth(ClientUtils.OSM_TILE_SIZE); v.setFitHeight(ClientUtils.OSM_TILE_SIZE);
+        v.setFitWidth(GuiUtils.OSM_TILE_SIZE); v.setFitHeight(GuiUtils.OSM_TILE_SIZE);
         v.setSmooth(true); v.setPreserveRatio(false);
         v.setLayoutX(lx); v.setLayoutY(ly);
         return v;
@@ -606,7 +575,7 @@ public class ClientApiViewController {
     }
 
     private void handleApiFailure(String provider, Throwable error) {
-        String msg = ClientUtils.extractErrorMessage(error);
+        String msg = GuiUtils.extractErrorMessage(error);
         setApiStatus(provider + " — " + msg, "error");
         if (!(error instanceof IllegalArgumentException)) dialogs.showError(provider, msg);
     }
@@ -614,9 +583,9 @@ public class ClientApiViewController {
     private void showEmptyState(String icon, String title, String sub) {
         VBox box = new VBox(10);
         box.setAlignment(Pos.CENTER); box.setPadding(new Insets(50));
-        Label i = new Label(icon); i.setStyle("-fx-font-size: 48px;");
-        Label t = new Label(title); t.setStyle("-fx-font-size: 18px; -fx-text-fill: rgba(255,255,255,0.6);");
-        Label s = new Label(sub);   s.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.4);");
+        Label i = new Label(icon); i.getStyleClass().add("empty-icon");
+        Label t = new Label(title); t.getStyleClass().add("empty-title");
+        Label s = new Label(sub);   s.getStyleClass().add("empty-subtitle");
         box.getChildren().addAll(i, t, s);
         hotelsContainer.getChildren().add(box);
     }
@@ -628,19 +597,19 @@ public class ClientApiViewController {
         bar.getStyleClass().add("api-section-header");
         Region accent = new Region();
         accent.setPrefWidth(5); accent.setMinWidth(5); accent.setMaxWidth(5);
-        accent.setStyle("-fx-background-color: " + accentColor + "; -fx-background-radius: 3 0 0 3;");
+        accent.getStyleClass().add("gv-section-accent");
+        accent.setStyle("-fx-background-color: " + accentColor + ";");
         VBox textArea = new VBox(4);
         textArea.setPadding(new Insets(14, 20, 14, 18)); HBox.setHgrow(textArea, Priority.ALWAYS);
         HBox titleRow = new HBox(10); titleRow.setAlignment(Pos.CENTER_LEFT);
-        Label iconLbl = new Label(icon); iconLbl.setStyle("-fx-font-size: 18px;");
+        Label iconLbl = new Label(icon); iconLbl.getStyleClass().add("gv-section-header-icon");
         Label titleLbl = new Label(title); titleLbl.getStyleClass().add("api-section-title");
         titleRow.getChildren().addAll(iconLbl, titleLbl);
         Label subLbl = new Label(subtitle); subLbl.getStyleClass().add("api-section-subtitle");
         textArea.getChildren().addAll(titleRow, subLbl);
         Label pill = new Label(provider);
-        pill.setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + accentColor + ";" +
-                "-fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 5 14; -fx-background-radius: 20;" +
-                "-fx-border-color: " + accentColor + "; -fx-border-width: 1.5; -fx-border-radius: 20;");
+        pill.getStyleClass().add("gv-section-pill");
+        pill.setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + accentColor + "; -fx-border-color: " + accentColor + ";");
         VBox pillBox = new VBox(pill); pillBox.setAlignment(Pos.CENTER_RIGHT);
         pillBox.setPadding(new Insets(0, 20, 0, 0));
         bar.getChildren().addAll(accent, textArea, pillBox);
@@ -694,7 +663,7 @@ public class ClientApiViewController {
                 dialogs.showWarning("Navigateur", "Ouverture navigateur non supportée."); return;
             }
             Desktop.getDesktop().browse(URI.create(url));
-        } catch (Exception e) { dialogs.showError("Navigateur", ClientUtils.extractErrorMessage(e)); }
+        } catch (Exception e) { dialogs.showError("Navigateur", GuiUtils.extractErrorMessage(e)); }
     }
 
 
@@ -705,32 +674,35 @@ public class ClientApiViewController {
     /** Styled button: filled (primary=true) or outlined. */
     private Button styledButton(String text, boolean filled, String mainColor, String hoverColor) {
         Button b = new Button(text);
-        String base = filled
-                ? "-fx-background-color: " + mainColor + "; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-weight: 700; -fx-font-size: 12px; -fx-padding: 9 0; -fx-cursor: hand;"
-                : "-fx-background-color: transparent; -fx-text-fill: " + mainColor + "; -fx-background-radius: 10; -fx-border-color: " + mainColor + "44; -fx-border-radius: 10; -fx-border-width: 1.5; -fx-font-weight: 700; -fx-font-size: 12px; -fx-padding: 8 0; -fx-cursor: hand;";
-        b.setStyle(base);
-        b.setOnMouseEntered(e -> b.setStyle(base.replace(mainColor, hoverColor)));
-        b.setOnMouseExited(e -> b.setStyle(base));
+        if (filled) {
+            b.getStyleClass().add("gv-styled-btn-filled");
+            b.setStyle("-fx-background-color: " + mainColor + ";");
+            b.setOnMouseEntered(e -> b.setStyle("-fx-background-color: " + hoverColor + ";"));
+            b.setOnMouseExited(e -> b.setStyle("-fx-background-color: " + mainColor + ";"));
+        } else {
+            b.getStyleClass().add("gv-styled-btn-outlined");
+            b.setStyle("-fx-text-fill: " + mainColor + "; -fx-border-color: " + mainColor + "44;");
+            b.setOnMouseEntered(e -> b.setStyle("-fx-text-fill: " + hoverColor + "; -fx-border-color: " + hoverColor + "44;"));
+            b.setOnMouseExited(e -> b.setStyle("-fx-text-fill: " + mainColor + "; -fx-border-color: " + mainColor + "44;"));
+        }
         return b;
     }
 
     /** Colored info chip (e.g. room type, board type). */
     private Label infoChip(String text, String bg, String border) {
         Label l = new Label(text);
-        l.setStyle("-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #374151;" +
-                "-fx-background-color: " + bg + "; -fx-background-radius: 7;" +
-                "-fx-border-color: " + border + "; -fx-border-radius: 7; -fx-border-width: 1;" +
-                "-fx-padding: 3 9;");
+        l.getStyleClass().add("gv-info-chip");
+        l.setStyle("-fx-background-color: " + bg + "; -fx-border-color: " + border + ";");
         return l;
     }
 
     /** Detail dialog row (icon | key | value). */
     private HBox detailRow(String icon, String key, String value) {
         HBox r = new HBox(0); r.setAlignment(Pos.CENTER_LEFT); r.setPadding(new Insets(11, 0, 11, 0));
-        r.setStyle("-fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent; -fx-border-width: 0 0 1 0;");
-        Label ic = new Label(icon); ic.setStyle("-fx-font-size: 14px; -fx-min-width: 26;");
-        Label k  = new Label(key + " :"); k.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.40); -fx-font-weight: 600; -fx-min-width: 110;");
-        Label v  = new Label(value); v.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.85); -fx-font-weight: 600;");
+        r.getStyleClass().add("gv-detail-row");
+        Label ic = new Label(icon); ic.getStyleClass().add("gv-detail-row-icon");
+        Label k  = new Label(key + " :"); k.getStyleClass().add("gv-detail-row-key");
+        Label v  = new Label(value); v.getStyleClass().add("gv-detail-row-value");
         v.setWrapText(true); HBox.setHgrow(v, Priority.ALWAYS);
         r.getChildren().addAll(ic, k, v);
         return r;
@@ -739,9 +711,7 @@ public class ClientApiViewController {
     private void styleCloseButton(Node n) {
         if (!(n instanceof Button cb)) return;
         Platform.runLater(() -> {
-            cb.setStyle("-fx-background-color: rgba(255,255,255,0.07); -fx-text-fill: rgba(255,255,255,0.75);" +
-                    "-fx-font-weight: 700; -fx-font-size: 13px; -fx-background-radius: 10; -fx-padding: 10 26;" +
-                    "-fx-border-color: rgba(255,255,255,0.13); -fx-border-width: 1; -fx-border-radius: 10; -fx-cursor: hand;");
+            cb.getStyleClass().add("gv-detail-close-btn");
             cb.setMinWidth(100);
         });
     }

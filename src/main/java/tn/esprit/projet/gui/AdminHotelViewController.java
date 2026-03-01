@@ -31,7 +31,7 @@ import java.util.*;
  * – Hotel services management dialog
  *
  * Delegates pure shared state (hotelsList, roomsList, localisation maps)
- * to AdminSharedState and uses AdminDialogHelper for all dialog chrome.
+ * to AdminSharedState and uses DialogHelper for all dialog chrome.
  */
 public class AdminHotelViewController {
 
@@ -77,6 +77,10 @@ public class AdminHotelViewController {
             col3.prefWidthProperty().unbind(); col4.prefWidthProperty().unbind();
             col5.prefWidthProperty().unbind(); col6.prefWidthProperty().unbind();
 
+            // Responsive minima to avoid right-side clipping on smaller windows.
+            col1.setMinWidth(100); col2.setMinWidth(160); col3.setMinWidth(90);
+            col4.setMinWidth(90);  col5.setMinWidth(130); col6.setMinWidth(240);
+
             // Reset any maxWidth constraints left by Geoapify mode
             col1.setMaxWidth(Double.MAX_VALUE); col2.setMaxWidth(Double.MAX_VALUE);
             col3.setMaxWidth(Double.MAX_VALUE); col4.setMaxWidth(Double.MAX_VALUE);
@@ -109,7 +113,7 @@ public class AdminHotelViewController {
                 data.getValue() instanceof Hotel h ? new SimpleStringProperty(h.getName()) : new SimpleStringProperty(""));
         // ── CRITICAL: reset cellFactory — Geoapify sets a custom one on col1
         // that checks instanceof HotelPlace; without this reset, Hotel rows show blank.
-        AdminDialogHelper.applyPlainTextCellFactory(col1);
+        DialogHelper.applyPlainTextCellFactory(col1);
 
         col2.setCellValueFactory(data -> {
             if (data.getValue() instanceof Hotel h) {
@@ -118,21 +122,21 @@ public class AdminHotelViewController {
             }
             return new SimpleStringProperty("");
         });
-        AdminDialogHelper.applyPlainTextCellFactory(col2);
+        DialogHelper.applyPlainTextCellFactory(col2);
 
         col3.setCellValueFactory(data ->
                 data.getValue() instanceof Hotel h
-                        ? new SimpleStringProperty(AdminUtils.formatStarsWithScore(h.getStars()))
+                        ? new SimpleStringProperty(GuiUtils.formatStarsWithScore(h.getStars()))
                         : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col3);
+        DialogHelper.applyPlainTextCellFactory(col3);
 
         col4.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) { setGraphic(null); return; }
                 if (getTableRow().getItem() instanceof Hotel hotel) {
-                    Label badge = new Label(AdminUtils.getStatusLabel(hotel.getStatus()));
-                    badge.getStyleClass().add(AdminUtils.getStatusStyleClass(hotel.getStatus()));
+                    Label badge = new Label(GuiUtils.getStatusLabel(hotel.getStatus()));
+                    badge.getStyleClass().add(GuiUtils.getStatusStyleClass(hotel.getStatus()));
                     setGraphic(badge);
                 } else { setGraphic(null); }
             }
@@ -144,22 +148,50 @@ public class AdminHotelViewController {
                 data.getValue() instanceof Hotel h
                         ? new SimpleStringProperty(state.resolveLocalisationLabel(h.getLocationId()))
                         : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col5);
+        DialogHelper.applyPlainTextCellFactory(col5);
 
         col6.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
         col6.setCellFactory(col -> new TableCell<>() {
-            private final Button viewBtn = AdminDialogHelper.createTableActionButton("Details", AdminDialogHelper.BLUE_BTN, AdminDialogHelper.BLUE_BTN_HOVER, 88);
-            private final Button editBtn = AdminDialogHelper.createTableActionButton("Modifier", AdminDialogHelper.ORANGE_BTN, AdminDialogHelper.ORANGE_BTN_HOVER, 96);
-            private final Button deleteBtn = AdminDialogHelper.createTableActionButton("Supprimer", AdminDialogHelper.RED_BTN, AdminDialogHelper.RED_BTN_HOVER, 106);
-            private final HBox box = new HBox(10, viewBtn, editBtn, deleteBtn);
-            { viewBtn.setTooltip(new Tooltip("Voir les details de cet hotel")); editBtn.setTooltip(new Tooltip("Modifier les informations")); deleteBtn.setTooltip(new Tooltip("Supprimer cet hotel")); box.setAlignment(Pos.CENTER); }
+            private final Button viewBtn = DialogHelper.createTableActionButton("Details", "gv-btn-blue", 84);
+            private final Button editBtn = DialogHelper.createTableActionButton("Modifier", "gv-btn-orange", 92);
+            private final Button deleteBtn = DialogHelper.createTableActionButton("Supprimer", "gv-btn-red", 98);
+            private final HBox box = new HBox(4, viewBtn, editBtn, deleteBtn);
+            {
+                viewBtn.setTooltip(new Tooltip("Voir les details de cet hotel"));
+                editBtn.setTooltip(new Tooltip("Modifier les informations"));
+                deleteBtn.setTooltip(new Tooltip("Supprimer cet hotel"));
+                box.setAlignment(Pos.CENTER_LEFT);
+            }
+
+            private void styleActionsForWidth() {
+                double w = getTableColumn() == null ? 0 : getTableColumn().getWidth();
+                boolean compact = w > 0 && w < 300;
+                if (compact) {
+                    viewBtn.setText("Voir");
+                    editBtn.setText("Edit");
+                    deleteBtn.setText("Supp.");
+                    box.setSpacing(4);
+                    viewBtn.setMinWidth(70); viewBtn.setPrefWidth(70); viewBtn.setMaxWidth(70);
+                    editBtn.setMinWidth(72); editBtn.setPrefWidth(72); editBtn.setMaxWidth(72);
+                    deleteBtn.setMinWidth(72); deleteBtn.setPrefWidth(72); deleteBtn.setMaxWidth(72);
+                } else {
+                    viewBtn.setText("Details");
+                    editBtn.setText("Modifier");
+                    deleteBtn.setText("Supprimer");
+                    box.setSpacing(6);
+                    viewBtn.setMinWidth(84); viewBtn.setPrefWidth(84); viewBtn.setMaxWidth(84);
+                    editBtn.setMinWidth(92); editBtn.setPrefWidth(92); editBtn.setMaxWidth(92);
+                    deleteBtn.setMinWidth(98); deleteBtn.setPrefWidth(98); deleteBtn.setMaxWidth(98);
+                }
+            }
 
             @Override protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || !(item instanceof Hotel hotel)) { setGraphic(null); return; }
+                styleActionsForWidth();
                 viewBtn.setOnAction(e -> admin.showHotelDetail(hotel));
                 editBtn.setOnAction(e -> showEditHotelDialog(hotel));
-                deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("hotel", hotel.getName(), () -> handleDeleteHotel(hotel), getClass()));
+                deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("hotel", hotel.getName(), () -> handleDeleteHotel(hotel), getClass()));
                 setGraphic(box);
             }
         });
@@ -213,25 +245,25 @@ public class AdminHotelViewController {
                                     TableView<HotelReview> reviewsTable) {
 
         detailName.setText(hotel.getName());
-        detailSubInfo.setText(AdminUtils.formatStarsWithScore(hotel.getStars()));
-        detailSubInfo.setStyle("-fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #FFBD59;");
+        detailSubInfo.setText(GuiUtils.formatStarsWithScore(hotel.getStars()));
+        detailSubInfo.getStyleClass().add("detail-stars-score");
         detailDesc.setText(hotel.getDescription());
 
         // ── API insight row — cleared, map is accessed via the 🗺 Carte button on demand ─
         if (detailApiRow != null) detailApiRow.getChildren().clear();
 
         detailBadges.getChildren().clear();
-        Label statusBadge = new Label(AdminUtils.getStatusLabel(hotel.getStatus()));
-        statusBadge.getStyleClass().add(AdminUtils.getStatusStyleClass(hotel.getStatus()));
-        statusBadge.setStyle("-fx-font-size: 13px;");
+        Label statusBadge = new Label(GuiUtils.getStatusLabel(hotel.getStatus()));
+        statusBadge.getStyleClass().add(GuiUtils.getStatusStyleClass(hotel.getStatus()));
+        statusBadge.getStyleClass().add("badge-font-override");
         Label locationBadge = new Label(state.resolveLocalisationLabel(hotel.getLocationId()));
-        locationBadge.setStyle("-fx-background-color: rgba(103,154,193,0.3); -fx-text-fill: #679AC1; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
+        locationBadge.getStyleClass().add("badge-location");
         int roomCount = (int) state.getRoomsList().stream().filter(r -> r.getHotelId() == hotel.getId()).count();
         Label roomsBadge = new Label(roomCount + " chambre(s)");
-        roomsBadge.setStyle("-fx-background-color: rgba(255,130,16,0.3); -fx-text-fill: #FF8210; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
+        roomsBadge.getStyleClass().add("badge-rooms");
         int servicesCount = getServiceCountForHotel(hotel.getId());
         Label servicesBadge = new Label(servicesCount + " service(s)");
-        servicesBadge.setStyle("-fx-background-color: rgba(40,167,69,0.25); -fx-text-fill: #7ce19b; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
+        servicesBadge.getStyleClass().add("badge-services");
         detailBadges.getChildren().addAll(statusBadge, locationBadge, roomsBadge, servicesBadge);
 
         if (detailServicesSection != null) { detailServicesSection.setVisible(true); detailServicesSection.setManaged(true); }
@@ -243,16 +275,16 @@ public class AdminHotelViewController {
 
         if (detailManageServicesBtn != null) {
             detailManageServicesBtn.setText("Gerer services");
-            detailManageServicesBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 16; -fx-font-size: 12px; -fx-font-weight: 700; -fx-cursor: hand;");
+            detailManageServicesBtn.getStyleClass().add("btn-manage-services");
             detailManageServicesBtn.setOnAction(e -> showHotelServicesDialog(hotel));
         }
 
-        Button editBtn = AdminDialogHelper.createDetailActionButton("Modifier l'hotel", "#FF8210");
+        Button editBtn = DialogHelper.createDetailActionButton("Modifier l'hotel", "#FF8210");
         editBtn.setOnAction(e -> showEditHotelDialog(hotel));
-        Button roomsBtn = AdminDialogHelper.createDetailActionButton("Voir les chambres", "#679AC1");
+        Button roomsBtn = DialogHelper.createDetailActionButton("Voir les chambres", "#679AC1");
         roomsBtn.setOnAction(e -> admin.navigateToRoomsFilteredByHotel(hotel));
-        Button deleteBtn = AdminDialogHelper.createDetailActionButton("Supprimer", "#dc3545");
-        deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("hotel", hotel.getName(), () -> {
+        Button deleteBtn = DialogHelper.createDetailActionButton("Supprimer", "#dc3545");
+        deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("hotel", hotel.getName(), () -> {
             handleDeleteHotel(hotel);
             admin.showHotelsView();
         }, getClass()));
@@ -300,17 +332,17 @@ public class AdminHotelViewController {
                 String name = item.getName() == null ? "" : item.getName().trim();
                 if (name.isEmpty()) continue;
                 Label chip = new Label(name);
-                chip.setStyle("-fx-background-color: rgba(103,154,193,0.22); -fx-text-fill: #d7ebfb; -fx-padding: 5 12; -fx-background-radius: 14; -fx-font-size: 12px;");
+                chip.getStyleClass().add("service-chip");
                 detailServicesPane.getChildren().add(chip);
             }
             if (detailServicesPane.getChildren().isEmpty()) {
                 Label empty = new Label("Aucun service actif");
-                empty.setStyle("-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 12px; -fx-font-style: italic;");
+                empty.getStyleClass().add("service-empty-label");
                 detailServicesPane.getChildren().add(empty);
             }
         } catch (SQLException e) {
             Label error = new Label("Erreur de chargement des services");
-            error.setStyle("-fx-text-fill: #FF8210; -fx-font-size: 12px;");
+            error.getStyleClass().add("gv-warning-text");
             detailServicesPane.getChildren().add(error);
         }
     }
@@ -329,7 +361,7 @@ public class AdminHotelViewController {
             hotelService.create(h);
             admin.loadAllData();
             admin.loadHotelsTable();
-            AdminDialogHelper.showNotification("Hotel cree avec succes!", "success", getClass());
+            DialogHelper.showNotification("Hotel cree avec succes!", "success", getClass());
         }));
     }
 
@@ -344,7 +376,7 @@ public class AdminHotelViewController {
             } else {
                 admin.loadHotelsTable();
             }
-            AdminDialogHelper.showNotification("Hotel modifie!", "success", getClass());
+            DialogHelper.showNotification("Hotel modifie!", "success", getClass());
         }));
     }
 
@@ -356,12 +388,12 @@ public class AdminHotelViewController {
         ButtonType saveBtn = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
 
         // ── Nom ────────────────────────────────────────────────────────────
         TextField nameField = new TextField(isNew ? "" : hotel.getName());
         nameField.setPromptText("Nom de l'hotel");
-        AdminDialogHelper.applyDialogFieldSizing(nameField);
+        DialogHelper.applyDialogFieldSizing(nameField);
 
         // ── Description ────────────────────────────────────────────────────
         TextArea descField = new TextArea(isNew ? "" : hotel.getDescription());
@@ -369,25 +401,25 @@ public class AdminHotelViewController {
         descField.setPrefRowCount(4);
         descField.setWrapText(true);
         descField.setPrefHeight(108);
-        AdminDialogHelper.applyDialogFieldSizing(descField);
+        DialogHelper.applyDialogFieldSizing(descField);
 
         // ── Etoiles ────────────────────────────────────────────────────────
         Spinner<Integer> starsSpinner = new Spinner<>(1, 5, isNew ? 3 : hotel.getStars());
         starsSpinner.setEditable(false);
-        AdminDialogHelper.configureDialogSpinner(starsSpinner, 0);
+        DialogHelper.configureDialogSpinner(starsSpinner, 0);
 
         // ── Statut ─────────────────────────────────────────────────────────
         ComboBox<String> statusCombo = new ComboBox<>(
                 FXCollections.observableArrayList("AVAILABLE", "OCCUPIED", "MAINTENANCE"));
         statusCombo.setValue(isNew ? "AVAILABLE" : hotel.getStatus());
-        AdminDialogHelper.applyDialogFieldSizing(statusCombo);
+        DialogHelper.applyDialogFieldSizing(statusCombo);
 
         // ── Localisation — existing destinations + inline "create" button ──
         state.refreshLocalisationLookup();
         ComboBox<String> localisationCombo = new ComboBox<>();
         localisationCombo.getItems().addAll(state.getSortedLocalisationLabels());
         localisationCombo.setPromptText("Sélectionner une destination");
-        AdminDialogHelper.applyDialogFieldSizing(localisationCombo);
+        DialogHelper.applyDialogFieldSizing(localisationCombo);
 
         if (isNew) {
             localisationCombo.setValue(null);
@@ -412,15 +444,15 @@ public class AdminHotelViewController {
         // ── Save-button guard ──────────────────────────────────────────────
         Node saveButton = dialog.getDialogPane().lookupButton(saveBtn);
         Runnable syncSaveState = () -> saveButton.setDisable(
-                AdminUtils.isBlank(nameField.getText())
-                        || AdminUtils.isBlank(localisationCombo.getValue()));
+                GuiUtils.isBlank(nameField.getText())
+                        || GuiUtils.isBlank(localisationCombo.getValue()));
         syncSaveState.run();
         nameField.textProperty().addListener((obs, old, val) -> syncSaveState.run());
         localisationCombo.valueProperty().addListener((obs, old, val) -> syncSaveState.run());
 
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 740, 430);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 740, 430);
+        DialogHelper.styleDialog(dialog, false, getClass());
         Platform.runLater(nameField::requestFocus);
 
         // ── Result converter ───────────────────────────────────────────────
@@ -431,7 +463,7 @@ public class AdminHotelViewController {
             int fallback = isNew ? state.getDefaultDestinationId() : hotel.getLocationId();
             int locationId = state.resolveLocalisationId(localisationCombo.getValue(), fallback);
             return new Hotel(0,
-                    AdminUtils.trimToEmpty(nameField.getText()),
+                    GuiUtils.trimToEmpty(nameField.getText()),
                     descField.getText(),
                     starsSpinner.getValue(),
                     statusCombo.getValue(),
@@ -445,7 +477,7 @@ public class AdminHotelViewController {
             hotelService.delete(hotel.getId());
             admin.loadAllData();
             admin.loadHotelsTable();
-            AdminDialogHelper.showNotification("Hotel supprime!", "success", getClass());
+            DialogHelper.showNotification("Hotel supprime!", "success", getClass());
         });
     }
 
@@ -524,7 +556,7 @@ public class AdminHotelViewController {
                     servicesList.scrollTo(idx);
                 }
             } catch (SQLException e) {
-                AdminDialogHelper.showNotification("Erreur services: " + e.getMessage(), "error", getClass());
+                DialogHelper.showNotification("Erreur services: " + e.getMessage(), "error", getClass());
             }
         };
         reloadServices.run();
@@ -534,39 +566,39 @@ public class AdminHotelViewController {
         addBtn.setOnAction(e -> {
             HotelServiceItem created = showHotelServiceFormDialog(hotel, null);
             if (created == null) return;
-            try { hotelServiceItemService.create(created); reloadServices.run(); AdminDialogHelper.showNotification("Service ajoute!", "success", getClass()); }
-            catch (SQLException ex) { AdminDialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
+            try { hotelServiceItemService.create(created); reloadServices.run(); DialogHelper.showNotification("Service ajoute!", "success", getClass()); }
+            catch (SQLException ex) { DialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
         });
         Button editBtn = new Button("Modifier"); editBtn.getStyleClass().addAll("gv-service-action-btn", "gv-service-action-edit");
         editBtn.setOnAction(e -> {
             HotelServiceItem selected = resolveSelectedService(servicesList);
-            if (selected == null) { AdminDialogHelper.showNotification("Selectionnez un service a modifier", "warning", getClass()); return; }
+            if (selected == null) { DialogHelper.showNotification("Selectionnez un service a modifier", "warning", getClass()); return; }
             HotelServiceItem updated = showHotelServiceFormDialog(hotel, selected);
             if (updated == null) return;
-            try { hotelServiceItemService.update(updated); reloadServices.run(); AdminDialogHelper.showNotification("Service modifie!", "success", getClass()); }
-            catch (SQLException ex) { AdminDialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
+            try { hotelServiceItemService.update(updated); reloadServices.run(); DialogHelper.showNotification("Service modifie!", "success", getClass()); }
+            catch (SQLException ex) { DialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
         });
         Button toggleBtn = new Button("Activer / Desactiver"); toggleBtn.getStyleClass().addAll("gv-service-action-btn", "gv-service-action-toggle");
         toggleBtn.setOnAction(e -> {
             HotelServiceItem selected = resolveSelectedService(servicesList);
-            if (selected == null) { AdminDialogHelper.showNotification("Selectionnez un service", "warning", getClass()); return; }
-            try { selected.setActive(!selected.isActive()); hotelServiceItemService.update(selected); reloadServices.run(); AdminDialogHelper.showNotification("Statut du service mis a jour!", "success", getClass()); }
-            catch (SQLException ex) { AdminDialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
+            if (selected == null) { DialogHelper.showNotification("Selectionnez un service", "warning", getClass()); return; }
+            try { selected.setActive(!selected.isActive()); hotelServiceItemService.update(selected); reloadServices.run(); DialogHelper.showNotification("Statut du service mis a jour!", "success", getClass()); }
+            catch (SQLException ex) { DialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
         });
         Button deleteBtn = new Button("Supprimer"); deleteBtn.getStyleClass().addAll("gv-service-action-btn", "gv-service-action-delete");
         deleteBtn.setOnAction(e -> {
             HotelServiceItem selected = resolveSelectedService(servicesList);
-            if (selected == null) { AdminDialogHelper.showNotification("Selectionnez un service a supprimer", "warning", getClass()); return; }
-            AdminDialogHelper.confirmDelete("service", selected.getName(), () -> {
-                try { hotelServiceItemService.delete(selected.getId()); reloadServices.run(); AdminDialogHelper.showNotification("Service supprime!", "success", getClass()); }
-                catch (SQLException ex) { AdminDialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
+            if (selected == null) { DialogHelper.showNotification("Selectionnez un service a supprimer", "warning", getClass()); return; }
+            DialogHelper.confirmDelete("service", selected.getName(), () -> {
+                try { hotelServiceItemService.delete(selected.getId()); reloadServices.run(); DialogHelper.showNotification("Service supprime!", "success", getClass()); }
+                catch (SQLException ex) { DialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
             }, getClass());
         });
         actions.getChildren().addAll(addBtn, editBtn, toggleBtn, deleteBtn);
         content.getChildren().addAll(header, servicesList, actions);
         dialog.getDialogPane().setContent(content);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 760, 460);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 760, 460);
+        DialogHelper.styleDialog(dialog, false, getClass());
         dialog.showAndWait();
         admin.loadAllData();
         Hotel refreshedHotel = state.getSelectedHotel();
@@ -578,18 +610,18 @@ public class AdminHotelViewController {
         dialog.setTitle(existing == null ? "Nouveau service" : "Modifier service");
         ButtonType saveBtn = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
         TextField nameField = new TextField(existing == null ? "" : existing.getName());
-        nameField.setPromptText("Nom du service"); AdminDialogHelper.applyDialogFieldSizing(nameField);
+        nameField.setPromptText("Nom du service"); DialogHelper.applyDialogFieldSizing(nameField);
         CheckBox activeCheck = new CheckBox("Service actif");
         activeCheck.setSelected(existing == null || existing.isActive());
-        activeCheck.setStyle("-fx-text-fill: #f8fbff; -fx-font-size: 14px; -fx-font-weight: bold;");
+        activeCheck.getStyleClass().add("gv-dialog-checkbox");
         grid.add(new Label("Hotel"), 0, 0); grid.add(new Label(hotel.getName()), 1, 0);
         grid.add(new Label("Nom *"), 0, 1); grid.add(nameField, 1, 1);
         grid.add(new Label("Etat"), 0, 2); grid.add(activeCheck, 1, 2);
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 320);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 700, 320);
+        DialogHelper.styleDialog(dialog, false, getClass());
         dialog.setResultConverter(btn -> {
             if (btn != saveBtn) return null;
             String serviceName = nameField.getText() == null ? "" : nameField.getText().trim();
@@ -628,8 +660,8 @@ public class AdminHotelViewController {
             }
         });
         colImageActions.setCellFactory(col -> new TableCell<>() {
-            private final Button deleteBtn = AdminDialogHelper.createTableActionButton("Supprimer", AdminDialogHelper.RED_BTN, AdminDialogHelper.RED_BTN_HOVER, 96);
-            { deleteBtn.setTooltip(new Tooltip("Supprimer cette image")); deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("image", "", () -> handleDeleteImage(getTableView().getItems().get(getIndex())), getClass())); }
+            private final Button deleteBtn = DialogHelper.createTableActionButton("Supprimer", "gv-btn-red", 96);
+            { deleteBtn.setTooltip(new Tooltip("Supprimer cette image")); deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("image", "", () -> handleDeleteImage(getTableView().getItems().get(getIndex())), getClass())); }
             @Override protected void updateItem(Void item, boolean empty) { super.updateItem(item, empty); setGraphic(empty ? null : deleteBtn); }
         });
     }
@@ -659,7 +691,7 @@ public class AdminHotelViewController {
         runSqlAction(() -> {
             hotelImageService.delete(image.getId());
             Hotel sel = state.getSelectedHotel();
-            if (sel != null) AdminDialogHelper.showNotification("Image supprimee!", "success", getClass());
+            if (sel != null) DialogHelper.showNotification("Image supprimee!", "success", getClass());
         });
     }
 
@@ -677,14 +709,14 @@ public class AdminHotelViewController {
         ButtonType addBtn = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addBtn, ButtonType.CANCEL);
 
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
         TextField pathField = new TextField();
         pathField.setPromptText("Chemin local ou URL");
-        AdminDialogHelper.applyDialogFieldSizing(pathField);
+        DialogHelper.applyDialogFieldSizing(pathField);
         pathField.setPrefWidth(460);
 
         Button chooseBtn = new Button("Choisir image");
-        chooseBtn.setStyle("-fx-background-color: #679AC1; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 14; -fx-font-size: 12px; -fx-font-weight: bold;");
+        chooseBtn.getStyleClass().add("btn-choose-image");
         chooseBtn.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Selectionner une image");
@@ -701,20 +733,20 @@ public class AdminHotelViewController {
         grid.add(new Label("Image *"), 0, 0); grid.add(inputRow, 1, 0);
 
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 760, 280);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 760, 280);
+        DialogHelper.styleDialog(dialog, false, getClass());
 
         Node addButtonNode = dialog.getDialogPane().lookupButton(addBtn);
         addButtonNode.setDisable(true);
-        pathField.textProperty().addListener((obs, oldText, newText) -> addButtonNode.setDisable(AdminUtils.isBlank(newText)));
-        dialog.setResultConverter(btn -> btn == addBtn ? AdminUtils.trimToNull(pathField.getText()) : null);
+        pathField.textProperty().addListener((obs, oldText, newText) -> addButtonNode.setDisable(GuiUtils.isBlank(newText)));
+        dialog.setResultConverter(btn -> btn == addBtn ? GuiUtils.trimToNull(pathField.getText()) : null);
 
         dialog.showAndWait().ifPresent(path -> {
             try {
                 saveHotelImage(path, selectedHotel.getId(), 0, imagesTable, mainImageContainer, thumbnailsContainer);
-                AdminDialogHelper.showNotification("Image ajoutee!", "success", getClass());
-            } catch (IllegalArgumentException ex) { AdminDialogHelper.showNotification(ex.getMessage(), "warning", getClass()); }
-            catch (SQLException ex) { AdminDialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
+                DialogHelper.showNotification("Image ajoutee!", "success", getClass());
+            } catch (IllegalArgumentException ex) { DialogHelper.showNotification(ex.getMessage(), "warning", getClass()); }
+            catch (SQLException ex) { DialogHelper.showNotification("Erreur: " + ex.getMessage(), "error", getClass()); }
         });
     }
 
@@ -723,17 +755,16 @@ public class AdminHotelViewController {
         HBox row = new HBox(0);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(13, 0, 13, 0));
-        if (alt) row.setStyle("-fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent; -fx-border-width: 0 0 1 0;");
-        else     row.setStyle("-fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent; -fx-border-width: 0 0 1 0;");
+        row.getStyleClass().add("gv-detail-row");
 
         Label iconLbl = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 14px; -fx-min-width: 26;");
+        iconLbl.getStyleClass().add("gv-detail-row-icon");
 
         Label keyLbl = new Label(key);
-        keyLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.45); -fx-font-weight: 600; -fx-min-width: 110;");
+        keyLbl.getStyleClass().add("gv-detail-row-key");
 
         Label valLbl = new Label(value);
-        valLbl.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.88); -fx-font-weight: 600;");
+        valLbl.getStyleClass().add("gv-detail-row-value");
         valLbl.setWrapText(true);
         HBox.setHgrow(valLbl, Priority.ALWAYS);
 
@@ -760,12 +791,8 @@ public class AdminHotelViewController {
                                      javafx.scene.control.DialogPane owner) {
         Button btn = new Button("➕");
         btn.setTooltip(new Tooltip("Créer une nouvelle destination"));
-        btn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px;"
-                + "-fx-background-radius: 8; -fx-padding: 6 10; -fx-cursor: hand; -fx-font-weight: bold;");
-        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #1e7e34; -fx-text-fill: white; -fx-font-size: 13px;"
-                + "-fx-background-radius: 8; -fx-padding: 6 10; -fx-cursor: hand; -fx-font-weight: bold;"));
-        btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px;"
-                + "-fx-background-radius: 8; -fx-padding: 6 10; -fx-cursor: hand; -fx-font-weight: bold;"));
+        btn.getStyleClass().add("btn-new-destination");
+        btn.getStyleClass().add("btn-new-destination");
 
         btn.setOnAction(e -> {
             Dialog<String[]> destDialog = new Dialog<>();
@@ -773,19 +800,19 @@ public class AdminHotelViewController {
             ButtonType createBtn = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
             destDialog.getDialogPane().getButtonTypes().addAll(createBtn, ButtonType.CANCEL);
 
-            GridPane dGrid = AdminDialogHelper.createDialogFormGrid();
+            GridPane dGrid = DialogHelper.createDialogFormGrid();
 
             TextField nameF    = new TextField();
             nameF.setPromptText("Nom de la destination");
-            AdminDialogHelper.applyDialogFieldSizing(nameF);
+            DialogHelper.applyDialogFieldSizing(nameF);
 
             TextField cityF    = new TextField(prefCity    == null ? "" : prefCity);
             cityF.setPromptText("Ville");
-            AdminDialogHelper.applyDialogFieldSizing(cityF);
+            DialogHelper.applyDialogFieldSizing(cityF);
 
             TextField countryF = new TextField(prefCountry == null ? "" : prefCountry);
             countryF.setPromptText("Pays");
-            AdminDialogHelper.applyDialogFieldSizing(countryF);
+            DialogHelper.applyDialogFieldSizing(countryF);
 
             // Auto-fill name from city if user leaves it blank
             cityF.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
@@ -798,15 +825,15 @@ public class AdminHotelViewController {
             dGrid.add(new Label("Pays"),   0, 2); dGrid.add(countryF, 1, 2);
 
             Node createNode = destDialog.getDialogPane().lookupButton(createBtn);
-            Runnable sync = () -> createNode.setDisable(AdminUtils.isBlank(nameF.getText())
-                    && AdminUtils.isBlank(cityF.getText()));
+            Runnable sync = () -> createNode.setDisable(GuiUtils.isBlank(nameF.getText())
+                    && GuiUtils.isBlank(cityF.getText()));
             sync.run();
             nameF.textProperty().addListener((obs, o, v) -> sync.run());
             cityF.textProperty().addListener((obs, o, v) -> sync.run());
 
             destDialog.getDialogPane().setContent(dGrid);
-            AdminDialogHelper.applyDialogPaneSizing(destDialog.getDialogPane(), 640, 320);
-            AdminDialogHelper.styleDialog(destDialog, false, getClass());
+            DialogHelper.applyDialogPaneSizing(destDialog.getDialogPane(), 640, 320);
+            DialogHelper.styleDialog(destDialog, false, getClass());
             Platform.runLater(cityF::requestFocus);
 
             destDialog.setResultConverter(b -> b == createBtn
@@ -823,9 +850,9 @@ public class AdminHotelViewController {
                     combo.getItems().clear();
                     combo.getItems().addAll(state.getSortedLocalisationLabels());
                     combo.setValue(newLabel);
-                    AdminDialogHelper.showNotification("Destination \"" + newLabel + "\" créée!", "success", getClass());
+                    DialogHelper.showNotification("Destination \"" + newLabel + "\" créée!", "success", getClass());
                 } catch (Exception ex) {
-                    AdminDialogHelper.showNotification("Erreur création destination: " + ex.getMessage(), "error", getClass());
+                    DialogHelper.showNotification("Erreur création destination: " + ex.getMessage(), "error", getClass());
                 }
             });
         });
@@ -841,6 +868,6 @@ public class AdminHotelViewController {
 
     private void runSqlAction(SqlAction action) {
         try { action.run(); }
-        catch (SQLException e) { AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
+        catch (SQLException e) { DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
     }
 }

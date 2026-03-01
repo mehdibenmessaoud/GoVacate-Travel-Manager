@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 public class MyDBConnexion {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/govacate";
-    private static final String USER = "root";
+    private static final String URL      = "jdbc:mysql://localhost:3306/govacate";
+    private static final String USER     = "root";
     private static final String PASSWORD = "";
-    
+
     private Connection connection;
     private static volatile MyDBConnexion instance;
 

@@ -61,6 +61,10 @@ public class AdminRoomViewController {
             col3.prefWidthProperty().unbind(); col4.prefWidthProperty().unbind();
             col5.prefWidthProperty().unbind(); col6.prefWidthProperty().unbind();
 
+            // Responsive minima to keep the Action column fully visible.
+            col1.setMinWidth(90);  col2.setMinWidth(180); col3.setMinWidth(90);
+            col4.setMinWidth(90);  col5.setMinWidth(110); col6.setMinWidth(240);
+
             col1.setMaxWidth(Double.MAX_VALUE); col2.setMaxWidth(Double.MAX_VALUE);
             col3.setMaxWidth(Double.MAX_VALUE); col4.setMaxWidth(Double.MAX_VALUE);
             col5.setMaxWidth(Double.MAX_VALUE); col6.setMaxWidth(Double.MAX_VALUE);
@@ -91,18 +95,18 @@ public class AdminRoomViewController {
                 data.getValue() instanceof Room r ? new SimpleStringProperty(state.getHotelName(r.getHotelId())) : new SimpleStringProperty(""));
         col3.setCellValueFactory(data ->
                 data.getValue() instanceof Room r ? new SimpleStringProperty(r.getRoomType()) : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col3);
+        DialogHelper.applyPlainTextCellFactory(col3);
         col4.setCellValueFactory(data ->
-                data.getValue() instanceof Room r ? new SimpleStringProperty(AdminUtils.formatPrice(r.getPricePerNight()) + " DT") : new SimpleStringProperty(""));
-        AdminDialogHelper.applyPlainTextCellFactory(col4);
+                data.getValue() instanceof Room r ? new SimpleStringProperty(GuiUtils.formatPrice(r.getPricePerNight()) + " DT") : new SimpleStringProperty(""));
+        DialogHelper.applyPlainTextCellFactory(col4);
 
         col5.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) { setGraphic(null); return; }
                 if (getTableRow().getItem() instanceof Room room) {
-                    Label badge = new Label(AdminUtils.getStatusLabel(room.getStatus()));
-                    badge.getStyleClass().add(AdminUtils.getStatusStyleClass(room.getStatus()));
+                    Label badge = new Label(GuiUtils.getStatusLabel(room.getStatus()));
+                    badge.getStyleClass().add(GuiUtils.getStatusStyleClass(room.getStatus()));
                     setGraphic(badge);
                 } else { setGraphic(null); }
             }
@@ -112,18 +116,46 @@ public class AdminRoomViewController {
 
         col6.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
         col6.setCellFactory(col -> new TableCell<>() {
-            private final Button viewBtn = AdminDialogHelper.createTableActionButton("Details", AdminDialogHelper.BLUE_BTN, AdminDialogHelper.BLUE_BTN_HOVER, 88);
-            private final Button editBtn = AdminDialogHelper.createTableActionButton("Modifier", AdminDialogHelper.ORANGE_BTN, AdminDialogHelper.ORANGE_BTN_HOVER, 96);
-            private final Button deleteBtn = AdminDialogHelper.createTableActionButton("Supprimer", AdminDialogHelper.RED_BTN, AdminDialogHelper.RED_BTN_HOVER, 106);
-            private final HBox box = new HBox(10, viewBtn, editBtn, deleteBtn);
-            { viewBtn.setTooltip(new Tooltip("Voir les details de cette chambre")); editBtn.setTooltip(new Tooltip("Modifier les informations")); deleteBtn.setTooltip(new Tooltip("Supprimer cette chambre")); box.setAlignment(Pos.CENTER); }
+            private final Button viewBtn = DialogHelper.createTableActionButton("Details", "gv-btn-blue", 84);
+            private final Button editBtn = DialogHelper.createTableActionButton("Modifier", "gv-btn-orange", 92);
+            private final Button deleteBtn = DialogHelper.createTableActionButton("Supprimer", "gv-btn-red", 98);
+            private final HBox box = new HBox(4, viewBtn, editBtn, deleteBtn);
+            {
+                viewBtn.setTooltip(new Tooltip("Voir les details de cette chambre"));
+                editBtn.setTooltip(new Tooltip("Modifier les informations"));
+                deleteBtn.setTooltip(new Tooltip("Supprimer cette chambre"));
+                box.setAlignment(Pos.CENTER_LEFT);
+            }
+
+            private void styleActionsForWidth() {
+                double w = getTableColumn() == null ? 0 : getTableColumn().getWidth();
+                boolean compact = w > 0 && w < 300;
+                if (compact) {
+                    viewBtn.setText("Voir");
+                    editBtn.setText("Edit");
+                    deleteBtn.setText("Supp.");
+                    box.setSpacing(4);
+                    viewBtn.setMinWidth(70); viewBtn.setPrefWidth(70); viewBtn.setMaxWidth(70);
+                    editBtn.setMinWidth(72); editBtn.setPrefWidth(72); editBtn.setMaxWidth(72);
+                    deleteBtn.setMinWidth(72); deleteBtn.setPrefWidth(72); deleteBtn.setMaxWidth(72);
+                } else {
+                    viewBtn.setText("Details");
+                    editBtn.setText("Modifier");
+                    deleteBtn.setText("Supprimer");
+                    box.setSpacing(6);
+                    viewBtn.setMinWidth(84); viewBtn.setPrefWidth(84); viewBtn.setMaxWidth(84);
+                    editBtn.setMinWidth(92); editBtn.setPrefWidth(92); editBtn.setMaxWidth(92);
+                    deleteBtn.setMinWidth(98); deleteBtn.setPrefWidth(98); deleteBtn.setMaxWidth(98);
+                }
+            }
 
             @Override protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || !(item instanceof Room room)) { setGraphic(null); return; }
+                styleActionsForWidth();
                 viewBtn.setOnAction(e -> admin.showRoomDetail(room));
                 editBtn.setOnAction(e -> showEditRoomDialog(room));
-                deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("chambre", room.getRoomNumber(), () -> handleDeleteRoom(room), getClass()));
+                deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("chambre", room.getRoomNumber(), () -> handleDeleteRoom(room), getClass()));
                 setGraphic(box);
             }
         });
@@ -175,19 +207,19 @@ public class AdminRoomViewController {
         String hotelName = state.getHotelName(room.getHotelId());
         detailName.setText("Chambre " + room.getRoomNumber());
         detailSubInfo.setText(hotelName);
-        detailSubInfo.setStyle("-fx-font-size: 14px; -fx-text-fill: #679AC1;");
+        detailSubInfo.getStyleClass().add("detail-room-subinfo");
         detailDesc.setText("Type: " + room.getRoomType() + "\nCapacite: " + room.getCapacity() + " personnes\nPrix par nuit: " + room.getPricePerNight() + " DT");
 
         detailBadges.getChildren().clear();
         Label typeBadge = new Label(room.getRoomType());
-        typeBadge.setStyle("-fx-background-color: #679AC1; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
+        typeBadge.getStyleClass().add("badge-room-type");
         Label priceBadge = new Label(room.getPricePerNight() + " DT/nuit");
-        priceBadge.setStyle("-fx-background-color: #FF8210; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
-        Label statusBadge = new Label(AdminUtils.getStatusLabel(room.getStatus()));
-        statusBadge.getStyleClass().add(AdminUtils.getStatusStyleClass(room.getStatus()));
-        statusBadge.setStyle("-fx-font-size: 13px;");
+        priceBadge.getStyleClass().add("badge-room-price");
+        Label statusBadge = new Label(GuiUtils.getStatusLabel(room.getStatus()));
+        statusBadge.getStyleClass().add(GuiUtils.getStatusStyleClass(room.getStatus()));
+        statusBadge.getStyleClass().add("badge-font-override");
         Label capacityBadge = new Label(room.getCapacity() + " personnes");
-        capacityBadge.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px;");
+        capacityBadge.getStyleClass().add("badge-room-capacity");
         detailBadges.getChildren().addAll(typeBadge, priceBadge, statusBadge, capacityBadge);
 
         if (detailServicesSection != null) { detailServicesSection.setVisible(false); detailServicesSection.setManaged(false); }
@@ -197,10 +229,10 @@ public class AdminRoomViewController {
         detailActionButtons.setHgap(12); detailActionButtons.setVgap(12);
         detailActionButtons.setPrefWrapLength(620); detailActionButtons.setAlignment(Pos.CENTER_LEFT);
 
-        Button editBtn = AdminDialogHelper.createDetailActionButton("Modifier la chambre", "#FF8210");
+        Button editBtn = DialogHelper.createDetailActionButton("Modifier la chambre", "#FF8210");
         editBtn.setOnAction(e -> showEditRoomDialog(room));
-        Button deleteBtn = AdminDialogHelper.createDetailActionButton("Supprimer", "#dc3545");
-        deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("chambre", room.getRoomNumber(), () -> {
+        Button deleteBtn = DialogHelper.createDetailActionButton("Supprimer", "#dc3545");
+        deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("chambre", room.getRoomNumber(), () -> {
             handleDeleteRoom(room); admin.showRoomsView();
         }, getClass()));
         detailActionButtons.getChildren().addAll(editBtn, deleteBtn);
@@ -218,12 +250,12 @@ public class AdminRoomViewController {
 
     public void showAddRoomDialog() {
         if (state.getHotelsList().isEmpty()) {
-            AdminDialogHelper.showNotification("Creez d'abord un hotel!", "warning", getClass()); return;
+            DialogHelper.showNotification("Creez d'abord un hotel!", "warning", getClass()); return;
         }
         Dialog<Room> dialog = createRoomDialog(null);
         dialog.showAndWait().ifPresent(r -> runSqlAction(() -> {
             roomService.create(r); admin.loadAllData(); admin.loadRoomsTable();
-            AdminDialogHelper.showNotification("Chambre creee!", "success", getClass());
+            DialogHelper.showNotification("Chambre creee!", "success", getClass());
         }));
     }
 
@@ -233,7 +265,7 @@ public class AdminRoomViewController {
             r.setId(room.getId()); roomService.update(r); admin.loadAllData();
             if (state.getSelectedRoom() != null && state.getSelectedRoom().getId() == room.getId()) admin.showRoomDetail(r);
             else admin.loadRoomsTable();
-            AdminDialogHelper.showNotification("Chambre modifiee!", "success", getClass());
+            DialogHelper.showNotification("Chambre modifiee!", "success", getClass());
         }));
     }
 
@@ -243,17 +275,17 @@ public class AdminRoomViewController {
         ButtonType saveBtn = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
         TextField numField = new TextField(room != null ? room.getRoomNumber() : "");
-        numField.setPromptText("Ex: 101"); AdminDialogHelper.applyDialogFieldSizing(numField);
+        numField.setPromptText("Ex: 101"); DialogHelper.applyDialogFieldSizing(numField);
         ComboBox<String> typeCombo = new ComboBox<>(FXCollections.observableArrayList("SINGLE", "DOUBLE", "SUITE", "DELUXE", "FAMILY"));
-        typeCombo.setValue(room != null ? room.getRoomType() : "SINGLE"); AdminDialogHelper.applyDialogFieldSizing(typeCombo);
+        typeCombo.setValue(room != null ? room.getRoomType() : "SINGLE"); DialogHelper.applyDialogFieldSizing(typeCombo);
         Spinner<Integer> capSpinner = new Spinner<>(1, 10, room != null ? room.getCapacity() : 2);
-        capSpinner.setEditable(false); AdminDialogHelper.configureDialogSpinner(capSpinner, 0);
+        capSpinner.setEditable(false); DialogHelper.configureDialogSpinner(capSpinner, 0);
         TextField priceField = new TextField(room != null ? String.valueOf(room.getPricePerNight()) : "100");
-        priceField.setPromptText("Prix par nuit"); AdminDialogHelper.applyDialogFieldSizing(priceField);
+        priceField.setPromptText("Prix par nuit"); DialogHelper.applyDialogFieldSizing(priceField);
         ComboBox<String> statusCombo = new ComboBox<>(FXCollections.observableArrayList("AVAILABLE", "OCCUPIED", "MAINTENANCE"));
-        statusCombo.setValue(room != null ? room.getStatus() : "AVAILABLE"); AdminDialogHelper.applyDialogFieldSizing(statusCombo);
+        statusCombo.setValue(room != null ? room.getStatus() : "AVAILABLE"); DialogHelper.applyDialogFieldSizing(statusCombo);
         ComboBox<Hotel> hotelCombo = new ComboBox<>();
         hotelCombo.setItems(FXCollections.observableArrayList(state.getHotelsList()));
         hotelCombo.setCellFactory(listView -> new ListCell<>() {
@@ -267,7 +299,7 @@ public class AdminRoomViewController {
         } else if (!state.getHotelsList().isEmpty()) {
             hotelCombo.setValue(state.getHotelsList().get(0));
         }
-        AdminDialogHelper.applyDialogFieldSizing(hotelCombo);
+        DialogHelper.applyDialogFieldSizing(hotelCombo);
 
         grid.add(new Label("No Chambre *"), 0, 0); grid.add(numField, 1, 0);
         grid.add(new Label("Type"), 0, 1); grid.add(typeCombo, 1, 1);
@@ -277,12 +309,12 @@ public class AdminRoomViewController {
         grid.add(new Label("Hotel *"), 0, 5); grid.add(hotelCombo, 1, 5);
 
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 740, 500);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 740, 500);
+        DialogHelper.styleDialog(dialog, false, getClass());
 
         Node saveButtonNode = dialog.getDialogPane().lookupButton(saveBtn);
         Runnable validate = () -> saveButtonNode.setDisable(
-                AdminUtils.isBlank(numField.getText()) || hotelCombo.getValue() == null || AdminUtils.parsePrice(priceField.getText()) == null);
+                GuiUtils.isBlank(numField.getText()) || hotelCombo.getValue() == null || GuiUtils.parsePrice(priceField.getText()) == null);
         validate.run();
         numField.textProperty().addListener((obs, oldValue, newValue) -> validate.run());
         priceField.textProperty().addListener((obs, oldValue, newValue) -> validate.run());
@@ -291,9 +323,9 @@ public class AdminRoomViewController {
         dialog.setResultConverter(btn -> {
             if (btn != saveBtn) return null;
             Hotel selected = hotelCombo.getValue();
-            Double price = AdminUtils.parsePrice(priceField.getText());
+            Double price = GuiUtils.parsePrice(priceField.getText());
             if (selected == null || price == null) return null;
-            return new Room(0, AdminUtils.trimToEmpty(numField.getText()), typeCombo.getValue(), capSpinner.getValue(), price, statusCombo.getValue(), selected.getId());
+            return new Room(0, GuiUtils.trimToEmpty(numField.getText()), typeCombo.getValue(), capSpinner.getValue(), price, statusCombo.getValue(), selected.getId());
         });
         return dialog;
     }
@@ -303,29 +335,29 @@ public class AdminRoomViewController {
         dialog.setTitle("Changer le statut");
         ButtonType saveBtn = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
-        GridPane grid = AdminDialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
         Label roomValue = new Label("Chambre " + room.getRoomNumber());
-        roomValue.setStyle("-fx-text-fill: #f8fbff; -fx-font-size: 16px; -fx-font-weight: bold;");
+        roomValue.getStyleClass().add("gv-dialog-value-label");
         ComboBox<String> statusCombo = new ComboBox<>(FXCollections.observableArrayList("AVAILABLE", "OCCUPIED", "MAINTENANCE"));
-        statusCombo.setValue(room.getStatus()); AdminDialogHelper.applyDialogFieldSizing(statusCombo);
+        statusCombo.setValue(room.getStatus()); DialogHelper.applyDialogFieldSizing(statusCombo);
         grid.add(new Label("Chambre"), 0, 0); grid.add(roomValue, 1, 0);
         grid.add(new Label("Nouveau statut"), 0, 1); grid.add(statusCombo, 1, 1);
         dialog.getDialogPane().setContent(grid);
-        AdminDialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 680, 300);
-        AdminDialogHelper.styleDialog(dialog, false, getClass());
+        DialogHelper.applyDialogPaneSizing(dialog.getDialogPane(), 680, 300);
+        DialogHelper.styleDialog(dialog, false, getClass());
         dialog.setResultConverter(btn -> btn == saveBtn ? statusCombo.getValue() : null);
         dialog.showAndWait().ifPresent(newStatus -> {
             try {
                 room.setStatus(newStatus); roomService.update(room); admin.loadAllData(); admin.showRoomDetail(room);
-                AdminDialogHelper.showNotification("Statut mis a jour!", "success", getClass());
-            } catch (SQLException e) { AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
+                DialogHelper.showNotification("Statut mis a jour!", "success", getClass());
+            } catch (SQLException e) { DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
         });
     }
 
     public void handleDeleteRoom(Room room) {
         runSqlAction(() -> {
             roomService.delete(room.getId()); admin.loadAllData(); admin.loadRoomsTable();
-            AdminDialogHelper.showNotification("Chambre supprimee!", "success", getClass());
+            DialogHelper.showNotification("Chambre supprimee!", "success", getClass());
         });
     }
 
@@ -348,8 +380,8 @@ public class AdminRoomViewController {
             }
         });
         colRoomImageActions.setCellFactory(col -> new TableCell<>() {
-            private final Button deleteBtn = AdminDialogHelper.createTableActionButton("Supprimer", AdminDialogHelper.RED_BTN, AdminDialogHelper.RED_BTN_HOVER, 96);
-            { deleteBtn.setTooltip(new Tooltip("Supprimer cette image")); deleteBtn.setOnAction(e -> AdminDialogHelper.confirmDelete("image", "", () -> handleDeleteRoomImage(getTableView().getItems().get(getIndex())), getClass())); }
+            private final Button deleteBtn = DialogHelper.createTableActionButton("Supprimer", "gv-btn-red", 96);
+            { deleteBtn.setTooltip(new Tooltip("Supprimer cette image")); deleteBtn.setOnAction(e -> DialogHelper.confirmDelete("image", "", () -> handleDeleteRoomImage(getTableView().getItems().get(getIndex())), getClass())); }
             @Override protected void updateItem(Void item, boolean empty) { super.updateItem(item, empty); setGraphic(empty ? null : deleteBtn); }
         });
     }
@@ -378,7 +410,7 @@ public class AdminRoomViewController {
         runSqlAction(() -> {
             roomImageService.delete(image.getId());
             Room sel = state.getSelectedRoom();
-            if (sel != null) AdminDialogHelper.showNotification("Image supprimee!", "success", getClass());
+            if (sel != null) DialogHelper.showNotification("Image supprimee!", "success", getClass());
         });
     }
 
@@ -391,6 +423,6 @@ public class AdminRoomViewController {
 
     private void runSqlAction(SqlAction action) {
         try { action.run(); }
-        catch (SQLException e) { AdminDialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
+        catch (SQLException e) { DialogHelper.showNotification("Erreur: " + e.getMessage(), "error", getClass()); }
     }
 }
