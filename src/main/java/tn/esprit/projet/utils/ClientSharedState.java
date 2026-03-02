@@ -1,8 +1,7 @@
-package tn.esprit.projet.gui;
+package tn.esprit.projet.utils;
 
 import tn.esprit.projet.entities.Hotel;
 import tn.esprit.projet.services.*;
-import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.sql.*;
 import java.util.*;

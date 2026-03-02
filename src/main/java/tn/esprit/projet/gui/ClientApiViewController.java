@@ -20,6 +20,9 @@ import javafx.util.Duration;
 
 import tn.esprit.projet.API.hotels.GeoapifyPlacesApiClient;
 import tn.esprit.projet.API.hotels.NominatimHotelApiClient;
+import tn.esprit.projet.utils.ClientSharedState;
+import tn.esprit.projet.utils.DialogHelper;
+import tn.esprit.projet.utils.GuiUtils;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -28,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -52,7 +54,7 @@ import java.util.function.Consumer;
 public class ClientApiViewController {
 
     // ── Shared state ──────────────────────────────────────────────────────────
-    private final ClientSharedState  state;
+    private final ClientSharedState state;
     private final DialogHelper.ClientDialogs dialogs;
 
     // ── FXML node refs ────────────────────────────────────────────────────────
@@ -334,7 +336,7 @@ public class ClientApiViewController {
         pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
-        java.net.URL cssUrl = getClass().getResource("/css/client-style.css");
+        URL cssUrl = getClass().getResource("/css/client-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 
@@ -467,11 +469,11 @@ public class ClientApiViewController {
         };
 
         final double[] dragAX = {0}, dragAY = {0}, dragCX = {0}, dragCY = {0};
-        mapViewport.setOnMousePressed(ev -> { if (!hasCoords) return; dragAX[0]=ev.getX(); dragAY[0]=ev.getY(); dragCX[0]=GuiUtils.longitudeToWorldPixelX(centerLon[0],zoom[0]); dragCY[0]=GuiUtils.latitudeToWorldPixelY(centerLat[0],zoom[0]); mapViewport.setCursor(javafx.scene.Cursor.CLOSED_HAND); });
-        mapViewport.setOnMouseReleased(ev -> mapViewport.setCursor(javafx.scene.Cursor.OPEN_HAND));
+        mapViewport.setOnMousePressed(ev -> { if (!hasCoords) return; dragAX[0]=ev.getX(); dragAY[0]=ev.getY(); dragCX[0]=GuiUtils.longitudeToWorldPixelX(centerLon[0],zoom[0]); dragCY[0]=GuiUtils.latitudeToWorldPixelY(centerLat[0],zoom[0]); mapViewport.setCursor(Cursor.CLOSED_HAND); });
+        mapViewport.setOnMouseReleased(ev -> mapViewport.setCursor(Cursor.OPEN_HAND));
         mapViewport.setOnMouseDragged(ev -> { if (!hasCoords) return; double ws=GuiUtils.OSM_TILE_SIZE*(double)(1<<zoom[0]); centerLon[0]=GuiUtils.worldPixelXToLongitude(GuiUtils.wrapPixelValue(dragCX[0]-(ev.getX()-dragAX[0]),ws),zoom[0]); centerLat[0]=GuiUtils.worldPixelYToLatitude(Math.max(0,Math.min(ws,dragCY[0]-(ev.getY()-dragAY[0]))),zoom[0]); renderMap.run(); });
         mapViewport.setOnScroll(ev -> { if (!hasCoords) return; if (ev.getDeltaY()>0&&zoom[0]<GuiUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();}else if(ev.getDeltaY()<0&&zoom[0]>GuiUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} ev.consume(); });
-        mapViewport.setCursor(javafx.scene.Cursor.OPEN_HAND);
+        mapViewport.setCursor(Cursor.OPEN_HAND);
         zoomInBtn.setOnAction(ev -> { if(zoom[0]<GuiUtils.OSM_PREVIEW_MAX_ZOOM){zoom[0]++;renderMap.run();} });
         zoomOutBtn.setOnAction(ev -> { if(zoom[0]>GuiUtils.OSM_PREVIEW_MIN_ZOOM){zoom[0]--;renderMap.run();} });
         zoomInBtn.setDisable(!hasCoords); zoomOutBtn.setDisable(!hasCoords);
@@ -485,7 +487,7 @@ public class ClientApiViewController {
         DialogPane pane = dialog.getDialogPane();
         pane.setContent(content); pane.setPadding(Insets.EMPTY);
         pane.setMinWidth(860); pane.setPrefWidth(900); pane.setMinHeight(680);
-        URL cssUrl = getClass().getResource("/css/client-style.css");
+        URL cssUrl = getClass().getResource("/css/client-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
         pane.getStyleClass().addAll("gv-map-dialog", "gv-detail-dialog-pane");

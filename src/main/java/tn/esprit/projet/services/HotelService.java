@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * Service class for Hotel CRUD operations.
  */
-public class HotelService implements CRUD<Hotel> {
+public class HotelService implements IService<Hotel> {
 
     private Connection cnx;
     private final GeoapifyPlacesApiClient geoapifyApiClient;

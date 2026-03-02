@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomImageService implements CRUD<RoomImage> {
+public class RoomImageService implements IService<RoomImage> {
 
     private Connection cnx;
     private final ImagePipelineService imagePipelineService;

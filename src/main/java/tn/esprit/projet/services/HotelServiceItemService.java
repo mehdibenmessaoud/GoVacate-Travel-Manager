@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Service for HotelServiceItem CRUD operations with MySQL persistence.
  */
-public class HotelServiceItemService implements CRUD<HotelServiceItem> {
+public class HotelServiceItemService implements IService<HotelServiceItem> {
 
     private final Connection cnx;
 

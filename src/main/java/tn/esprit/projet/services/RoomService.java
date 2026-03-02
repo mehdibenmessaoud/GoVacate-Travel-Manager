@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Service class for Room CRUD operations.
  */
-public class RoomService implements CRUD<Room> {
+public class RoomService implements IService<Room> {
 
     private final Connection cnx;
 

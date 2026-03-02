@@ -6,11 +6,13 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.control.DatePicker;
 
 import tn.esprit.projet.entities.*;
-import tn.esprit.projet.services.ReservationService;
+import tn.esprit.projet.utils.ClientSharedState;
+import tn.esprit.projet.utils.DialogHelper;
+import tn.esprit.projet.utils.GuiUtils;
+import tn.esprit.projet.utils.ImageGalleryBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -21,16 +23,16 @@ import java.util.function.Function;
  */
 public class ClientRoomViewController {
 
-    private final ClientSharedState  state;
+    private final ClientSharedState state;
     private final DialogHelper.ClientDialogs dialogs;
     private final Function<String, Image> imageLoader;
-    private final ClientController   controller;
+    private final ClientController3 controller;
 
     public ClientRoomViewController(
             ClientSharedState  state,
             DialogHelper.ClientDialogs dialogs,
             Function<String, Image> imageLoader,
-            ClientController   controller
+            ClientController3 controller
     ) {
         this.state       = state;
         this.dialogs     = dialogs;
@@ -479,7 +481,7 @@ public class ClientRoomViewController {
             }
 
             // Persist to database
-            Reservation dbReservation = new Reservation();
+            ReservationHotelChambre dbReservation = new ReservationHotelChambre();
             dbReservation.setReservationId(0); // generated in service
             dbReservation.setHotelId(resolvedHotelId);
             dbReservation.setChambreId(room.getId());
@@ -490,7 +492,7 @@ public class ClientRoomViewController {
             dbReservation.setUserId(state.resolveClientReviewUserId());
             try {
                 state.reservationService.create(dbReservation);
-            } catch (java.sql.SQLException ex) {
+            } catch (SQLException ex) {
                 dialogs.showError("Erreur BD", "Impossible d'enregistrer la réservation : " + ex.getMessage());
                 return;
             }

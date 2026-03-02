@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import tn.esprit.projet.services.ReservationService;
 import tn.esprit.projet.services.ReservationService.ReservationDetail;
+import tn.esprit.projet.utils.DialogHelper;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class AdminReservationViewController {
 
-    private final AdminController    admin;
+    private final AdminController3 admin;
     private final ReservationService reservationService;
 
     private List<ReservationDetail>            masterList     = Collections.emptyList();
@@ -37,7 +38,7 @@ public class AdminReservationViewController {
     private Label             boundSubtitle;
     private boolean           listenersWired = false;
 
-    public AdminReservationViewController(AdminController admin) {
+    public AdminReservationViewController(AdminController3 admin) {
         this.admin              = admin;
         this.reservationService = new ReservationService();
     }

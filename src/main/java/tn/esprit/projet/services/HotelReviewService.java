@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * Service for managing HotelReview entities.
  * Provides SQL methods for single queries and Stream-based helper for multiple filters.
  */
-public class HotelReviewService implements CRUD<HotelReview> {
+public class HotelReviewService implements IService<HotelReview> {
 
     private final Connection cnx;
     private final ReviewIntelligenceService reviewIntelligenceService;

@@ -1,761 +1,312 @@
 package tn.esprit.projet.gui;
 
 import javafx.animation.*;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.CacheHint;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.image.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.util.Duration;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import tn.esprit.projet.entities.Room;
+public class ClientController {
 
-import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
+    @FXML private ImageView bgView1, bgView2;
+    @FXML private HBox topDealsContainer;
+    @FXML private VBox socialFeed;
+    @FXML private HBox navBar;
+    @FXML private TextField searchField;
+    @FXML private Button categoryBtn;
+    @FXML private StackPane megaMenu;
+    @FXML private Circle avatarPlaceholder;
+    @FXML private ScrollPane rootScroll;
+    @FXML private ImageView cartIcon;
+    @FXML private Label profileName;
+    @FXML private Label cartCount;
+    @FXML private Button quickRestaurants;
+    @FXML private VBox megaRestaurantsCol;
 
-/**
- * Thin FXML controller for Client.fxml.
- *
- * Responsibilities:
- *  - FXML lifecycle (@FXML initialize)
- *  - Sidebar liquid-menu animation
- *  - Navigation between views (hotels grid / rooms grid / detail pages)
- *  - Filter setup (stars, hotel, room type/status)
- *  - Delegates all business logic to sub-controllers
- *
- * Sub-controllers:
- *  {@link ClientHotelViewController} - hotel cards, hotel detail, availability
- *  {@link ClientRoomViewController}  - room cards, room detail
- *  {@link ClientReviewViewController} - review list, add-review dialog
- *  {@link ClientApiViewController}   - Amadeus / OSM search
- *
- * Shared infrastructure:
- *  {@link ClientSharedState}         - services, destination cache
- *  {@link DialogHelper.ClientDialogs}        - styled dialogs
- *  {@link ImageGalleryBuilder}       - generic image gallery
- *  {@link GuiUtils}               - pure static utilities
- */
-public class ClientController implements Initializable {
+    private List<Image> images = new ArrayList<>();
+    private int currentIndex = 0;
+    private boolean isView1Active = true;
 
-    // Included section roots
-    @FXML private AnchorPane clientSidebar;
-    @FXML private VBox clientContent;
+    public void initialize() {
+        loadBackgroundImages();
+        startSlideshow();
+        loadSQLContent();
+        setupNav();
+        showNavBarWithDelay();
+        attachCategoryBehavior();
+    }
 
-    // â”€â”€ FXML: sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    @FXML private Pane   slidingPane;
-    @FXML private VBox   menuContainer;
+    private void setupNav() {
+        // load icons if present
+        try {
+            var res = getClass().getResource("/images/cart.png");
+            if (res != null) cartIcon.setImage(new Image(res.toExternalForm()));
+        } catch (Exception ignored) {}
 
-    @FXML private Button btnHotels;
-    @FXML private Button btnChambres;
-    @FXML private Button btnReservations;
-    @FXML private Button btnProfil;
-    @FXML private Button btnLogout;
-
-    // â”€â”€ FXML: content area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    @FXML private VBox     contentArea;
-    @FXML private VBox     searchPanel;
-    @FXML private HBox     headerBox;
-    @FXML private FlowPane hotelsContainer;
-
-    // â”€â”€ FXML: labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    @FXML private Label sectionTitle;
-    @FXML private Label subtitleLabel;
-    @FXML private Label welcomeLabel;
-    @FXML private Label searchTitle;
-    @FXML private Label apiStatusLabel;
-    @FXML private Label filterLabel;
-    @FXML private Label roomTypeFilterLabel;
-    @FXML private Label roomStatusFilterLabel;
-
-    // â”€â”€ FXML: search / filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    @FXML private TextField        searchField;
-    @FXML private TextField        apiSearchField;
-    @FXML private HBox             apiToolbar;
-    @FXML private Button           searchButton;
-    @FXML private Button           geoapifyApiButton;
-    @FXML private ProgressIndicator apiLoadingIndicator;
-    @FXML private ComboBox<String> starsFilterCombo;
-    @FXML private ComboBox<String> hotelFilterCombo;
-    @FXML private ComboBox<String> roomTypeFilterCombo;
-    @FXML private ComboBox<String> roomStatusFilterCombo;
-
-    @FXML private VBox filterContainer;
-    @FXML private VBox roomTypeFilterContainer;
-    @FXML private VBox roomStatusFilterContainer;
-    @FXML private Pane roomFilterSeparator;
-
-    // â”€â”€ Sub-controllers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    private ClientSharedState         sharedState;
-    private DialogHelper.ClientDialogs        dialogHelper;
-    private ClientHotelViewController hotelVC;
-    private ClientRoomViewController  roomVC;
-    private ClientReviewViewController reviewVC;
-    private ClientApiViewController   apiVC;
-    private ClientReservationViewController reservationVC;
-
-    // â”€â”€ Navigation state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    private String currentView = "hotels";
-    private Button currentActiveBtn = null;
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Initialise
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        bindIncludedNodes();
-        wireActionHandlers();
-
-        // Sliding pane setup
-        slidingPane.setMouseTransparent(true);
-        slidingPane.setCache(true);
-        slidingPane.setCacheHint(CacheHint.SPEED);
-
-        setupResponsiveGrid();
-
-        // Build shared infrastructure
-        sharedState  = new ClientSharedState();
-        sharedState.initServices();
-
-        dialogHelper = new DialogHelper.ClientDialogs(getClass(), this::loadImage);
-        reviewVC     = new ClientReviewViewController(sharedState, dialogHelper, this::loadImage);
-        hotelVC      = new ClientHotelViewController(sharedState, dialogHelper, reviewVC, this::loadImage, this);
-        roomVC       = new ClientRoomViewController(sharedState, dialogHelper, this::loadImage, this);
-        apiVC        = new ClientApiViewController(sharedState, dialogHelper);
-        reservationVC = new ClientReservationViewController(this);
-
-        // Wire API sub-controller FXML refs
-        apiVC.setApiStatusLabel(apiStatusLabel);
-        apiVC.setApiLoadingIndicator(apiLoadingIndicator);
-        apiVC.setGeoapifyApiButton(geoapifyApiButton);
-        apiVC.setSearchField(searchField);
-        apiVC.setApiSearchField(apiSearchField);
-        apiVC.setSectionTitle(sectionTitle);
-        apiVC.setSubtitleLabel(subtitleLabel);
-        apiVC.setHotelsContainer(hotelsContainer);
-
-        // Menu buttons
-        Button[] buttons = {btnHotels, btnChambres, btnReservations, btnProfil, btnLogout};
-        for (Button btn : buttons) {
-            if (btn == null) continue;
-            btn.setOnAction(e -> handleMenuClick(btn));
-        }
-
-        // Prepare UI for current DB state
-        if (sharedState.databaseAvailable) {
-            setupHotelsFilter();
-            apiVC.updateApiButtonState(true, true);
-            apiVC.setApiStatus("Pret pour recherche API", "idle");
-        } else {
-            disableUiForOfflineMode();
-            apiVC.setApiStatus("Base indisponible", "error");
-        }
-
-        // Post-layout: set initial sliding pane position and load content
-        Platform.runLater(() -> {
-            if (btnHotels != null) {
-                slidingPane.setTranslateY(btnHotels.getLayoutY());
-                currentActiveBtn = btnHotels;
-                highlightButton(btnHotels, true);
+        try {
+            var res2 = getClass().getResource("/images/avatar_default.png");
+            if (res2 != null && avatarPlaceholder != null) {
+                Image av = new Image(res2.toExternalForm(), 36, 36, true, true);
+                avatarPlaceholder.setFill(new ImagePattern(av));
+            } else if (avatarPlaceholder != null) {
+                avatarPlaceholder.setFill(Color.web("#FF8210"));
             }
-            slidingPane.toBack();
-            if (sharedState.databaseAvailable) {
-                loadHotels();
-            } else {
-                showDatabaseUnavailableState();
-            }
-        });
+        } catch (Exception ignored) { if (avatarPlaceholder != null) avatarPlaceholder.setFill(Color.web("#FF8210")); }
 
-        // Hover: animate bubble to hovered button, but restore to active on mouse-exit
-        if (menuContainer != null) {
-            menuContainer.setOnMouseMoved(event -> {
-                double mouseY = event.getY();
-                for (Button btn : buttons) {
-                    if (btn == null) continue;
-                    double startY = btn.getLayoutY();
-                    double endY   = startY + btn.getHeight();
-                    if (mouseY >= startY && mouseY <= endY) {
-                        handleHoverPreview(btn);
-                        break;
+        try { if (cartCount != null) cartCount.setText("0"); } catch (Exception ignored) {}
+        try { if (profileName != null) profileName.setText("Invité"); } catch (Exception ignored) {}
+    }
+
+    private void attachCategoryBehavior() {
+        if (categoryBtn != null) categoryBtn.setOnAction(e -> toggleMegaMenu());
+        if (quickRestaurants != null) quickRestaurants.setOnAction(e -> openRestaurantPage(null));
+        // attach handlers to mega menu restaurant items
+        if (megaRestaurantsCol != null) {
+            if (megaRestaurantsCol.getChildren().size() > 1 && megaRestaurantsCol.getChildren().get(1) instanceof VBox) {
+                VBox inner = (VBox) megaRestaurantsCol.getChildren().get(1);
+                for (var node : inner.getChildren()) {
+                    if (node instanceof Button) {
+                        Button b = (Button) node;
+                        b.setOnAction(ev -> openRestaurantPage(b.getText()));
+                    }
+                }
+            }
+        }
+        if (rootScroll != null) {
+            rootScroll.addEventFilter(MouseEvent.MOUSE_PRESSED, ev -> {
+                if (megaMenu != null && megaMenu.isVisible()) {
+                    Node target = (Node) ev.getTarget();
+                    if (!isDescendant(target, megaMenu) && target != categoryBtn) {
+                        hideMegaMenu();
                     }
                 }
             });
-            menuContainer.setOnMouseExited(event -> {
-                // Restore bubble to the actually active button
-                if (currentActiveBtn != null) moveBubble(currentActiveBtn);
-            });
         }
     }
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Filter setup helpers
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    @SuppressWarnings("unchecked")
-    private void bindIncludedNodes() {
-        if (clientSidebar != null) {
-            slidingPane = firstNonNull(slidingPane, findNode(clientSidebar, "slidingPane", Pane.class));
-            menuContainer = firstNonNull(menuContainer, findNode(clientSidebar, "menuContainer", VBox.class));
-            btnHotels = firstNonNull(btnHotels, findNode(clientSidebar, "btnHotels", Button.class));
-            btnChambres = firstNonNull(btnChambres, findNode(clientSidebar, "btnChambres", Button.class));
-            btnReservations = firstNonNull(btnReservations, findNode(clientSidebar, "btnReservations", Button.class));
-
-            btnProfil = firstNonNull(btnProfil, findNode(clientSidebar, "btnProfil", Button.class));
-            btnLogout = firstNonNull(btnLogout, findNode(clientSidebar, "btnLogout", Button.class));
+    private boolean isDescendant(Node target, Node parent) {
+        Node cur = target;
+        while (cur != null) {
+            if (cur == parent) return true;
+            cur = cur.getParent();
         }
-
-        if (clientContent != null) {
-            contentArea = firstNonNull(contentArea, findNode(clientContent, "contentArea", VBox.class));
-            searchPanel = firstNonNull(searchPanel, findNode(clientContent, "searchPanel", VBox.class));
-            headerBox = firstNonNull(headerBox, findNode(clientContent, "headerBox", HBox.class));
-            hotelsContainer = firstNonNull(hotelsContainer, findNode(clientContent, "hotelsContainer", FlowPane.class));
-
-            sectionTitle = firstNonNull(sectionTitle, findNode(clientContent, "sectionTitle", Label.class));
-            subtitleLabel = firstNonNull(subtitleLabel, findNode(clientContent, "subtitleLabel", Label.class));
-            welcomeLabel = firstNonNull(welcomeLabel, findNode(clientContent, "welcomeLabel", Label.class));
-            searchTitle = firstNonNull(searchTitle, findNode(clientContent, "searchTitle", Label.class));
-            apiStatusLabel = firstNonNull(apiStatusLabel, findNode(clientContent, "apiStatusLabel", Label.class));
-            filterLabel = firstNonNull(filterLabel, findNode(clientContent, "filterLabel", Label.class));
-            roomTypeFilterLabel = firstNonNull(roomTypeFilterLabel, findNode(clientContent, "roomTypeFilterLabel", Label.class));
-            roomStatusFilterLabel = firstNonNull(roomStatusFilterLabel, findNode(clientContent, "roomStatusFilterLabel", Label.class));
-
-            searchField = firstNonNull(searchField, findNode(clientContent, "searchField", TextField.class));
-            apiSearchField = firstNonNull(apiSearchField, findNode(clientContent, "apiSearchField", TextField.class));
-            apiToolbar = firstNonNull(apiToolbar, findNode(clientContent, "apiToolbar", HBox.class));
-            searchButton = firstNonNull(searchButton, findNode(clientContent, "searchButton", Button.class));
-            geoapifyApiButton = firstNonNull(geoapifyApiButton, findNode(clientContent, "geoapifyApiButton", Button.class));
-            apiLoadingIndicator = firstNonNull(apiLoadingIndicator, findNode(clientContent, "apiLoadingIndicator", ProgressIndicator.class));
-
-            starsFilterCombo = firstNonNull(starsFilterCombo, findNode(clientContent, "starsFilterCombo", ComboBox.class));
-            hotelFilterCombo = firstNonNull(hotelFilterCombo, findNode(clientContent, "hotelFilterCombo", ComboBox.class));
-            roomTypeFilterCombo = firstNonNull(roomTypeFilterCombo, findNode(clientContent, "roomTypeFilterCombo", ComboBox.class));
-            roomStatusFilterCombo = firstNonNull(roomStatusFilterCombo, findNode(clientContent, "roomStatusFilterCombo", ComboBox.class));
-
-            filterContainer = firstNonNull(filterContainer, findNode(clientContent, "filterContainer", VBox.class));
-            roomTypeFilterContainer = firstNonNull(roomTypeFilterContainer, findNode(clientContent, "roomTypeFilterContainer", VBox.class));
-            roomStatusFilterContainer = firstNonNull(roomStatusFilterContainer, findNode(clientContent, "roomStatusFilterContainer", VBox.class));
-            roomFilterSeparator = firstNonNull(roomFilterSeparator, findNode(clientContent, "roomFilterSeparator", Pane.class));
-        }
+        return false;
     }
 
-    private void wireActionHandlers() {
-        if (searchButton != null) searchButton.setOnAction(e -> handleSearch());
-        if (starsFilterCombo != null) starsFilterCombo.setOnAction(e -> handleFilter());
-        if (hotelFilterCombo != null) hotelFilterCombo.setOnAction(e -> handleFilter());
-        if (roomTypeFilterCombo != null) roomTypeFilterCombo.setOnAction(e -> handleFilter());
-        if (roomStatusFilterCombo != null) roomStatusFilterCombo.setOnAction(e -> handleFilter());
-        if (geoapifyApiButton != null) geoapifyApiButton.setOnAction(e -> handleGeoapifySearchAction());
+    private void toggleMegaMenu() {
+        if (megaMenu == null) return;
+        if (megaMenu.isVisible()) hideMegaMenu(); else showMegaMenu();
     }
 
-    private <T> T firstNonNull(T current, T fallback) {
-        return current != null ? current : fallback;
+    private void showMegaMenu() {
+        megaMenu.setManaged(true);
+        megaMenu.setVisible(true);
+        megaMenu.setOpacity(0);
+        FadeTransition ft = new FadeTransition(Duration.seconds(0.22), megaMenu);
+        ft.setFromValue(0); ft.setToValue(1); ft.play();
     }
 
-    private <T> T findNode(Node root, String fxId, Class<T> type) {
-        Node found = findNodeById(root, fxId);
-        return type.isInstance(found) ? type.cast(found) : null;
+    private void hideMegaMenu() {
+        if (megaMenu == null) return;
+        FadeTransition ft = new FadeTransition(Duration.seconds(0.18), megaMenu);
+        ft.setFromValue(1); ft.setToValue(0);
+        ft.setOnFinished(e -> { megaMenu.setVisible(false); megaMenu.setManaged(false); });
+        ft.play();
     }
 
-    private Node findNodeById(Node root, String fxId) {
-        if (root == null || fxId == null) return null;
-
-        Object fxIdProperty = root.getProperties().get("fx:id");
-        if (fxId.equals(root.getId()) || fxId.equals(fxIdProperty)) {
-            return root;
-        }
-
-        if (root instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                Node found = findNodeById(child, fxId);
-                if (found != null) return found;
-            }
-        }
-
-        return null;
-    }
-
-    private void setupHotelsFilter() {
-        showSearchPanel(true);
-        filterLabel.setText("Etoiles");
-
-        starsFilterCombo.getItems().clear();
-        starsFilterCombo.getItems().addAll("Toutes", "5 etoiles", "4 etoiles", "3 etoiles", "2 etoiles", "1 etoile");
-        starsFilterCombo.setValue("Toutes");
-        starsFilterCombo.setVisible(true);
-        starsFilterCombo.setManaged(true);
-        hotelFilterCombo.setVisible(false);
-        hotelFilterCombo.setManaged(false);
-
-        subtitleLabel.setText("Decouvrez nos meilleurs hotels");
-        searchTitle.setText("Ou voulez-vous aller ?");
-        sectionTitle.setText("Hotels Disponibles");
-        searchField.setPromptText("Nom d'hotel...");
-        searchField.clear();
-
-        showHotelAdvancedFilters();
-        apiVC.updateApiButtonState(sharedState.databaseAvailable, true);
-        if (true) apiVC.setApiStatus("Pret pour recherche API", "idle");
-    }
-
-    private void setupRoomsFilter() {
-        showSearchPanel(true);
-        filterLabel.setText("Hotel");
-
-        roomVC.setupHotelFilterCombo(hotelFilterCombo);
-        starsFilterCombo.setVisible(false);
-        starsFilterCombo.setManaged(false);
-        hotelFilterCombo.setVisible(true);
-        hotelFilterCombo.setManaged(true);
-
-        subtitleLabel.setText("Trouvez la chambre ideale");
-        searchTitle.setText("Quelle chambre cherchez-vous ?");
-        sectionTitle.setText("Chambres Disponibles");
-        searchField.setPromptText("Numero chambre ou hotel...");
-        searchField.clear();
-
-        showRoomAdvancedFilters();
-        apiVC.updateApiButtonState(sharedState.databaseAvailable, false);
-        apiVC.setApiStatus("API disponible en vue Hotels uniquement", "idle");
-    }
-
-    private void showHotelAdvancedFilters() {
-        roomFilterSeparator.setVisible(true);
-        roomFilterSeparator.setManaged(true);
-        roomTypeFilterContainer.setVisible(true);
-        roomTypeFilterContainer.setManaged(true);
-        roomStatusFilterContainer.setVisible(true);
-        roomStatusFilterContainer.setManaged(true);
-
-        if (roomTypeFilterLabel  != null) roomTypeFilterLabel.setText("Localisation");
-        if (roomStatusFilterLabel != null) roomStatusFilterLabel.setText("Statut");
-
-        sharedState.refreshLocalisationLookup();
-        roomTypeFilterCombo.getItems().clear();
-        roomTypeFilterCombo.getItems().add("Toutes localisations");
-        roomTypeFilterCombo.getItems().addAll(sharedState.getSortedLocalisationLabels());
-        roomTypeFilterCombo.setValue("Toutes localisations");
-        roomTypeFilterCombo.setPromptText("Localisation");
-        roomTypeFilterCombo.setMinWidth(190);
-        roomTypeFilterCombo.setPrefWidth(190);
-
-        roomStatusFilterCombo.getItems().clear();
-        roomStatusFilterCombo.getItems().addAll("Tous", "AVAILABLE", "OCCUPIED", "MAINTENANCE");
-        roomStatusFilterCombo.setValue("Tous");
-        roomStatusFilterCombo.setPromptText("Statut");
-        roomStatusFilterCombo.setMinWidth(130);
-        roomStatusFilterCombo.setPrefWidth(130);
-    }
-
-    private void showRoomAdvancedFilters() {
-        roomFilterSeparator.setVisible(true);
-        roomFilterSeparator.setManaged(true);
-        roomTypeFilterContainer.setVisible(true);
-        roomTypeFilterContainer.setManaged(true);
-        if (roomTypeFilterLabel != null) roomTypeFilterLabel.setText("Type");
-
-        roomTypeFilterCombo.getItems().clear();
-        roomTypeFilterCombo.getItems().addAll("Tous", "SINGLE", "DOUBLE", "SUITE", "DELUXE", "FAMILY");
-        roomTypeFilterCombo.setValue("Tous");
-        roomTypeFilterCombo.setPromptText("Type");
-        roomTypeFilterCombo.setMinWidth(120);
-        roomTypeFilterCombo.setPrefWidth(120);
-
-        roomStatusFilterContainer.setVisible(true);
-        roomStatusFilterContainer.setManaged(true);
-        if (roomStatusFilterLabel != null) roomStatusFilterLabel.setText("Statut");
-
-        roomStatusFilterCombo.getItems().clear();
-        roomStatusFilterCombo.getItems().addAll("Tous", "AVAILABLE", "OCCUPIED", "MAINTENANCE");
-        roomStatusFilterCombo.setValue("Tous");
-        roomStatusFilterCombo.setPromptText("Statut");
-        roomStatusFilterCombo.setMinWidth(120);
-        roomStatusFilterCombo.setPrefWidth(120);
-    }
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Navigation (called by sub-controllers and FXML actions)
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    /** Navigate to hotel card grid. */
-    public void goToHotels() {
-        currentView = "hotels";
-        setupHotelsFilter();
-        if (apiToolbar != null) { apiToolbar.setVisible(true); apiToolbar.setManaged(true); }
-        if (apiSearchField != null) apiSearchField.clear();
-        loadHotels();
-    }
-
-    /** Navigate to rooms grid (plain). */
-    public void goToRooms() {
-        currentView = "rooms";
-        setupRoomsFilter();
-        if (apiToolbar != null) { apiToolbar.setVisible(false); apiToolbar.setManaged(false); }
-        loadRooms();
-    }
-
-    /** Navigate to rooms grid filtered by a specific hotel (from hotel card). */
-    public void goToRoomsForHotel(tn.esprit.projet.entities.Hotel hotel) {
-        currentView = "rooms";
-        setupRoomsFilter();
-        searchField.setText(hotel.getName());
-        loadRooms();
-    }
-
-    /** Navigate to the Mes Réservations view. */
-    public void goToReservations() {
-        currentView = "reservations";
-        showSearchPanel(false);
-        if (btnReservations != null) setActiveButton(btnReservations);
-        reservationVC.showReservations();
-    }
-
-    /** Delegate: show room detail (called from hotel availability rows and room cards). */
-    public void showRoomDetails(Room room, String hotelName) {
-        roomVC.showRoomDetails(room, hotelName);
-    }
-
-    public void showBookingForm(Room room, String hotelName) {
-        roomVC.showBookingForm(room, hotelName);
-    }
-
-    /**
-     * Opens the OSM map dialog for a hotel by looking up its coordinates via Nominatim.
-     * Called from the hotel detail view's "Voir sur la Carte" button.
-     */
-    public void showHotelOnMap(tn.esprit.projet.entities.Hotel hotel) {
-        javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
-            @Override protected Void call() throws Exception {
-                tn.esprit.projet.services.HotelService.HotelExternalInsight insight =
-                        sharedState.hotelService.fetchExternalInsight(hotel);
-                tn.esprit.projet.API.hotels.NominatimHotelApiClient.LocationSummary loc =
-                        insight.locationSummary().orElse(null);
-                String url = apiVC.buildOpenStreetMapUrl(loc);
-                javafx.application.Platform.runLater(() -> apiVC.showOpenStreetMapPreviewDialog(loc, url));
-                return null;
-            }
-            @Override protected void failed() {
-                javafx.application.Platform.runLater(() ->
-                        dialogHelper.showError("Carte indisponible",
-                                "Impossible de charger la position: " + getException().getMessage()));
-            }
-        };
-        // Show a brief loading indicator on the map button while fetching
-        Thread t = new Thread(task, "map-lookup");
-        t.setDaemon(true);
-        t.start();
-    }
-
-    /** Expose apiVC so sub-controllers can open the map with an already-fetched location (no re-fetch). */
-    public ClientApiViewController getApiVC() { return apiVC; }
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Load helpers
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    private void loadHotels() {
-        if (!sharedState.databaseAvailable) { showDatabaseUnavailableState(); return; }
-        hotelVC.loadHotels(hotelsContainer, sectionTitle, searchField,
-                starsFilterCombo, roomTypeFilterCombo, roomStatusFilterCombo);
-    }
-
-    private void loadRooms() {
-        if (!sharedState.databaseAvailable) { showDatabaseUnavailableState(); return; }
-        roomVC.loadRooms(hotelsContainer, sectionTitle, searchField,
-                hotelFilterCombo, roomTypeFilterCombo, roomStatusFilterCombo);
-    }
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Offline / error states
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    private void showDatabaseUnavailableState() {
-        hotelsContainer.getChildren().clear();
-        sectionTitle.setText("Connexion base indisponible");
-        subtitleLabel.setText("Le service MySQL est indisponible");
-        String details = sharedState.databaseErrorMessage == null || sharedState.databaseErrorMessage.isBlank()
-                ? "Impossible de se connecter a la base. Verifiez MySQL et vos identifiants."
-                : sharedState.databaseErrorMessage;
-        showEmptyState("", "Connexion MySQL impossible", details);
-    }
-
-    private void disableUiForOfflineMode() {
-        searchPanel.setDisable(true);
-        btnHotels.setDisable(true);
-        btnChambres.setDisable(true);
-        btnReservations.setDisable(true);
-
-        btnProfil.setDisable(true);
-    }
-
-    private void showEmptyState(String icon, String title, String subtitle) {
-        VBox box = new VBox(10);
-        box.setAlignment(javafx.geometry.Pos.CENTER);
-        box.setPadding(new javafx.geometry.Insets(50));
-        Label iconL  = new Label(icon);  iconL.getStyleClass().add("empty-icon");
-        Label titleL = new Label(title); titleL.getStyleClass().add("empty-title");
-        Label subL   = new Label(subtitle); subL.getStyleClass().add("empty-subtitle");
-        box.getChildren().addAll(iconL, titleL, subL);
-        hotelsContainer.getChildren().add(box);
-    }
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  FXML action handlers
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    @FXML
-    private void handleSearch() {
-        if (!sharedState.databaseAvailable) { showDatabaseUnavailableState(); return; }
-        if (currentView.equals("rooms")) loadRooms();
-        else {
-            loadHotels();
-            apiVC.setApiStatus("Retour aux donnees locales", "idle");
-        }
-    }
-
-    @FXML
-    private void handleFilter() {
-        if (!sharedState.databaseAvailable) { showDatabaseUnavailableState(); return; }
-        if (currentView.equals("rooms")) loadRooms();
-        else {
-            loadHotels();
-            apiVC.setApiStatus("Retour aux donnees locales", "idle");
-        }
-    }
-
-    @FXML
-    private void handleGeoapifySearchAction() {
-        apiVC.handleGeoapifySearch("hotels".equals(currentView));
-    }
-
-    @FXML
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Menu click handler
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    private void handleMenuClick(Button btn) {
-        if (btn == btnLogout) { System.exit(0); return; }
-        setActiveButton(btn);
-        if (!sharedState.databaseAvailable) { showDatabaseUnavailableState(); return; }
-        if (btn == btnHotels)           goToHotels();
-        else if (btn == btnChambres)    goToRooms();
-        else if (btn == btnReservations) goToReservations();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    private void setActiveButton(Button btn) {
-        if (currentActiveBtn == btn) return;
-        if (currentActiveBtn != null) highlightButton(currentActiveBtn, false);
-        applyLiquidDirection(btn);
-        glidePane(btn, 320);
-        highlightButton(btn, true);
-        currentActiveBtn = btn;
-    }
-
-    private void handleHoverPreview(Button targetBtn) {
-        if (targetBtn != currentActiveBtn) glidePane(targetBtn, 160);
-    }
-
-    private void handleHover(Button targetBtn) { setActiveButton(targetBtn); }
-
-    private void glidePane(Button target, int ms) {
-        if (slidingPane == null || target == null) return;
-        TranslateTransition tt = new TranslateTransition(Duration.millis(ms), slidingPane);
-        tt.setToY(target.getLayoutY());
-        tt.setInterpolator(Interpolator.SPLINE(0.16, 0.84, 0.44, 1.0));
-        tt.play();
-    }
-
-    private void moveBubble(Button target)     { glidePane(target, 320); }
-    private void moveBubbleFast(Button target) { glidePane(target, 160); }
-
-    private void highlightButton(Button btn, boolean activate) {
-        if (btn == null) return;
-        ScaleTransition st = new ScaleTransition(Duration.millis(activate ? 240 : 200), btn);
-        st.setToX(activate ? 1.04 : 1.0);
-        st.setToY(activate ? 1.10 : 1.0);
-        st.setInterpolator(Interpolator.EASE_OUT);
-        FadeTransition ft = new FadeTransition(Duration.millis(activate ? 180 : 140), btn);
-        ft.setToValue(activate ? 1.0 : 0.85);
-        new ParallelTransition(st, ft).play();
-        if (activate) { if (!btn.getStyleClass().contains("active")) btn.getStyleClass().add("active"); }
-        else          { btn.getStyleClass().remove("active"); }
-    }
-
-    private void animateText(Button btn, boolean activate) { highlightButton(btn, activate); }
-
-    private void applyLiquidDirection(Button target) {
-        if (slidingPane == null) return;
-        slidingPane.getStyleClass().removeAll("from-top", "from-bottom");
-        if (currentActiveBtn == null) return;
-        slidingPane.getStyleClass().add(
-                target.getLayoutY() > currentActiveBtn.getLayoutY() ? "from-top" : "from-bottom");
-    }
-
-    private void setupResponsiveGrid() {
-        hotelsContainer.setHgap(24);
-        hotelsContainer.setVgap(28);
-        hotelsContainer.setPrefWrapLength(1080);
-        hotelsContainer.setAlignment(javafx.geometry.Pos.TOP_CENTER);
-        hotelsContainer.setMinWidth(0);
-        hotelsContainer.setMaxWidth(Double.MAX_VALUE);
-
-        Platform.runLater(() -> {
-            double initial = Math.max(700, contentArea.getWidth() - 80);
-            hotelsContainer.setPrefWidth(initial);
-            hotelsContainer.setPrefWrapLength(initial);
-        });
-
-        contentArea.widthProperty().addListener((obs, oldVal, newVal) -> {
-            double available = Math.max(700, newVal.doubleValue() - 80);
-            hotelsContainer.setPrefWidth(available);
-            hotelsContainer.setPrefWrapLength(available);
-        });
-    }
-
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  Package-visible accessors (used by sub-controllers)
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    public FlowPane getHotelsContainer() { return hotelsContainer; }
-    public Label    getSectionTitle()    { return sectionTitle;    }
-    public Label    getSearchTitle()     { return searchTitle;     }
-    public Label    getSubtitleLabel()   { return subtitleLabel;   }
-    public javafx.scene.control.TextField        getClientSearchField()     { return searchField;          }
-    public javafx.scene.control.ComboBox<String> getRoomStatusFilterCombo() { return roomStatusFilterCombo; }
-    public javafx.scene.control.ComboBox<String> getRoomTypeFilterCombo()   { return roomTypeFilterCombo;  }
-
-    public void hideStarsFilter() {
-        if (starsFilterCombo != null) { starsFilterCombo.setVisible(false); starsFilterCombo.setManaged(false); }
-    }
-    public void hideHotelFilter() {
-        if (hotelFilterCombo != null) { hotelFilterCombo.setVisible(false); hotelFilterCombo.setManaged(false); }
-    }
-
-    /**
-     * Configure the extra-filter slots for the Reservations view:
-     * hides room-type filter, shows status filter pre-filled with reservation statuses.
-     */
-    public void showReservationFilters() {
-        if (roomFilterSeparator       != null) { roomFilterSeparator.setVisible(true);       roomFilterSeparator.setManaged(true);       }
-        if (roomTypeFilterContainer   != null) { roomTypeFilterContainer.setVisible(false);  roomTypeFilterContainer.setManaged(false);  }
-        if (roomStatusFilterContainer != null) { roomStatusFilterContainer.setVisible(true); roomStatusFilterContainer.setManaged(true); }
-        if (roomStatusFilterLabel     != null) roomStatusFilterLabel.setText("Statut");
-        if (roomStatusFilterCombo != null) {
-            roomStatusFilterCombo.getItems().clear();
-            roomStatusFilterCombo.getItems().addAll("Tous les statuts", "En attente", "Confirmée", "Annulée");
-            roomStatusFilterCombo.setValue("Tous les statuts");
-        }
-    }
-
-    public void showSearchPanel(boolean show) {
-        searchPanel.setVisible(show);
-        searchPanel.setManaged(show);
-        headerBox.setVisible(show);
-        headerBox.setManaged(show);
-    }
-
-    /** Hide the API toolbar (Destination/Ville + Geoapify button). */
-    public void hideApiToolbar() {
-        if (apiToolbar != null) { apiToolbar.setVisible(false); apiToolbar.setManaged(false); }
-    }
-
-
-    public Image loadImage(String imagePath) {
-        if (imagePath == null || imagePath.isEmpty()) return null;
+    private void openRestaurantPage(String category) {
         try {
-            if (imagePath.startsWith("http://") || imagePath.startsWith("https://"))
-                return new Image(imagePath, true);
-
-            File absolute = new File(imagePath);
-            if (absolute.exists()) return new Image(absolute.toURI().toString());
-
-            URL resourceUrl = getClass().getResource("/images/" + imagePath);
-            if (resourceUrl != null) return new Image(resourceUrl.toExternalForm());
-
-            for (String path : new String[]{
-                    "src/main/resources/images/" + imagePath,
-                    "target/classes/images/" + imagePath
-            }) {
-                File f = new File(path);
-                if (f.exists()) return new Image(f.toURI().toString());
+            var res = getClass().getResource("/RestaurantPage.fxml");
+            if (res == null) return;
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(res);
+            javafx.scene.Parent page = loader.load();
+            Object ctrl = loader.getController();
+            if (ctrl instanceof RestaurantController && category != null) {
+                ((RestaurantController) ctrl).applyInitialCategory(category);
             }
-        } catch (Exception e) {
-            System.err.println("Error loading image: " + imagePath + " - " + e.getMessage());
+
+            // replace the scene root so back navigation works correctly
+            javafx.scene.Scene scene = (navBar != null) ? navBar.getScene() : (rootScroll != null ? rootScroll.getScene() : null);
+            if (scene != null) {
+                scene.setRoot(page);
+            } else if (rootScroll != null) {
+                rootScroll.setContent(page);
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
+        hideMegaMenu();
+    }
+
+    private void showNavBarWithDelay() {
+        if (navBar == null) return;
+        navBar.setOpacity(0);
+        navBar.setTranslateY(-10);
+        PauseTransition wait = new PauseTransition(Duration.seconds(0.7));
+        wait.setOnFinished(evt -> {
+            FadeTransition fade = new FadeTransition(Duration.seconds(0.55), navBar);
+            fade.setFromValue(0); fade.setToValue(1);
+            TranslateTransition slide = new TranslateTransition(Duration.seconds(0.55), navBar);
+            slide.setFromY(-10); slide.setToY(0);
+            new ParallelTransition(fade, slide).play();
+        });
+        wait.play();
+    }
+
+    private void loadBackgroundImages() {
+        for (int i = 1; i <= 5; i++) {
+            var res = getClass().getResource("/images/background_" + i + ".png");
+            if (res != null) images.add(new Image(res.toExternalForm()));
         }
+        if (!images.isEmpty()) bgView1.setImage(images.get(0));
+    }
+
+    private void startSlideshow() {
+        Timeline slideTimer = new Timeline(new KeyFrame(Duration.seconds(6), e -> transitionNext()));
+        slideTimer.setCycleCount(Timeline.INDEFINITE);
+        slideTimer.play();
+    }
+
+    private void transitionNext() {
+        currentIndex = (currentIndex + 1) % images.size();
+        ImageView visible = isView1Active ? bgView1 : bgView2;
+        ImageView hidden = isView1Active ? bgView2 : bgView1;
+
+        hidden.setImage(images.get(currentIndex));
+
+        FadeTransition out = new FadeTransition(Duration.seconds(2), visible);
+        out.setToValue(0);
+        FadeTransition in = new FadeTransition(Duration.seconds(2), hidden);
+        in.setToValue(1);
+
+        new ParallelTransition(out, in).play();
+        isView1Active = !isView1Active;
+    }
+
+    private void loadSQLContent() {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/govacate", "root", "")) {
+            // 1. Charger Top Packs
+            ResultSet rsPack = conn.createStatement().executeQuery("SELECT name, prix FROM pack LIMIT 3");
+            while(rsPack.next()) {
+                topDealsContainer.getChildren().add(createCard(rsPack.getString("name"), rsPack.getDouble("prix") + "€", "PACK"));
+            }
+
+            // 2. Charger Social Feed
+            String postSql = "SELECT p.*, u.nom FROM post p JOIN utilisateur u ON p.userid = u.id ORDER BY p.createdat DESC";
+            ResultSet rsPost = conn.createStatement().executeQuery(postSql);
+            while(rsPost.next()) {
+                socialFeed.getChildren().add(createSocialPost(rsPost.getString("nom"), rsPost.getString("title"), rsPost.getString("content")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    private VBox createCard(String title, String price, String type) {
+        VBox card = new VBox(12);
+        card.getStyleClass().add("deal-card");
+        card.setPadding(new Insets(12));
+
+        StackPane imageWrap = new StackPane();
+        imageWrap.getStyleClass().add("deal-image");
+        imageWrap.setPrefSize(260, 180);
+
+        Label typeLabel = new Label(type);
+        typeLabel.getStyleClass().add("deal-type");
+        StackPane.setAlignment(typeLabel, Pos.TOP_RIGHT);
+        StackPane.setMargin(typeLabel, new Insets(10));
+
+        Label titleLbl = new Label(title);
+        titleLbl.getStyleClass().add("deal-title");
+
+        Label priceLbl = new Label(price);
+        priceLbl.getStyleClass().add("deal-price");
+        imageWrap.getChildren().add(typeLabel);
+
+        // rating + actions
+        HBox meta = new HBox(10);
+        meta.setAlignment(Pos.CENTER_LEFT);
+
+        HBox stars = new HBox(4);
+        stars.getChildren().addAll(new Label("★"), new Label("★"), new Label("★"), new Label("☆"));
+        stars.getStyleClass().add("deal-stars");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button addBtn = new Button("Ajouter");
+        addBtn.getStyleClass().addAll("add-btn");
+
+        meta.getChildren().addAll(stars, spacer, priceLbl, addBtn);
+
+        card.getChildren().addAll(imageWrap, titleLbl, meta);
+        return card;
+    }
+
+    private VBox createSocialPost(String user, String title, String content) {
+        VBox post = new VBox(12);
+        post.getStyleClass().add("insta-post");
+
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Circle avatar = new Circle(22);
+        try {
+            var res = getClass().getResource("/images/avatar_default.png");
+            if (res != null) {
+                Image av = new Image(res.toExternalForm(), 44, 44, true, true);
+                avatar.setFill(new ImagePattern(av));
+            } else {
+                avatar.setFill(Color.web("#FF8210"));
+            }
+        } catch (Exception ex) { avatar.setFill(Color.web("#FF8210")); }
+
+        VBox headerText = new VBox(2);
+        Label nameLbl = new Label(user);
+        nameLbl.getStyleClass().add("post-username");
+        Label locationLbl = new Label("— Localisation inconnue");
+        locationLbl.getStyleClass().add("post-location");
+        headerText.getChildren().addAll(nameLbl, locationLbl);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label timeLbl = new Label("2h");
+        timeLbl.getStyleClass().add("post-time");
+
+        header.getChildren().addAll(avatar, headerText, spacer, timeLbl);
+
+        Text caption = new Text((title == null ? "" : title) + "\n" + (content == null ? "" : content));
+        caption.getStyleClass().add("post-caption");
+        caption.setWrappingWidth(650);
+
+        HBox actions = new HBox(18);
+        actions.getStyleClass().add("post-actions");
+        Label like = new Label("❤️ 124");
+        Label comment = new Label("💬 21");
+        actions.getChildren().addAll(like, comment);
+
+        post.getChildren().addAll(header, caption, actions);
+        return post;
+    }
+
+    // helper not used right now but useful for future image loads
+    private Image tryLoad(String path, double w, double h) {
+        try {
+            var res = getClass().getResource(path);
+            if (res != null) return new Image(res.toExternalForm(), w, h, true, true);
+        } catch (Exception ignored) {}
         return null;
     }
 }

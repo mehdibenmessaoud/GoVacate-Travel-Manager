@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Circle?>
 
 <AnchorPane prefWidth="256.0" styleClass="sidebar-root"
-            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.projet.gui.AdminSidebarController">
 
     <!-- Brand -->
@@ -54,17 +54,17 @@
         <Button fx:id="btnHotels"
                 prefHeight="46.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F3E8;   H&#xF4;tels"/>
+                text="Hotels"/>
 
         <Button fx:id="btnChambres"
                 prefHeight="46.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F6CF;   Chambres"/>
+                text="Chambres"/>
 
         <Button fx:id="btnReservations"
                 prefHeight="46.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F4C5;   R&#xE9;servations"/>
+                text="Reservations"/>
 
         <Pane prefHeight="10.0" mouseTransparent="true"/>
         <Pane styleClass="sidebar-sep"/>
@@ -73,14 +73,15 @@
         <Button fx:id="btnLogout"
                 prefHeight="46.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-logout-btn"
-                text="  &#x2192;   D&#xE9;connexion"/>
+                text="Deconnexion"/>
     </VBox>
 
     <!-- Footer -->
     <HBox alignment="CENTER_LEFT" spacing="7.0"
           AnchorPane.leftAnchor="20.0" AnchorPane.bottomAnchor="18.0">
         <Circle fill="rgba(255,130,16,0.55)" radius="3.0"/>
-        <Label styleClass="sidebar-footer" text="GoVacate v1.0  &#xB7;  Admin"/>
+        <Label styleClass="sidebar-footer" text="GoVacate v1.0 - Admin"/>
     </HBox>
 
 </AnchorPane>
+

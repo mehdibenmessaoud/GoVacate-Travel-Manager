@@ -1,12 +1,10 @@
-package tn.esprit.projet.gui;
+package tn.esprit.projet.utils;
 
 import javafx.collections.ObservableList;
 import tn.esprit.projet.entities.Hotel;
 import tn.esprit.projet.entities.Room;
-import tn.esprit.projet.utils.MyDBConnexion;
 
 import java.sql.*;
-import java.util.*;
 
 /**
  * Admin-specific shared state. Extends SharedState with:
@@ -60,10 +58,10 @@ public class AdminSharedState extends SharedState {
     public java.util.List<ReviewUserOption> loadReviewUserOptions() {
         java.util.List<ReviewUserOption> options = new java.util.ArrayList<>();
         try {
-            java.sql.Connection cnx = MyDBConnexion.getInstance().getConnection();
+            Connection cnx = MyDBConnexion.getInstance().getConnection();
             if (cnx == null) return options;
 
-            java.sql.DatabaseMetaData meta    = cnx.getMetaData();
+            DatabaseMetaData meta    = cnx.getMetaData();
             String                    catalog = cnx.getCatalog();
 
             java.util.List<String> tables = java.util.List.of("user","users","client","clients","utilisateur","utilisateurs");
@@ -75,23 +73,23 @@ public class AdminSharedState extends SharedState {
                 String nameCol = null;
 
                 for (String col : idCols) {
-                    try (java.sql.ResultSet rs = meta.getColumns(catalog, null, table, col)) {
+                    try (ResultSet rs = meta.getColumns(catalog, null, table, col)) {
                         if (rs.next()) { idCol = col; break; }
-                    } catch (java.sql.SQLException ignored) {}
+                    } catch (SQLException ignored) {}
                 }
                 if (idCol == null) continue;
 
                 for (String col : nameCols) {
-                    try (java.sql.ResultSet rs = meta.getColumns(catalog, null, table, col)) {
+                    try (ResultSet rs = meta.getColumns(catalog, null, table, col)) {
                         if (rs.next()) { nameCol = col; break; }
-                    } catch (java.sql.SQLException ignored) {}
+                    } catch (SQLException ignored) {}
                 }
 
                 String sel = nameCol != null
                         ? "SELECT `" + idCol + "`, `" + nameCol + "` FROM `" + table + "` ORDER BY `" + idCol + "`"
                         : "SELECT `" + idCol + "`, NULL FROM `" + table + "` ORDER BY `" + idCol + "`";
-                try (java.sql.PreparedStatement ps = cnx.prepareStatement(sel);
-                     java.sql.ResultSet rs = ps.executeQuery()) {
+                try (PreparedStatement ps = cnx.prepareStatement(sel);
+                     ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         int    uid   = rs.getInt(1);
                         String uname = rs.getString(2);
@@ -101,9 +99,9 @@ public class AdminSharedState extends SharedState {
                         options.add(new ReviewUserOption(uid, label));
                     }
                     if (!options.isEmpty()) return options;
-                } catch (java.sql.SQLException ignored) {}
+                } catch (SQLException ignored) {}
             }
-        } catch (java.sql.SQLException ignored) {}
+        } catch (SQLException ignored) {}
         return options;
     }
 

@@ -1,4 +1,4 @@
-package tn.esprit.projet.gui;
+package tn.esprit.projet.utils;
 
 import java.util.Locale;
 

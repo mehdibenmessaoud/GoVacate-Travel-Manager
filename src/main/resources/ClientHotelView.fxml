@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="contentArea" spacing="40.0"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets top="40.0" right="50.0" bottom="50.0" left="50.0"/>
     </padding>
@@ -81,3 +81,4 @@
     <Label fx:id="sectionTitle" styleClass="section-title" text="Hotels Disponibles"/>
     <FlowPane fx:id="hotelsContainer" alignment="TOP_CENTER" hgap="24.0" prefWrapLength="960.0" styleClass="cards-grid" vgap="24.0"/>
 </VBox>
+

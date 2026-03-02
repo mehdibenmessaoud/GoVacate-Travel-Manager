@@ -17,6 +17,8 @@ import javafx.util.Duration;
 import tn.esprit.projet.API.hotels.GeoapifyPlacesApiClient;
 import tn.esprit.projet.API.hotels.NominatimHotelApiClient;
 import tn.esprit.projet.services.HotelService;
+import tn.esprit.projet.utils.DialogHelper;
+import tn.esprit.projet.utils.GuiUtils;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -38,7 +40,7 @@ public class AdminApiViewController {
     private static final int    OSM_TILE_SIZE            = 256;
     private static final String OSM_TILE_URL_TEMPLATE    = "https://tile.openstreetmap.org/%d/%d/%d.png";
 
-    private final AdminController    admin;
+    private final AdminController3 admin;
     private final HotelService       hotelService;
     private final Map<String, Image> osmTileCache         = new HashMap<>();
     // Stores the last Geoapify search query so the import cell factory can
@@ -46,7 +48,7 @@ public class AdminApiViewController {
     private String                   lastGeoapifyQuery    = "";
     private       boolean            apiRequestInProgress = false;
 
-    public AdminApiViewController(AdminController admin, HotelService hotelService) {
+    public AdminApiViewController(AdminController3 admin, HotelService hotelService) {
         this.admin        = admin;
         this.hotelService = hotelService;
     }
@@ -119,7 +121,7 @@ public class AdminApiViewController {
         col5.setMinWidth(0); col5.setPrefWidth(0); col5.setMaxWidth(0);
 
         // Constrained flex for Geoapify (3 visible cols fill 100% of table width)
-        col1.getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        col1.getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         col1.setText("Nom");       col1.setMinWidth(160); col1.setPrefWidth(220);
         col2.setText("Site web");  col2.setMinWidth(180); col2.setPrefWidth(240);
@@ -127,21 +129,21 @@ public class AdminApiViewController {
         col6.setText("Actions");   col6.setMinWidth(260); col6.setPrefWidth(290); col6.setMaxWidth(320);
 
         // col1: name — wrapping
-        col1.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col1.setCellFactory(tc -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) { setText(null); setGraphic(null); return; }
                 Object row = getTableView().getItems().get(getIndex());
                 String val = row instanceof GeoapifyPlacesApiClient.HotelPlace p ? p.name() : "";
                 Label l = wrapLabel(val, col1.getPrefWidth() - 16);
-                setGraphic(l); setText(null); setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                setGraphic(l); setText(null); setAlignment(Pos.CENTER_LEFT);
             }
         });
         col1.setCellValueFactory(d -> d.getValue() instanceof GeoapifyPlacesApiClient.HotelPlace o
                 ? new SimpleStringProperty(o.name()) : new SimpleStringProperty(""));
 
         // col2: clickable website — wrapping
-        col2.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col2.setCellFactory(tc -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) { setGraphic(null); setText(null); return; }
@@ -164,7 +166,7 @@ public class AdminApiViewController {
 
         // col3: phone + hours — wrapping
         // col2: clickable website
-        col2.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col2.setCellFactory(tc -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) { setGraphic(null); setText(null); return; }
@@ -186,7 +188,7 @@ public class AdminApiViewController {
                 ? new SimpleStringProperty(o.website()) : new SimpleStringProperty(""));
 
         // col3: phone only
-        col3.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col3.setCellFactory(tc -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) { setGraphic(null); setText(null); return; }
@@ -194,19 +196,19 @@ public class AdminApiViewController {
                 if (!(row instanceof GeoapifyPlacesApiClient.HotelPlace p)) { setText(""); setGraphic(null); return; }
                 String phone = p.phone().isBlank() ? "N/A" : "📞 " + p.phone();
                 Label l = wrapLabel(phone, col3.getPrefWidth() - 16);
-                setGraphic(l); setText(null); setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                setGraphic(l); setText(null); setAlignment(Pos.CENTER_LEFT);
             }
         });
         col3.setCellValueFactory(d -> new SimpleStringProperty(""));
 
         // col6: Détails + Carte + Importer buttons
-        col6.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col6.setCellFactory(tc -> new TableCell<>() {
             private final Button mapBtn      = buildActionBtn("🗺  Carte",     "#0ea5e9", "#0284c7");
             private final Button detailBtn   = buildActionBtn("ℹ  Détails",   "#6366f1", "#4f46e5");
             private final Button importBtn   = buildActionBtn("＋ Importer",   "#16a34a", "#15803d");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(6, detailBtn, mapBtn, importBtn);
+            private final HBox box = new HBox(6, detailBtn, mapBtn, importBtn);
             {
-                box.setAlignment(javafx.geometry.Pos.CENTER);
+                box.setAlignment(Pos.CENTER);
                 mapBtn.setOnAction(e -> {
                     Object item = getTableView().getItems().get(getIndex());
                     if (item instanceof GeoapifyPlacesApiClient.HotelPlace p && p.hasCoords()) {
@@ -267,7 +269,7 @@ public class AdminApiViewController {
     private void importGeoapifyHotel(GeoapifyPlacesApiClient.HotelPlace place, String query) {
         // Fresh load from DB — only existing destinations are offered
         admin.getState().refreshLocalisationLookup();
-        java.util.List<String> locLabels = admin.getState().getSortedLocalisationLabels();
+        List<String> locLabels = admin.getState().getSortedLocalisationLabels();
 
         // Try to smart-match against existing destinations.
         // We try three sources in order:
@@ -287,35 +289,35 @@ public class AdminApiViewController {
         if (!place.website().isBlank()) cleanDesc.append("  |  🌐 ").append(place.website());
 
         // ── Dialog ────────────────────────────────────────────────────────────
-        javafx.scene.control.Dialog<Boolean> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle("Importer — " + place.name());
-        javafx.scene.control.ButtonType importType =
-                new javafx.scene.control.ButtonType("Importer", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(importType, javafx.scene.control.ButtonType.CANCEL);
+        ButtonType importType =
+                new ButtonType("Importer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(importType, ButtonType.CANCEL);
 
-        javafx.scene.layout.GridPane grid = DialogHelper.createDialogFormGrid();
+        GridPane grid = DialogHelper.createDialogFormGrid();
 
-        javafx.scene.control.TextField nameField = new javafx.scene.control.TextField(place.name());
+        TextField nameField = new TextField(place.name());
         DialogHelper.applyDialogFieldSizing(nameField);
 
-        javafx.scene.control.TextArea descField =
-                new javafx.scene.control.TextArea(cleanDesc.toString().trim());
+        TextArea descField =
+                new TextArea(cleanDesc.toString().trim());
         descField.setPrefRowCount(3);
         descField.setWrapText(true);
         DialogHelper.applyDialogFieldSizing(descField);
 
-        javafx.scene.control.Spinner<Integer> starsSpinner =
-                new javafx.scene.control.Spinner<>(1, 5, 3);
+        Spinner<Integer> starsSpinner =
+                new Spinner<>(1, 5, 3);
         starsSpinner.setEditable(false);
         DialogHelper.configureDialogSpinner(starsSpinner, 0);
 
-        javafx.scene.control.ComboBox<String> statusCombo = new javafx.scene.control.ComboBox<>(
+        ComboBox<String> statusCombo = new ComboBox<>(
                 javafx.collections.FXCollections.observableArrayList("AVAILABLE", "OCCUPIED", "MAINTENANCE"));
         statusCombo.setValue("AVAILABLE");
         DialogHelper.applyDialogFieldSizing(statusCombo);
 
         // Localisation — existing destinations only, no DB writes
-        javafx.scene.control.ComboBox<String> locCombo = new javafx.scene.control.ComboBox<>();
+        ComboBox<String> locCombo = new ComboBox<>();
         locCombo.getItems().addAll(locLabels);
         locCombo.setPromptText("Sélectionner une destination");
         locCombo.setValue(bestMatch); // null when no match → user must pick
@@ -325,16 +327,16 @@ public class AdminApiViewController {
         // Pre-fill city and country from the Geoapify result (or query as fallback)
         String prefCity    = (place.city() != null && !place.city().isBlank()) ? place.city() : query;
         String prefCountry = place.country();
-        javafx.scene.control.Button newDestBtn =
+        Button newDestBtn =
                 admin.getHotelViewController().buildNewDestinationButton(locCombo, prefCity, prefCountry, dialog.getDialogPane());
 
-        javafx.scene.layout.HBox locRow = new javafx.scene.layout.HBox(8, locCombo, newDestBtn);
-        locRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        javafx.scene.layout.HBox.setHgrow(locCombo, javafx.scene.layout.Priority.ALWAYS);
+        HBox locRow = new HBox(8, locCombo, newDestBtn);
+        locRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(locCombo, Priority.ALWAYS);
 
         // Warning when no destination matches — show the user's original search query
         // (Latin, readable) NOT the Arabic place.city() from Geoapify
-        javafx.scene.control.Label hintLabel = new javafx.scene.control.Label();
+        Label hintLabel = new Label();
         if (bestMatch == null) {
             String hint = (query != null && !query.isBlank()) ? query : place.locationLine();
             hintLabel.setText("⚠ \"" + hint + "\" n'existe pas dans vos destinations — "
@@ -342,16 +344,16 @@ public class AdminApiViewController {
             hintLabel.getStyleClass().add("gv-hint-label");
         }
 
-        grid.add(new javafx.scene.control.Label("Nom *"),          0, 0); grid.add(nameField,    1, 0);
-        grid.add(new javafx.scene.control.Label("Description"),    0, 1); grid.add(descField,    1, 1);
-        grid.add(new javafx.scene.control.Label("Étoiles"),        0, 2); grid.add(starsSpinner, 1, 2);
-        grid.add(new javafx.scene.control.Label("Statut"),         0, 3); grid.add(statusCombo,  1, 3);
-        grid.add(new javafx.scene.control.Label("Localisation *"), 0, 4); grid.add(locRow,       1, 4);
+        grid.add(new Label("Nom *"),          0, 0); grid.add(nameField,    1, 0);
+        grid.add(new Label("Description"),    0, 1); grid.add(descField,    1, 1);
+        grid.add(new Label("Étoiles"),        0, 2); grid.add(starsSpinner, 1, 2);
+        grid.add(new Label("Statut"),         0, 3); grid.add(statusCombo,  1, 3);
+        grid.add(new Label("Localisation *"), 0, 4); grid.add(locRow,       1, 4);
         if (!hintLabel.getText().isBlank()) grid.add(hintLabel, 1, 5);
 
         // Save disabled until both name and localisation are filled.
         // Use Platform.runLater so lookupButton resolves after dialog is shown.
-        javafx.scene.Node importNode = dialog.getDialogPane().lookupButton(importType);
+        Node importNode = dialog.getDialogPane().lookupButton(importType);
         Runnable syncState = () -> importNode.setDisable(
                 nameField.getText().isBlank() || GuiUtils.isBlank(locCombo.getValue()));
         javafx.application.Platform.runLater(syncState); // initial state after show
@@ -406,7 +408,7 @@ public class AdminApiViewController {
      * Returns null when nothing matches — caller leaves combo blank.
      */
     private String findBestLocalisationMatch(
-            java.util.List<String> labels, String city, String searchQuery, String country) {
+            List<String> labels, String city, String searchQuery, String country) {
 
         if (labels == null || labels.isEmpty()) return null;
 
@@ -450,24 +452,24 @@ public class AdminApiViewController {
     }
 
     private void showGeoapifyDetailDialog(GeoapifyPlacesApiClient.HotelPlace place) {
-        javafx.scene.control.Dialog<Void> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Détails — " + place.name());
-        javafx.scene.control.ButtonType closeType =
-                new javafx.scene.control.ButtonType("Fermer", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType closeType =
+                new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().add(closeType);
 
-        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(0);
+        VBox root = new VBox(0);
         root.getStyleClass().add("gv-detail-dialog-root");
 
         // Header
-        javafx.scene.layout.HBox hbar = new javafx.scene.layout.HBox(14);
-        hbar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        HBox hbar = new HBox(14);
+        hbar.setAlignment(Pos.CENTER_LEFT);
         hbar.setPadding(new Insets(18, 24, 18, 24));
         hbar.getStyleClass().add("gv-detail-dialog-header");
         Label iconLbl = new Label("🌍");
         iconLbl.getStyleClass().add("gv-detail-dialog-icon");
-        javafx.scene.layout.VBox titleBox = new javafx.scene.layout.VBox(3);
-        javafx.scene.layout.HBox.setHgrow(titleBox, Priority.ALWAYS);
+        VBox titleBox = new VBox(3);
+        HBox.setHgrow(titleBox, Priority.ALWAYS);
         Label titleLbl = new Label(place.name());
         titleLbl.getStyleClass().add("gv-detail-dialog-title");
         Label subLbl = new Label("Geoapify Places API  ·  " + place.categoryLabel());
@@ -476,7 +478,7 @@ public class AdminApiViewController {
         hbar.getChildren().addAll(iconLbl, titleBox);
 
         // Body rows
-        javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(0);
+        VBox body = new VBox(0);
         body.setPadding(new Insets(20, 26, 24, 26));
         String[][] rows = {
                 {"🏨", "Type",        place.categoryLabel().isBlank()  ? "N/A" : place.categoryLabel()},
@@ -502,23 +504,23 @@ public class AdminApiViewController {
                         "node", 0, "", "", 1.0);
                 openOpenStreetMapLocation(loc);
             });
-            javafx.scene.layout.HBox mapRow = new javafx.scene.layout.HBox(mapBtn2);
+            HBox mapRow = new HBox(mapBtn2);
             mapRow.setPadding(new Insets(14, 0, 0, 0));
             body.getChildren().add(mapRow);
         }
 
         root.getChildren().addAll(hbar, body);
-        javafx.scene.control.DialogPane pane = dialog.getDialogPane();
+        DialogPane pane = dialog.getDialogPane();
         pane.setContent(root); pane.setPadding(Insets.EMPTY);
         pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
-        java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
+        java.net.URL cssUrl = getClass().getResource("/css/admin-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 
         javafx.application.Platform.runLater(() -> {
-            javafx.scene.Node closeNode = pane.lookupButton(closeType);
+            Node closeNode = pane.lookupButton(closeType);
             if (closeNode instanceof Button cb) {
                 cb.setMinWidth(100);
                 cb.getStyleClass().add("gv-detail-close-btn");
@@ -527,15 +529,15 @@ public class AdminApiViewController {
         dialog.showAndWait();
     }
 
-    private javafx.scene.layout.HBox detailDialogRow(String icon, String key, String value) {
-        javafx.scene.layout.HBox r = new javafx.scene.layout.HBox(0);
-        r.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+    private HBox detailDialogRow(String icon, String key, String value) {
+        HBox r = new HBox(0);
+        r.setAlignment(Pos.CENTER_LEFT);
         r.setPadding(new Insets(11, 0, 11, 0));
         r.getStyleClass().add("gv-detail-row");
         Label ic = new Label(icon); ic.getStyleClass().add("gv-detail-row-icon");
         Label k  = new Label(key + " :"); k.getStyleClass().add("gv-detail-row-key");
         Label v  = new Label(value); v.getStyleClass().add("gv-detail-row-value");
-        v.setWrapText(true); javafx.scene.layout.HBox.setHgrow(v, Priority.ALWAYS);
+        v.setWrapText(true); HBox.setHgrow(v, Priority.ALWAYS);
         r.getChildren().addAll(ic, k, v);
         return r;
     }
@@ -619,11 +621,11 @@ public class AdminApiViewController {
         col6.setVisible(true);
         col6.setText("Actions");
         col6.setMinWidth(130); col6.setPrefWidth(140); col6.setMaxWidth(160);
-        col6.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
+        col6.setCellFactory(tc -> new TableCell<>() {
             private final Button mapBtn = buildActionBtn("🗺  Carte", "#0ea5e9", "#0284c7");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(mapBtn);
+            private final HBox box = new HBox(mapBtn);
             {
-                box.setAlignment(javafx.geometry.Pos.CENTER);
+                box.setAlignment(Pos.CENTER);
                 mapBtn.setOnAction(e -> {
                     Object item = getTableView().getItems().get(getIndex());
                     if (item instanceof NominatimHotelApiClient.LocationSummary loc) {
@@ -871,7 +873,7 @@ public class AdminApiViewController {
         pane.setMinHeight(680);
         pane.getStyleClass().add("gv-detail-dialog-pane");
 
-        java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
+        java.net.URL cssUrl = getClass().getResource("/css/admin-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 

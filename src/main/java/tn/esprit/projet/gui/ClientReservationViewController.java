@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import tn.esprit.projet.services.ReservationService;
 import tn.esprit.projet.services.ReservationService.ReservationDetail;
+import tn.esprit.projet.utils.SessionManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,18 +14,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Renders the "Mes Réservations" page.
- * Loads data from the reservation_hotel DB table (via ReservationService).
+ * Renders the "Réservation Chambres" page (hotel module, client side).
+ * Shows only the reservations of the currently logged-in user.
  */
 public class ClientReservationViewController {
 
-    private final ClientController   controller;
+    private final ClientController3 controller;
     private final ReservationService reservationService;
 
-    /** In-memory list loaded from DB – status changes live here during session. */
     private List<ReservationDetail> sessionReservations = new ArrayList<>();
 
-    public ClientReservationViewController(ClientController controller) {
+    public ClientReservationViewController(ClientController3 controller) {
         this.controller         = controller;
         this.reservationService = new ReservationService();
     }
@@ -34,40 +34,34 @@ public class ClientReservationViewController {
     // ─────────────────────────────────────────────────────────────────────────
 
     public void showReservations() {
-        // ── Show & configure the shared search panel (same as Hôtels / Chambres) ──
-        controller.showSearchPanel(true);
-        controller.hideApiToolbar(); // Hide the API toolbar (Destination/Ville + Geoapify) — not needed for Reservations
+        controller.showSearchPanel(false);
 
-        // Configure search panel labels
-        javafx.scene.control.Label searchTitle = controller.getSearchTitle();
-        javafx.scene.control.Label subtitleLabel = controller.getSubtitleLabel();
-        javafx.scene.control.TextField searchField = controller.getClientSearchField();
-        javafx.scene.control.ComboBox<String> statusCombo = controller.getRoomStatusFilterCombo();
-        javafx.scene.control.ComboBox<String> roomTypeCombo = controller.getRoomTypeFilterCombo();
+        ComboBox<String> statusCombo = controller.getRoomStatusFilterCombo();
+        TextField searchField = controller.getClientSearchField();
 
-        if (searchTitle   != null) searchTitle.setText("Rechercher une réservation");
-        if (subtitleLabel != null) subtitleLabel.setText("Gérez vos réservations");
-        if (searchField   != null) { searchField.setPromptText("🔍  Hôtel, chambre, type..."); searchField.clear(); }
-        controller.getSectionTitle().setText("Mes Réservations");
-
-        // Hide stars/hotel combos, show status filter in the extra-filter slots
         controller.hideStarsFilter();
         controller.hideHotelFilter();
-        controller.showReservationFilters(); // configures statusCombo + hides roomType
+        controller.showReservationFilters();
 
-        // Load from DB
+        // Load only the current user's reservations
         try {
-            sessionReservations = reservationService.getAllWithDetails();
+            int userId = SessionManager.getCurrentUserId();
+            System.out.println("[ClientReservationView] loading for userId=" + userId);
+            if (userId > 0) {
+                sessionReservations = reservationService.getByUserIdWithDetails(userId);
+            } else {
+                sessionReservations = reservationService.getAllWithDetails();
+            }
         } catch (Exception e) {
-            sessionReservations = new java.util.ArrayList<>();
+            e.printStackTrace();
+            sessionReservations = new ArrayList<>();
         }
 
-        // ── Build the content area ─────────────────────────────────────────
         FlowPane container = controller.getHotelsContainer();
         container.getChildren().clear();
 
         VBox root = new VBox(24);
-        root.setPadding(new javafx.geometry.Insets(6, 10, 20, 10));
+        root.setPadding(new Insets(6, 10, 20, 10));
         root.setMaxWidth(Double.MAX_VALUE);
 
         // Header
@@ -80,7 +74,7 @@ public class ClientReservationViewController {
         countLabel.getStyleClass().add("res-count-label");
         header.getChildren().addAll(agency, title, countLabel);
 
-        // Table — wired to the shared search panel field and status combo
+        // Table only — no payment button here
         VBox tableWrap = buildReservationTable(sessionReservations, searchField, statusCombo, countLabel);
 
         root.getChildren().addAll(header, tableWrap);
@@ -91,26 +85,9 @@ public class ClientReservationViewController {
     //  Builders
     // ─────────────────────────────────────────────────────────────────────────
 
-    private TextField buildSearchField() {
-        TextField f = new TextField();
-        f.setPromptText("🔍  Rechercher...");
-        f.getStyleClass().add("res-search-field");
-        f.setPrefWidth(280);
-        return f;
-    }
-
-    private ComboBox<String> buildStatusFilter() {
-        ComboBox<String> cb = new ComboBox<>();
-        cb.getItems().addAll("Tous les statuts", "En attente", "Confirmée", "Annulée");
-        cb.setValue("Tous les statuts");
-        cb.getStyleClass().add("res-status-filter");
-        cb.setPrefWidth(180);
-        return cb;
-    }
-
     private VBox buildReservationTable(List<ReservationDetail> all,
-                                       javafx.scene.control.TextField searchField,
-                                       javafx.scene.control.ComboBox<String> statusFilter,
+                                       TextField searchField,
+                                       ComboBox<String> statusFilter,
                                        Label countLabel) {
         VBox wrap = new VBox(0);
         wrap.getStyleClass().add("res-table-wrap");
@@ -139,12 +116,12 @@ public class ClientReservationViewController {
     }
 
     private int renderRows(VBox rows, List<ReservationDetail> all,
-                           javafx.scene.control.TextField searchField,
-                           javafx.scene.control.ComboBox<String> statusFilter) {
+                           TextField searchField,
+                           ComboBox<String> statusFilter) {
         rows.getChildren().clear();
         String search = (searchField == null || searchField.getText() == null)
                 ? "" : searchField.getText().toLowerCase().trim();
-        String status = (statusFilter == null) ? "Tous les statuts" : statusFilter.getValue();
+        String statusVal = (statusFilter == null) ? "Tous les statuts" : statusFilter.getValue();
         boolean first = true;
 
         List<ReservationDetail> filtered = all.stream()
@@ -153,14 +130,16 @@ public class ClientReservationViewController {
                             || b.safeRoomNumber().toLowerCase().contains(search)
                             || b.safeHotelName().toLowerCase().contains(search)
                             || b.safeRoomType().toLowerCase().contains(search);
-                    // Map friendly label → DB status value
-                    String dbStatus = switch (status == null ? "" : status) {
-                        case "En attente"  -> "EN_ATTENTE";
-                        case "Confirmée"   -> "CONFIRMÉE";
-                        case "Annulée"     -> "ANNULÉE";
-                        default            -> "";  // "Tous les statuts"
+
+                    String normalizedDbStatus = normalizeStatus(b.status);
+                    String filterStatus = switch (statusVal) {
+                        case "En attente" -> "PENDING";
+                        case "Confirmée"  -> "CONFIRMED";
+                        case "Annulée"    -> "CANCELLED";
+                        default           -> "";
                     };
-                    boolean matchStatus = dbStatus.isEmpty() || dbStatus.equals(b.status);
+                    
+                    boolean matchStatus = filterStatus.isEmpty() || filterStatus.equals(normalizedDbStatus);
                     return matchSearch && matchStatus;
                 })
                 .collect(Collectors.toList());
@@ -189,42 +168,45 @@ public class ClientReservationViewController {
     }
 
     private HBox buildColHeader() {
-        HBox row = new HBox(0);
+        HBox row = new HBox(15);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(14, 22, 14, 22));
         row.getStyleClass().add("res-col-header");
-        row.getChildren().addAll(
-                colLabel("CHAMBRE",   170),
-                colLabel("HÔTEL",     200),
-                colLabel("SÉJOUR",    200),
-                colLabel("TOTAL (DT)",110),
-                colLabel("STATUT",    120),
-                colLabel("ACTIONS",   160)
-        );
+        
+        Label roomCol = colLabel("CHAMBRE", 140);
+        Label hotelCol = colLabel("HÔTEL", 150);
+        Label dateCol = colLabel("SÉJOUR", 160);
+        Label priceCol = colLabel("TOTAL (DT)", 100);
+        Label statusCol = colLabel("STATUT", 110);
+        Label actionCol = colLabel("ACTIONS", 140);
+
+        // Use HGrow for flexibility
+        HBox.setHgrow(hotelCol, Priority.ALWAYS);
+        HBox.setHgrow(dateCol, Priority.ALWAYS);
+
+        row.getChildren().addAll(roomCol, hotelCol, dateCol, priceCol, statusCol, actionCol);
         return row;
     }
 
     private HBox buildRow(ReservationDetail b, Runnable refresh) {
-        HBox row = new HBox(0);
+        HBox row = new HBox(15);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(16, 22, 16, 22));
 
-        // Room cell
         VBox roomCell = new VBox(2);
         Label roomNum = new Label("Ch. " + b.safeRoomNumber());
         roomNum.getStyleClass().add("res-room-num");
         Label roomType = new Label(b.safeRoomType());
         roomType.getStyleClass().add("res-room-type");
         roomCell.getChildren().addAll(roomNum, roomType);
-        roomCell.setMinWidth(170); roomCell.setPrefWidth(170);
+        roomCell.setMinWidth(140); roomCell.setPrefWidth(140);
 
-        // Hotel
         Label hotelLbl = new Label(b.safeHotelName());
         hotelLbl.getStyleClass().add("res-hotel-name");
-        hotelLbl.setWrapText(false);
-        hotelLbl.setMinWidth(200); hotelLbl.setPrefWidth(200); hotelLbl.setMaxWidth(200);
+        hotelLbl.setWrapText(true);
+        hotelLbl.setMinWidth(150); 
+        HBox.setHgrow(hotelLbl, Priority.ALWAYS);
 
-        // Date cell
         VBox dateCell = new VBox(2);
         Label dateRange = new Label(b.dateRange());
         dateRange.getStyleClass().add("res-date-range");
@@ -232,15 +214,18 @@ public class ClientReservationViewController {
         Label nightsLbl = new Label(nights + " nuit" + (nights > 1 ? "s" : ""));
         nightsLbl.getStyleClass().add("res-nights");
         dateCell.getChildren().addAll(dateRange, nightsLbl);
-        dateCell.setMinWidth(200); dateCell.setPrefWidth(200);
+        dateCell.setMinWidth(160);
+        HBox.setHgrow(dateCell, Priority.ALWAYS);
 
-        // Price
         Label priceLbl = new Label(String.format("%.0f DT", b.prix));
         priceLbl.getStyleClass().add("res-price");
-        priceLbl.setMinWidth(110); priceLbl.setPrefWidth(110);
+        priceLbl.setMinWidth(100); priceLbl.setPrefWidth(100);
 
-        row.getChildren().addAll(roomCell, hotelLbl, dateCell, priceLbl,
-                buildStatusCell(b.status), buildActionCell(b, refresh));
+        HBox statusCell = buildStatusCell(b.status);
+        
+        HBox actionCell = buildActionCell(b, refresh);
+
+        row.getChildren().addAll(roomCell, hotelLbl, dateCell, priceLbl, statusCell, actionCell);
 
         row.getStyleClass().add("res-row");
         row.setOnMouseEntered(e -> { if (!row.getStyleClass().contains("res-row-hover")) row.getStyleClass().add("res-row-hover"); });
@@ -249,48 +234,62 @@ public class ClientReservationViewController {
     }
 
     private HBox buildStatusCell(String status) {
-        String cssVariant = switch (status) {
-            case "CONFIRMÉE" -> "res-badge-confirmed";
-            case "ANNULÉE"   -> "res-badge-cancelled";
-            default          -> "res-badge-pending";
-        };
-        Label badge = new Label(status);
+        String normalized = normalizeStatus(status);
+        String labelText = status;
+        String cssVariant;
+
+        switch (normalized) {
+            case "CONFIRMED" -> {
+                cssVariant = "res-badge-confirmed";
+                labelText = "CONFIRMÉE";
+            }
+            case "CANCELLED" -> {
+                cssVariant = "res-badge-cancelled";
+                labelText = "ANNULÉE";
+            }
+            default -> {
+                cssVariant = "res-badge-pending";
+                labelText = "EN ATTENTE";
+            }
+        }
+        
+        Label badge = new Label(labelText);
         badge.getStyleClass().addAll("res-badge-base", cssVariant);
         HBox cell = new HBox(badge);
         cell.setAlignment(Pos.CENTER_LEFT);
-        cell.setMinWidth(120); cell.setPrefWidth(120);
+        cell.setMinWidth(110); cell.setPrefWidth(110);
         return cell;
     }
 
     private HBox buildActionCell(ReservationDetail b, Runnable refresh) {
         HBox cell = new HBox(8);
         cell.setAlignment(Pos.CENTER_LEFT);
-        cell.setMinWidth(160); cell.setPrefWidth(160);
+        cell.setMinWidth(140); cell.setPrefWidth(140);
 
-        switch (b.status) {
-            case "EN_ATTENTE" -> {
-                // Client can only cancel a pending reservation — confirmation is admin's role
+        String normalized = normalizeStatus(b.status);
+
+        switch (normalized) {
+            case "PENDING" -> {
                 Button cancel = actionBtn("Annuler ✕", "#dc3545", "#c82333");
                 cancel.setOnAction(e -> {
                     try {
                         reservationService.updateStatus(b.id, "ANNULÉE");
                         b.status = "ANNULÉE";
-                    } catch (SQLException ex) { /* silent — status still updates in memory */ }
+                    } catch (SQLException ex) { ex.printStackTrace(); }
                     refresh.run();
                 });
                 cell.getChildren().add(cancel);
             }
-            case "CONFIRMÉE" -> {
-                // Confirmed — read-only badge, no actions for client
+            case "CONFIRMED" -> {
                 Label confirmed = new Label("Confirmée ✓");
                 confirmed.getStyleClass().add("res-confirmed-label");
                 cell.getChildren().add(confirmed);
             }
-            default -> { // ANNULÉE
-                // Can remove a cancelled reservation from their list
+            default -> {
+                // For CANCELLED or REJECTED, show delete option
                 Button del = actionBtn("Supprimer 🗑", "#6c757d", "#5a6268");
                 del.setOnAction(e -> {
-                    try { reservationService.delete(b.id); } catch (SQLException ex) { /* log */ }
+                    try { reservationService.delete(b.id); } catch (SQLException ex) { ex.printStackTrace(); }
                     sessionReservations.remove(b);
                     refresh.run();
                 });
@@ -298,6 +297,17 @@ public class ClientReservationViewController {
             }
         }
         return cell;
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null) return "PENDING";
+        String s = status.trim().toUpperCase();
+        // Remove accents manually for common cases
+        s = s.replace("É", "E").replace("È", "E");
+        
+        if (s.contains("CONFIRM")) return "CONFIRMED";
+        if (s.contains("ANNUL") || s.contains("CANCEL") || s.contains("REFUS")) return "CANCELLED";
+        return "PENDING";
     }
 
     private Button actionBtn(String label, String bg, String hoverBg) {

@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.RoomImageService;
 import tn.esprit.projet.services.RoomService;
+import tn.esprit.projet.utils.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -27,11 +28,11 @@ import java.util.List;
 public class AdminRoomViewController {
 
     private final AdminSharedState state;
-    private final AdminController admin;
+    private final AdminController3 admin;
     private final RoomService roomService;
     private final RoomImageService roomImageService;
 
-    public AdminRoomViewController(AdminSharedState state, AdminController admin,
+    public AdminRoomViewController(AdminSharedState state, AdminController3 admin,
                                    RoomService roomService, RoomImageService roomImageService) {
         this.state = state;
         this.admin = admin;

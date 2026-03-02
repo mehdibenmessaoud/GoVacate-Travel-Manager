@@ -10,6 +10,9 @@ import javafx.scene.layout.HBox;
 import tn.esprit.projet.API.reviews.ReviewIntelligenceService;
 import tn.esprit.projet.entities.HotelReview;
 import tn.esprit.projet.services.HotelReviewService;
+import tn.esprit.projet.utils.AdminSharedState;
+import tn.esprit.projet.utils.DialogHelper;
+import tn.esprit.projet.utils.GuiUtils;
 
 import java.sql.SQLException;
 import java.util.Locale;
@@ -25,10 +28,10 @@ public class AdminReviewViewController {
     private static final String MODERATION_PREFIX = "[Avis masque par moderation]";
 
     private final AdminSharedState state;
-    private final AdminController admin;
+    private final AdminController3 admin;
     private final HotelReviewService reviewService;
 
-    public AdminReviewViewController(AdminSharedState state, AdminController admin,
+    public AdminReviewViewController(AdminSharedState state, AdminController3 admin,
                                      HotelReviewService reviewService) {
         this.state = state;
         this.admin = admin;
@@ -119,7 +122,7 @@ public class AdminReviewViewController {
         GridPane grid = DialogHelper.createDialogFormGrid();
 
         // Star rating selector
-        javafx.scene.layout.HBox starsBox = new javafx.scene.layout.HBox(8);
+        HBox starsBox = new HBox(8);
         starsBox.setAlignment(Pos.CENTER_LEFT);
         final int[] rating = {review != null ? review.getRating() : 4};
         Label[] stars = new Label[5];

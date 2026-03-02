@@ -11,11 +11,12 @@ import javafx.stage.Window;
 
 import tn.esprit.projet.API.reviews.ReviewIntelligenceService;
 import tn.esprit.projet.entities.*;
+import tn.esprit.projet.utils.ClientSharedState;
+import tn.esprit.projet.utils.DialogHelper;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -23,7 +24,7 @@ import java.util.function.Function;
  */
 public class ClientReviewViewController {
 
-    private final ClientSharedState  state;
+    private final ClientSharedState state;
     private final DialogHelper.ClientDialogs dialogs;
     private final Function<String, Image> imageLoader;
 

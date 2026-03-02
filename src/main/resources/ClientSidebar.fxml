@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Circle?>
 
 <AnchorPane prefWidth="256.0" styleClass="sidebar-root"
-            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- Brand -->
     <HBox alignment="CENTER_LEFT" spacing="13.0" styleClass="sidebar-brand"
@@ -53,17 +53,17 @@
         <Button fx:id="btnHotels"
                 prefHeight="44.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F3E8;   H&#xF4;tels"/>
+                text="Hotels"/>
 
         <Button fx:id="btnChambres"
                 prefHeight="44.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F6CF;   Chambres"/>
+                text="Chambres"/>
 
         <Button fx:id="btnReservations"
                 prefHeight="44.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F4C5;   R&#xE9;servations"/>
+                text="Reservations"/>
 
         <Pane prefHeight="10.0" mouseTransparent="true"/>
         <Pane styleClass="sidebar-sep"/>
@@ -76,18 +76,19 @@
         <Button fx:id="btnProfil"
                 prefHeight="44.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-nav-btn"
-                text="  &#x1F464;   Mon Profil"/>
+                text="Mon Profil"/>
 
         <Button fx:id="btnLogout"
                 prefHeight="44.0" maxWidth="1.7976931348623157E308"
                 styleClass="sidebar-logout-btn"
-                text="  &#x2192;   D&#xE9;connexion"/>
+                text="Deconnexion"/>
     </VBox>
 
     <!-- Footer -->
     <VBox spacing="2.0"
           AnchorPane.leftAnchor="20.0" AnchorPane.bottomAnchor="18.0">
-        <Label styleClass="sidebar-footer" text="GoVacate v1.0  &#xB7;  Client"/>
+        <Label styleClass="sidebar-footer" text="GoVacate v1.0 - Client"/>
     </VBox>
 
 </AnchorPane>
+

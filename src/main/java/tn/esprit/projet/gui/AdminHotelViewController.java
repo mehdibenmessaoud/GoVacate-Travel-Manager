@@ -16,9 +16,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.*;
+import tn.esprit.projet.utils.*;
 
 import java.io.File;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -36,14 +36,14 @@ import java.util.*;
 public class AdminHotelViewController {
 
     private final AdminSharedState state;
-    private final AdminController admin; // for navigation callbacks
+    private final AdminController3 admin; // for navigation callbacks
 
     // ── services ─────────────────────────────────────────────────────────────
     private final HotelService hotelService;
     private final HotelImageService hotelImageService;
     private final HotelServiceItemService hotelServiceItemService;
 
-    public AdminHotelViewController(AdminSharedState state, AdminController admin,
+    public AdminHotelViewController(AdminSharedState state, AdminController3 admin,
                                     HotelService hotelService,
                                     HotelImageService hotelImageService,
                                     HotelServiceItemService hotelServiceItemService) {
@@ -94,7 +94,7 @@ public class AdminHotelViewController {
             // (not yet laid out). runLater fires after the scene has done its first layout
             // pass so the binding immediately resolves to the correct pixel value.
             final TableView<Object> tbl = mainTable;
-            javafx.application.Platform.runLater(() -> {
+            Platform.runLater(() -> {
                 javafx.beans.binding.DoubleBinding usable = tbl.widthProperty().subtract(18);
                 col1.prefWidthProperty().bind(usable.multiply(0.13));
                 col2.prefWidthProperty().bind(usable.multiply(0.22));
@@ -788,7 +788,7 @@ public class AdminHotelViewController {
     Button buildNewDestinationButton(ComboBox<String> combo,
                                      String prefCity,
                                      String prefCountry,
-                                     javafx.scene.control.DialogPane owner) {
+                                     DialogPane owner) {
         Button btn = new Button("➕");
         btn.setTooltip(new Tooltip("Créer une nouvelle destination"));
         btn.getStyleClass().add("btn-new-destination");
