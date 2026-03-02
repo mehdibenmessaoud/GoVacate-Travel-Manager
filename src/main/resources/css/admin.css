@@ -1,0 +1,548 @@
+/* =========================================================
+   BASE & BACKGROUND
+========================================================= */
+.root-pane {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-background-color: #001F3F;
+}
+
+.deep-water-bg {
+    -fx-background-color: #001F3F;
+}
+
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* =========================================================
+   SIDEBAR & ANIMATIONS
+========================================================= */
+.sidebar-liquid {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+    -fx-transition: all 0.4s ease-out;
+}
+
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 0 15 25;
+}
+
+.liquid-btn:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.12;
+    -fx-text-fill: white;
+}
+
+.liquid-btn-active {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+}
+
+.liquid-btn:focused {
+    -fx-background-color: transparent;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+.status-badge-details {
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.status-available {
+    -fx-background-color: #2ecc71;
+    -fx-border-color: #27ae60;
+    -fx-border-width: 1;
+    -fx-border-radius: 15px;
+}
+
+.status-unavailable {
+    -fx-background-color: #e74c3c;
+    -fx-border-color: #c0392b;
+    -fx-border-width: 1;
+    -fx-border-radius: 15px;
+}
+
+/* =========================================================
+   HEADER & SEARCH BAR
+========================================================= */
+.text-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub {
+    -fx-font-size: 14px;
+    -fx-text-fill: #679AC1;
+}
+
+.glass-panel {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -fx-background-radius: 30px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+    -fx-border-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.6), rgba(0, 255, 255, 0.4), rgba(255, 0, 255, 0.4));
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 4);
+}
+
+.search-bar-liquid {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 50px;
+    -fx-padding: 0 10 0 30;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00447B;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.search-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* =========================================================
+   FORM INPUTS
+========================================================= */
+.form-input {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+}
+
+.form-input:focused {
+    -fx-border-color: #FF8210;
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-input-area {
+    -fx-control-inner-background: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10px;
+    -fx-padding: 5px;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: #FF8210;
+    -fx-background-radius: 0 10 10 0;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+.btn-orange-glow {
+    -fx-background-color: linear-gradient(to right, #FF8210, #FFBD59);
+    -fx-text-fill: white;
+    -fx-background-radius: 30px;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.5), 15, 0.3, 0, 0);
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: linear-gradient(to right, #FFBD59, #FF8210);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* =========================================================
+   TABLEVIEW
+========================================================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-background-radius: 20px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px 20px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 45px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER;
+}
+
+.btn-table-details, .btn-table-edit, .btn-table-delete {
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 6 15;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-border-width: 1px;
+}
+
+.btn-table-details {
+    -fx-background-color: rgba(52, 152, 219, 0.2);
+    -fx-border-color: rgba(52, 152, 219, 0.5);
+}
+
+.btn-table-edit {
+    -fx-background-color: rgba(46, 204, 113, 0.2);
+    -fx-border-color: rgba(46, 204, 113, 0.5);
+}
+
+.btn-table-delete {
+    -fx-background-color: rgba(231, 76, 60, 0.2);
+    -fx-border-color: #e74c3c;
+    -fx-text-fill: #e74c3c;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+/* =========================================================
+   MODERN COMBO BOX (CLEANED & FIXED)
+========================================================= */
+/* =========================================================
+   MODERN COMBO BOX (STRUCTURE COMPATIBLE JAVAFX)
+========================================================= */
+.modern-combo {
+    -fx-background-color: rgba(255, 255, 255, 0.08) !important;
+    -fx-border-color: rgba(255, 255, 255, 0.3) !important;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* Texte affiché dans le champ */
+.modern-combo .cell {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+}
+
+/* LA BOÎTE DÉROULANTE (Le Menu) */
+/* LA BOÎTE DÉROULANTE (Le Menu qui s'ouvre) */
+.modern-combo .context-menu {
+    /* Utilise une couleur solide (non transparente) pour bloquer ce qu'il y a derrière */
+    -fx-background-color: #001F3F !important;
+    -fx-border-color: #FF8210 !important;
+    -fx-border-width: 2px !important;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+
+    /* Ombre portée très forte pour créer de la profondeur */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 20, 0, 0, 10);
+}
+
+/* La liste interne doit aussi être opaque */
+.modern-combo .list-view {
+    -fx-background-color: #001F3F !important;
+    -fx-background-radius: 10;
+}
+
+/* Les cellules de la liste */
+.modern-combo .list-cell {
+    -fx-text-fill: white !important;
+    -fx-background-color: transparent !important;
+    -fx-padding: 10 15;
+}
+
+/* État au survol pour une lisibilité parfaite */
+.modern-combo .list-cell:hover {
+    -fx-background-color: #FF8210 !important;
+    -fx-text-fill: white !important;
+}
+
+
+
+/* LA FLÈCHE */
+.modern-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.modern-combo .arrow {
+    -fx-background-color: #FF8210 !important;
+}
+
+/* =========================================================
+   CAROUSEL & DETAILS
+========================================================= */
+.image-carousel-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 15;
+}
+
+.details-container-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px;
+}
+
+.btn-back-simple {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+}
+
+
+
+/* --- Style global de la fenêtre d'alerte --- */
+.dialog-pane {
+    -fx-background-color: rgba(15, 23, 42, 0.9); /* Fond sombre bleuté semi-transparent */
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, 10);
+    -fx-padding: 10;
+}
+
+/* --- En-tête et Titre --- */
+.dialog-pane .header-panel {
+    -fx-background-color: linear-gradient(to right, #FF8210, #e6760e);
+    -fx-background-radius: 15 15 0 0;
+    -fx-padding: 15;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* --- Contenu (Texte du message) --- */
+.dialog-pane .content {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 14px;
+    -fx-padding: 20;
+}
+
+
+
+/* --- Boutons (OK, Annuler, etc.) --- */
+.dialog-pane .button-bar button {
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-transition: 0.3s;
+}
+
+/* Bouton OK / Confirmer (Orange GoVacate) */
+.dialog-pane .button-bar .button.ok,
+.dialog-pane .button-bar .button.yes,
+.dialog-pane .button-bar .button.finish {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button-bar .button.ok:hover {
+    -fx-background-color: #e6760e;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Bouton Annuler (Transparent / Outline) */
+.dialog-pane .button-bar .button.cancel,
+.dialog-pane .button-bar .button.no {
+    -fx-background-color: transparent;
+    -fx-border-color: #64748b;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-text-fill: #94a3b8;
+}
+
+.dialog-pane .button-bar .button.cancel:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: white;
+}
+
+/* Amélioration de la visibilité des textes du Dashboard */
+.stat-label {
+    -fx-text-fill: #bdc3c7; /* Gris clair pour les titres secondaires */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-orange {
+    -fx-text-fill: #FF8210; /* Orange vif GoVacate */
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-blue {
+    -fx-text-fill: #679AC1; /* Bleu clair */
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.text-header-main {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Style pour les cartes de statistiques */
+.stat-card {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 15;
+    -fx-padding: 20;
+}
+
+
+/* Conteneur principal */
+.main-form-container {
+    -fx-background-color: #0d1620; /* Bleu très sombre comme l'image destination */
+}
+
+/* Titre principal */
+.form-header-title {
+    -fx-font-size: 32px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* Labels à gauche */
+.form-label {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+/* Champs de saisie (TextField) */
+.form-input {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent;
+}
+
+.form-input:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+}
+
+/* ComboBox style blanc */
+.form-combo {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-padding: 5;
+}
+
+.form-combo .list-cell {
+    -fx-text-fill: #333333;
+}
+
+/* Bouton Annuler */
+.btn-cancel {
+    -fx-background-color: #1a252f;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 30;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #2c3e50;
+}
+
+/* Bouton Enregistrer (Orange Glow) */
+.btn-save-orange {
+    -fx-background-color: linear-gradient(to right, #FF8210, #ffaa5d);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 12 40;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 15, 0, 0, 0);
+}
+
+.btn-save-orange:hover {
+    -fx-background-color: linear-gradient(to right, #e6760e, #FF8210);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* S'assurer que les inputs sont bien blancs avec texte noir comme l'image destination */
+.form-input {
+    -fx-background-color: white !important;
+    -fx-text-fill: #2c3e50 !important;
+    -fx-prompt-text-fill: #bdc3c7 !important;
+}
+
+.form-combo {
+    -fx-background-color: white !important;
+}
+
+.form-combo .cell {
+    -fx-text-fill: #2c3e50 !important;
+}

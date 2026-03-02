@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fx:id="mainContentArea" fitToWidth="true" styleClass="transparent-scroll"
+            stylesheets="@css/client_style.css" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.projet.gui.PacksContentController">
+    <VBox spacing="35.0" styleClass="center-content-main">
+        <padding>
+            <Insets top="40.0" right="50.0" bottom="40.0" left="50.0"/>
+        </padding>
+
+        <VBox spacing="8.0">
+            <Label styleClass="text-header-main" text="Trouvez votre prochaine aventure" />
+            <Label styleClass="text-sub-blue" text="Decouvrez nos packs exclusifs selectionnes pour vous" />
+        </VBox>
+
+        <VBox styleClass="glass-panel">
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="search-bar-liquid">
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label styleClass="search-label" text="DESTINATION / PACK"/>
+                    <TextField fx:id="searchField"  promptText="Ou voulez-vous aller ?" styleClass="search-field" minWidth="240"/>
+                </VBox>
+                <Separator orientation="VERTICAL" styleClass="search-separator"/>
+                <VBox>
+                    <Label styleClass="search-label" text="CATEGORIE"/>
+                    <ComboBox fx:id="categoryFilter" promptText="Toutes" styleClass="search-field-combo" minWidth="160" prefWidth="180"/>
+                </VBox>
+                <Button onAction="#handleSearch" styleClass="btn-orange-glow" text="Chercher" prefHeight="50" minWidth="130" prefWidth="130" maxWidth="130" HBox.hgrow="NEVER"/>
+            </HBox>
+        </VBox>
+
+        <FlowPane fx:id="packsContainer" hgap="30.0" vgap="30.0" alignment="TOP_LEFT" />
+    </VBox>
+</ScrollPane>
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="cardRoot" onMouseClicked="#handleClick" prefWidth="260.0" spacing="10.0" styleClass="water-card" stylesheets="@css/client_style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ExcursionCardController">
+    <children>
+        <StackPane styleClass="card-image-container">
+            <ImageView fx:id="excursionImage" fitHeight="160.0" fitWidth="260.0" pickOnBounds="true" />
+            <Label fx:id="priceBadge" styleClass="price-badge" StackPane.alignment="TOP_RIGHT" text="0 DT" />
+        </StackPane>
+
+        <VBox spacing="5.0" styleClass="card-content-area">
+            <Label fx:id="activiteLabel" styleClass="excursion-activity-type" text="ACTIVITÃ‰" />
+            <Label fx:id="nameLabel" styleClass="excursion-card-title" text="Nom Excursion" />
+            <HBox spacing="15.0" styleClass="excursion-info-row">
+                <Label fx:id="durationLabel" styleClass="excursion-meta" text="â± 0h" />
+                <Label fx:id="capacityLabel" styleClass="excursion-meta" text="ðŸ‘¥ 0 pers" />
+            </HBox>
+        </VBox>
+    </children>
+</VBox>

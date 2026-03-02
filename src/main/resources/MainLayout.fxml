@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="mainContainer" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.MainLayoutController">
+    <children>
+        <fx:include source="/Sidebar.fxml" />
+
+        <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS" style="-fx-background-color: #051937;" />
+    </children>
+</HBox>

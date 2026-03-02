@@ -214,3 +214,806 @@ Circle#avatarPlaceholder { -fx-fill: #e6eef8; -fx-stroke: #d7e9fb; -fx-stroke-wi
 }
 
 .restaurant-card > .add-btn { -fx-background-color: #00447B; }
+
+/* ==========================================================================
+   CONFIG GÉNÉRALE & FOND
+   ========================================================================== */
+.root {
+    -fx-background-color: #051937; /* Bleu nuit profond */
+}
+
+/* On s'assure que le ScrollPane ne bloque pas la vue */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Background avec cercles flous (Deep Water) */
+.deep-water-bg {
+    -fx-background-color: #051937;
+}
+
+/* ==========================================================================
+   SIDEBAR (BARRE LATÉRALE)
+   ========================================================================== */
+/* =========================================================
+   SIDEBAR CLIENT (STYLE ADMIN UNIFIÉ)
+========================================================= */
+
+.sidebar-liquid {
+    /* Dégradé subtil identique à l'admin */
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    /* Bordure lumineuse sur le côté droit */
+    -fx-border-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    /* Effet d'éclat orange sous le texte */
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* Le panneau de surbrillance (Sliding Highlight) */
+.sliding-highlight {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+}
+
+/* Boutons de navigation style Admin */
+.liquid-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 0 15 25;
+}
+
+.liquid-btn:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.12;
+    -fx-text-fill: white;
+}
+
+/* État actif (si vous n'utilisez pas le slidingPane mais des classes CSS) */
+.liquid-btn-active {
+    -fx-text-fill: white;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 30px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Bouton déconnexion spécifique */
+.btn-logout {
+    -fx-text-fill: #FFBD59; /* Couleur dorée/orange du style admin */
+}
+/* ==========================================================================
+   BARRE DE RECHERCHE (STYLE PILULE BLANCHE)
+   ========================================================================== */
+.search-bar-liquid {
+    -fx-background-color: white;
+    -fx-background-radius: 40;
+    -fx-padding: 8 15 8 25;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 20, 0, 0, 10);
+}
+
+.search-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-prompt-text-fill: #A0A0A0;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+}
+
+.btn-orange-glow {
+    -fx-background-color: #FF8210;
+    -fx-background-radius: 30;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-min-width: 130;
+    -fx-text-overrun: clip;
+    -fx-cursor: hand;
+}
+
+.btn-orange-glow:hover {
+    -fx-background-color: #e6760e;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* ==========================================================================
+   CARTES DES PACKS (WATER-CARD)
+   ========================================================================== */
+.water-card {
+    -fx-background-color: #1A2F48;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 15, 0, 0, 10);
+}
+
+.water-card:hover {
+    -fx-translate-y: -10;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.2), 20, 0, 0, 12);
+}
+
+.glass-card {
+    -fx-padding: 15;
+    -fx-spacing: 10;
+    -fx-background-radius: 0 0 20 20;
+}
+
+/* --- Typographie Pack (Visibilité renforcée) --- */
+.card-title {
+    -fx-text-fill: white !important; /* Force le texte en blanc */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.card-sub {
+    -fx-text-fill: #679AC1 !important; /* Bleu clair pour la catégorie */
+    -fx-font-size: 13px;
+}
+
+/* Badge de prix flottant sur l'image */
+.price-tag-floating {
+    -fx-background-color: rgba(255, 130, 16, 0.9);
+    -fx-text-fill: white;
+    -fx-padding: 5 12;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* ==========================================================================
+   BADGES & BOUTONS D'ACTION
+   ========================================================================== */
+.status-badge-details {
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.status-available {
+    -fx-background-color: #2ecc71 !important; /* Vert */
+    -fx-text-fill: white !important;
+}
+
+.status-unavailable {
+    -fx-background-color: #e74c3c !important; /* Rouge */
+    -fx-text-fill: white !important;
+}
+
+
+
+.status-occupied {
+    -fx-background-color: #E67E22;
+}
+
+.btn-orange-glow:disabled {
+    -fx-background-color: #7f8c8d; /* Gris */
+    -fx-effect: none; /* Enlève l'effet de lueur orange */
+    -fx-cursor: default;
+}
+
+
+.btn-details-small {
+    -fx-background-color: #4A6984;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-background-radius: 15;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+.btn-reserve-small {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+/* Styles pour la vue Destination */
+
+.text-header-main {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub-main {
+    -fx-font-size: 16px;
+    -fx-text-fill: #bdc3c7; /* Gris clair bleuté */
+}
+
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.transparent-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.grid-container {
+    -fx-background-color: transparent;
+}
+
+/* --- Cartes d'Excursion --- */
+
+.water-card {
+    -fx-background-color: rgba(255, 255, 255, 0.05); /* Fond vitré très léger */
+    -fx-background-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 15px;
+    -fx-cursor: hand;
+    -fx-overflow: hidden; /* Pour que l'image ne dépasse pas des rayons */
+}
+
+.water-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-translate-y: -5px; /* Petit saut vers le haut */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 15, 0, 0, 10);
+}
+
+.card-image-container {
+    /* Style pour le conteneur de l'image si besoin */
+}
+
+.price-badge {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-padding: 5 12;
+    -fx-background-radius: 0 15 0 15; /* Coins arrondis spécifiques */
+    -fx-font-weight: bold;
+}
+
+.card-content-area {
+    -fx-padding: 10 15 15 15;
+}
+
+.excursion-activity-type {
+    -fx-text-fill: #ffa500;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.excursion-card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.excursion-meta {
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 13px;
+}
+
+.excursion-info-row {
+    -fx-padding: 5 0 0 0;
+}
+
+/* --- Page Détails Excursion --- */
+
+.details-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.details-subtitle {
+    -fx-text-fill: #ffa500;
+    -fx-font-size: 16px;
+}
+
+.status-badge-details {
+    -fx-background-color: #2ecc71; /* Vert succès */
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.section-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.image-hbox-padding {
+    -fx-padding: 10px;
+}
+
+/* --- Grille d'informations (Meta) --- */
+.meta-label {
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 13px;
+}
+
+.meta-value {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.meta-price {
+    -fx-text-fill: #ffa500;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.details-description {
+    -fx-fill: white;
+    -fx-font-size: 15px;
+}
+
+/* Correction pour les ScrollPane dans les détails */
+.image-carousel-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 10px;
+}
+
+
+/* Styles pour la vue Excursion */
+
+.text-header-excursion {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.btn-back {
+    -fx-background-color: #FF8210; /* Orange de votre charte */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-transition: 0.3s;
+}
+
+.btn-back:hover {
+    -fx-background-color: #e6760e;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* On réutilise les classes déjà définies précédemment si besoin */
+.text-sub-main {
+    -fx-font-size: 14px;
+    -fx-text-fill: #bdc3c7;
+}
+
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.transparent-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* --- Décoration Arrière-plan --- */
+.bg-circle-orange {
+    -fx-fill: #FF8210;
+    -fx-opacity: 0.15;
+}
+
+.bg-circle-blue {
+    -fx-fill: #679AC1;
+    -fx-opacity: 0.1;
+}
+
+/* --- Sidebar Footer --- */
+.sidebar-footer {
+    -fx-padding: 0 0 40 0;
+}
+
+.btn-logout {
+    -fx-text-fill: #E74C3C;
+}
+
+/* --- Textes Principaux --- */
+.text-header-main {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-sub-blue {
+    -fx-font-size: 16px;
+    -fx-text-fill: #679AC1;
+}
+
+
+
+/* --- Barre de Recherche --- */
+.search-separator {
+    -fx-opacity: 0.2;
+    -fx-max-height: 30;
+}
+
+.search-field-combo {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* --- ScrollPane et Contenu --- */
+.center-content-main {
+    -fx-background-color: transparent;
+}
+
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.transparent-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* --- Cartes de Destination --- */
+
+.destination-card {
+    -fx-background-radius: 15px;
+    -fx-cursor: hand;
+}
+
+/* Arrondir l'image à l'intérieur de la carte */
+.destination-card .image-view {
+    -fx-background-radius: 15px;
+}
+
+/* Effet de zoom léger au survol de la carte */
+.destination-card:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 7);
+}
+
+/* Overlay dégradé noir pour faire ressortir le texte blanc */
+.card-overlay {
+    -fx-fill: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+}
+
+.card-text-container {
+    /* Assure que le texte est au-dessus de l'overlay */
+}
+
+.destination-name {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.destination-location {
+    -fx-text-fill: #ffa500; /* Couleur orange/ambre */
+    -fx-font-size: 14px;
+}
+
+/* --- Cartes des Packs --- */
+
+.pack-card-main {
+    -fx-background-color: rgba(255, 255, 255, 0.08); /* Effet verre */
+    -fx-background-radius: 20px;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 20px;
+    -fx-overflow: hidden;
+}
+
+.pack-card-main:hover {
+    -fx-border-color: rgba(255, 130, 16, 0.5); /* Bordure orange au survol */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 5);
+}
+
+.pack-image-header {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-background-radius: 20px 20px 0 0;
+}
+
+.status-badge-pack {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-padding: 5 12;
+    -fx-background-radius: 0 20 0 20;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    /* Remplacement de la marge inline par du padding/translation si nécessaire */
+}
+
+.pack-info-body {
+    -fx-padding: 15px;
+}
+
+.pack-title-label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.pack-price-label {
+    -fx-text-fill: #FF8210;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-alignment: center-right;
+}
+
+.pack-description-text {
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 2px;
+}
+
+.pack-meta-info {
+    -fx-text-fill: #679AC1;
+    -fx-font-size: 12px;
+}
+
+.pack-action-box {
+    -fx-padding: 10 0 0 0;
+}
+
+/* --- Boutons de la Carte --- */
+
+.btn-details-pack {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF8210;
+    -fx-border-radius: 10px;
+    -fx-text-fill: white;
+    -fx-pref-width: 110px;
+    -fx-pref-height: 35px;
+    -fx-cursor: hand;
+}
+
+.btn-details-pack:hover {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+}
+
+.btn-reserve-pack {
+    -fx-background-color: #FF8210;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-pref-width: 110px;
+    -fx-pref-height: 35px;
+    -fx-cursor: hand;
+}
+
+.btn-reserve-pack:hover {
+    -fx-background-color: #e6760e;
+}
+
+/* --- Page Détails du Pack --- */
+
+.details-container-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px;
+}
+
+.btn-back-simple {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 100px;
+    -fx-cursor: hand;
+}
+
+.btn-back-simple:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.details-header-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.details-separator {
+    -fx-opacity: 0.2;
+}
+
+.image-view-details {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.details-price-large {
+    -fx-font-size: 24px;
+    -fx-text-fill: #FF8210;
+    -fx-font-weight: bold;
+}
+
+.details-meta-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.details-description-label {
+    -fx-text-fill: #b0c4de; /* Acier bleu clair */
+    -fx-font-size: 14px;
+}
+
+/* On réutilise le badge créé pour l'excursion */
+.status-badge-details {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-padding: 5 15;
+    -fx-background-radius: 15px;
+    -fx-font-weight: bold;
+}
+
+
+/* --- Conteneur Principal du Chat --- */
+.chat-container {
+    -fx-background-color: rgba(5, 25, 55, 0.85); /* Bleu nuit translucide */
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, 0);
+}
+
+/* --- Header du Chat --- */
+.chat-header {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15 15 0 0;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* --- Zone de défilement (Messages) --- */
+.chat-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.chat-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Personnalisation de la barre de défilement */
+.chat-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 6;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 10;
+}
+
+/* --- Zone de saisie (Bas) --- */
+.chat-input-area {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 0 0 15 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1 0 0 0;
+}
+
+.modern-textfield {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #adb5bd;
+    -fx-padding: 0 15 0 15;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+}
+
+.modern-textfield:focused {
+    -fx-border-color: #FF8210; /* Orange lors du clic */
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Bulles de Message (À ajouter dynamiquement en Java) --- */
+.user-bubble {
+    -fx-background-color: #FF8210; /* Orange dynamique */
+    -fx-background-radius: 15 15 0 15;
+    -fx-padding: 10 15;
+    -fx-text-fill: white;
+    -fx-font-size: 13;
+    -fx-max-width: 300;
+}
+
+.ai-bubble {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15 15 15 0;
+    -fx-padding: 10 15;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13;
+    -fx-max-width: 300;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 15 15 15 0;
+}
+
+/* --- Bouton Envoyer (chat only) --- */
+.chat-input-area .btn-orange-glow {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+}
+
+.chat-input-area .btn-orange-glow:hover {
+    -fx-background-color: #ff9431;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 10, 0, 0, 0);
+}
+
+/* Bouton Icone (Poubelle) */
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-text-fill: #adb5bd;
+    -fx-font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Arial";
+    -fx-font-size: 18;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-text-fill: #e74c3c; /* Rouge au survol */
+}
+
+
+/* Style pour les messages de l'IA */
+.message-ai {
+    -fx-background-color: rgba(255, 130, 16, 0.15);
+    -fx-background-radius: 0 15 15 15;
+    -fx-padding: 10;
+    -fx-text-fill: white;
+    -fx-max-width: 300;
+}
+
+/* Style pour les messages du Client */
+.message-user {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15 15 0 15;
+    -fx-padding: 10;
+    -fx-text-fill: white;
+    -fx-max-width: 300;
+    -fx-alignment: center-right;
+}
+
+/* Bouton Flottant IA */
+.chat-fab {
+    -fx-background-color: linear-gradient(to bottom right, #FF8210, #e6760e);
+    -fx-text-fill: white;
+    -fx-font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Arial";
+    -fx-font-size: 24px;
+    -fx-padding: 0;
+    -fx-text-overrun: clip;
+    -fx-min-width: 74px;
+    -fx-min-height: 74px;
+    -fx-max-width: 74px;
+    -fx-max-height: 74px;
+    -fx-background-radius: 50;
+    -fx-cursor: hand;
+    /* Ombre portée pour l'effet de profondeur */
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.4), 15, 0, 0, 8);
+    -fx-transition: 0.3s;
+}
+.chat-fab:hover {
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.6), 20, 0, 0, 10);
+}

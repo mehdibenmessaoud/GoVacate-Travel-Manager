@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<StackPane fx:id="rootPane" styleClass="root" stylesheets="@css/client_style.css"
+           xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.projet.gui.ClientPackController">
+
+    <Pane styleClass="deep-water-bg">
+        <Circle styleClass="bg-circle-orange" layoutX="150.0" layoutY="150.0" radius="180.0">
+            <effect><GaussianBlur radius="80.0"/></effect>
+        </Circle>
+        <Circle styleClass="bg-circle-blue" layoutX="1000.0" layoutY="600.0" radius="250.0">
+            <effect><GaussianBlur radius="100.0"/></effect>
+        </Circle>
+    </Pane>
+
+    <BorderPane fx:id="mainLayout"
+                maxHeight="1.7976931348623157E308"
+                maxWidth="1.7976931348623157E308">
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  SIDEBAR — fully fills height, footer pinned   -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <left>
+            <BorderPane prefWidth="260.0" styleClass="sidebar-liquid"
+                        maxHeight="1.7976931348623157E308">
+
+                <!-- TOP: logo + nav buttons -->
+                <top>
+                    <VBox spacing="12.0">
+                        <padding><Insets top="30.0" left="25.0" right="20.0" bottom="10.0"/></padding>
+
+                        <Label styleClass="logo-text" text="GoVacate"/>
+
+                        <Separator opacity="0.15"/>
+                        <Button fx:id="btnDashboard" onAction="#handleDashboard" styleClass="liquid-btn" text="Dashboard" prefWidth="210" alignment="CENTER_LEFT"/>
+
+                        <Button fx:id="btnExplorer" onAction="#handleShowPacks"
+                                styleClass="liquid-btn, liquid-btn-active"
+                                text="Explorer les Packs" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnExplorerDest" onAction="#handleShowDestinations"
+                                styleClass="liquid-btn"
+                                text="Explorer les Destinations" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnHotelsModule" onAction="#handleShowHotelsModule"
+                                styleClass="liquid-btn"
+                                text="Explorer les Hotels" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnRoomsModule" onAction="#handleShowRoomsModule"
+                                styleClass="liquid-btn"
+                                text="Gestion Chambres" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnRoomReservationsModule" onAction="#handleShowRoomReservationsModule"
+                                styleClass="liquid-btn"
+                                text="Reservation Chambres" prefWidth="210" alignment="CENTER_LEFT"/>
+
+                        <Separator opacity="0.1"/>
+
+
+                        <Button fx:id="btnReservations" onAction="#handleShowReservations"
+                                styleClass="liquid-btn"
+                                text="Mes Reservations" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnFactures" onAction="#handleShowFactures"
+                                styleClass="liquid-btn"
+                                text="Mes Factures" prefWidth="210" alignment="CENTER_LEFT"/>
+                        <Button fx:id="btnSupport" onAction="#showChat"
+                                styleClass="liquid-btn"
+                                text="Support en Direct" prefWidth="210" alignment="CENTER_LEFT">
+                            <style>-fx-text-fill: #FF8210; -fx-font-weight: bold;</style>
+                        </Button>
+                    </VBox>
+                </top>
+
+                <!-- BOTTOM: profile + logout always visible -->
+                <bottom>
+                    <VBox spacing="8.0" styleClass="sidebar-footer">
+                        <padding><Insets top="10.0" left="25.0" right="20.0" bottom="20.0"/></padding>
+                        <Separator opacity="0.15"/>
+                        <Button fx:id="btnProfile" text="Mon Profil"
+                                onAction="#handleProfileClick"
+                                styleClass="liquid-btn" prefWidth="210"/>
+                        <Button fx:id="btnLogout" text="Deconnexion"
+                                onAction="#handleLogout"
+                                styleClass="liquid-btn, btn-logout" prefWidth="210"/>
+                    </VBox>
+                </bottom>
+
+            </BorderPane>
+        </left>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  CENTER — main content                         -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <center>
+            <ScrollPane fx:id="mainContentArea" fitToWidth="true" styleClass="transparent-scroll">
+                <VBox fx:id="dynamicContent" spacing="35.0" styleClass="center-content-main">
+                    <padding>
+                        <Insets top="40.0" right="50.0" bottom="40.0" left="50.0"/>
+                    </padding>
+
+                    <VBox spacing="8.0">
+                        <Label styleClass="text-header-main" text="Trouvez votre prochaine aventure"/>
+                        <Label styleClass="text-sub-blue" text="Decouvrez nos packs exclusifs selectionnes pour vous"/>
+                    </VBox>
+
+                    <VBox styleClass="glass-panel">
+                        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="search-bar-liquid">
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="search-label" text="DESTINATION / PACK"/>
+                                <TextField fx:id="searchField" onAction="#handleSearch"
+                                           promptText="Ou voulez-vous aller ?"
+                                           styleClass="search-field" minWidth="240"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL" styleClass="search-separator"/>
+                            <VBox>
+                                <Label styleClass="search-label" text="CATEGORIE"/>
+                                <ComboBox fx:id="categoryFilter" promptText="Toutes"
+                                          styleClass="search-field-combo" minWidth="160" prefWidth="180"/>
+                            </VBox>
+                            <Button onAction="#handleSearch" styleClass="btn-orange-glow"
+                                    text="Chercher" prefHeight="50"
+                                    minWidth="130" prefWidth="130" maxWidth="130" HBox.hgrow="NEVER"/>
+                        </HBox>
+                    </VBox>
+
+                    <FlowPane fx:id="packsContainer" hgap="30.0" vgap="30.0" alignment="TOP_LEFT"/>
+                </VBox>
+            </ScrollPane>
+        </center>
+
+    </BorderPane>
+
+    <!-- FAB button top-right -->
+    <Button onAction="#openAIChat" styleClass="chat-fab" text="&#x1F4AC;"
+            StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets top="80.0" right="30.0"/>
+        </StackPane.margin>
+        <tooltip><Tooltip text="Assistant IA GoVacate"/></tooltip>
+    </Button>
+
+</StackPane>

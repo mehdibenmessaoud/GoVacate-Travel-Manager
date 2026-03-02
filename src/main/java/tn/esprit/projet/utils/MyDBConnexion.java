@@ -5,32 +5,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyDBConnexion {
-    private final String URL = "jdbc:mysql://localhost:3306/GoVacate";
-    private final String USER = "root";
+    private final String URL      = "jdbc:mysql://localhost:3306/GoVacate2?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true";
+    private final String USER     = "root";
     private final String PASSWORD = "";
+
     private Connection connection;
     private static MyDBConnexion instance;
-    private boolean isConnected = false;
 
-    private MyDBConnexion() {
-        try {
-            // Try to establish connection
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            isConnected = true;
-            System.out.println("✓ Connexion établie avec succès à GoVacate!");
-        } catch (ClassNotFoundException e) {
-            System.err.println("✗ Erreur: Driver MySQL non trouvé - " + e.getMessage());
-            isConnected = false;
-        } catch (SQLException e) {
-            System.err.println("✗ Erreur de connexion à la base de données: " + e.getMessage());
-            System.err.println("  Assurez-vous que MySQL est démarré et que la base 'GoVacate' existe");
-            isConnected = false;
-        } catch (Exception e) {
-            System.err.println("✗ Erreur d'initialisation: " + e.getMessage());
-            isConnected = false;
-        }
-    }
+    private MyDBConnexion() {}
 
     public static MyDBConnexion getInstance() {
         if (instance == null) {
@@ -40,36 +22,83 @@ public class MyDBConnexion {
     }
 
     public Connection getConnection() {
+        try {
+            // Always check if connection is valid before returning
+            if (connection == null || connection.isClosed()) {
+                connection = createNewConnection();
+            } else if (!isValid()) {
+                // Connection exists but is invalid, reconnect
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    // Ignore errors from closing invalid connection
+                }
+                connection = createNewConnection();
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Erreur SQL lors de la vérification de la connexion: " + e.getMessage());
+            // Force reconnection on error
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (Exception ex) {
+                // Ignore
+            }
+            try {
+                connection = createNewConnection();
+            } catch (SQLException ex) {
+                System.err.println("✗ Impossible de rétablir la connexion: " + ex.getMessage());
+            }
+        }
         return connection;
     }
 
-    public boolean isConnected() {
-        return isConnected && connection != null;
+    /** Create a new database connection. */
+    private Connection createNewConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("Driver MySQL introuvable: " + e.getMessage(), e);
+        }
+        Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        conn.setAutoCommit(true);
+        System.out.println("✅ Connexion (re)établie avec succès !");
+        return conn;
     }
 
-    public String getConnectionStatus() {
-        if (isConnected) {
-            return "Connecté";
-        } else {
-            return "Déconnecté - Vérifiez la base de données";
+    /** Quick validity check — ping the server. */
+    private boolean isValid() {
+        try {
+            return connection != null && connection.isValid(2); // 2 second timeout
+        } catch (SQLException e) {
+            return false;
         }
     }
 
-    public void testConnection() {
-        if (isConnected) {
-            try {
-                if (!connection.isClosed()) {
-                    System.out.println("✓ Test de connexion réussi");
-                } else {
-                    System.out.println("✗ Connexion fermée");
-                    isConnected = false;
-                }
-            } catch (SQLException e) {
-                System.err.println("✗ Test de connexion échoué: " + e.getMessage());
-                isConnected = false;
+    public void closeConnection() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("🔌 Connexion fermée proprement.");
             }
-        } else {
-            System.out.println("✗ Pas de connexion active");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        // Clear the cached connection so a new one will be created
+        connection = null;
+    }
+
+    /** Reconnect to the database (force a new connection). */
+    public void reconnect() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        connection = null;
+        getConnection(); // This will create a new connection
     }
 }

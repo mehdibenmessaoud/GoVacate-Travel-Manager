@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+
+<StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@css/client-hotel-style.css"
+           xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.projet.gui.ClientController3">
+
+    <Pane styleClass="deep-water-bg">
+        <Circle fill="#FF8210" layoutX="150.0" layoutY="150.0" opacity="0.15" radius="180.0">
+            <effect>
+                <GaussianBlur radius="80.0"/>
+            </effect>
+        </Circle>
+        <Circle fill="#679AC1" layoutX="900.0" layoutY="600.0" opacity="0.1" radius="250.0">
+            <effect>
+                <GaussianBlur radius="100.0"/>
+            </effect>
+        </Circle>
+    </Pane>
+
+    <BorderPane>
+        <left>
+            <fx:include fx:id="clientSidebar" source="ClientSidebar.fxml"/>
+        </left>
+
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="AS_NEEDED">
+                <content>
+                    <fx:include fx:id="clientContent" source="ClientHotelView.fxml"/>
+                </content>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+</StackPane>
+
