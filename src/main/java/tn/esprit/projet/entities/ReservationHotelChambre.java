@@ -2,7 +2,7 @@ package tn.esprit.projet.entities;
 
 import java.time.LocalDate;
 
-public class Reservation {
+public class ReservationHotel {
 
     private int       id;
     private int       reservationId;
@@ -15,7 +15,7 @@ public class Reservation {
     private int       userId      = 1;
 
 
-    public Reservation(int id, int reservationId, int hotelId, Integer chambreId, LocalDate dateCheckin, LocalDate dateCheckout, double prix) {
+    public ReservationHotel(int id, int reservationId, int hotelId, Integer chambreId, LocalDate dateCheckin, LocalDate dateCheckout, double prix) {
         this.id = id;
         this.reservationId = reservationId;
         this.hotelId = hotelId;
@@ -26,7 +26,7 @@ public class Reservation {
     }
 
 
-    public Reservation() {}
+    public ReservationHotel() {}
 
 
     public int getId() {
