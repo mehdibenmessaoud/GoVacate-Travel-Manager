@@ -27,11 +27,11 @@ import java.util.List;
 public class AdminRoomViewController {
 
     private final AdminSharedState state;
-    private final AdminController admin;
+    private final AdminController3 admin;
     private final RoomService roomService;
     private final RoomImageService roomImageService;
 
-    public AdminRoomViewController(AdminSharedState state, AdminController admin,
+    public AdminRoomViewController(AdminSharedState state, AdminController3 admin,
                                    RoomService roomService, RoomImageService roomImageService) {
         this.state = state;
         this.admin = admin;

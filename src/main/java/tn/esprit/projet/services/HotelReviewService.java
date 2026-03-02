@@ -2,7 +2,7 @@ package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.HotelReview;
 import tn.esprit.projet.API.reviews.ReviewIntelligenceService;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
  * Service for managing HotelReview entities.
  * Provides SQL methods for single queries and Stream-based helper for multiple filters.
  */
-public class HotelReviewService implements CRUD<HotelReview> {
+public class HotelReviewService implements IService<HotelReview> {
 
     private final Connection cnx;
     private final ReviewIntelligenceService reviewIntelligenceService;
 
     public HotelReviewService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
         reviewIntelligenceService = new ReviewIntelligenceService();
     }
 

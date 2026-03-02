@@ -18,7 +18,6 @@ import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.*;
 
 import java.io.File;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -36,14 +35,14 @@ import java.util.*;
 public class AdminHotelViewController {
 
     private final AdminSharedState state;
-    private final AdminController admin; // for navigation callbacks
+    private final AdminController3 admin; // for navigation callbacks
 
     // ── services ─────────────────────────────────────────────────────────────
     private final HotelService hotelService;
     private final HotelImageService hotelImageService;
     private final HotelServiceItemService hotelServiceItemService;
 
-    public AdminHotelViewController(AdminSharedState state, AdminController admin,
+    public AdminHotelViewController(AdminSharedState state, AdminController3 admin,
                                     HotelService hotelService,
                                     HotelImageService hotelImageService,
                                     HotelServiceItemService hotelServiceItemService) {

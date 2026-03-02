@@ -1,7 +1,7 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.HotelServiceItem;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Service for HotelServiceItem CRUD operations with MySQL persistence.
  */
-public class HotelServiceItemService implements CRUD<HotelServiceItem> {
+public class HotelServiceItemService implements IService<HotelServiceItem> {
 
     private final Connection cnx;
 
     public HotelServiceItemService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
     }
 
 

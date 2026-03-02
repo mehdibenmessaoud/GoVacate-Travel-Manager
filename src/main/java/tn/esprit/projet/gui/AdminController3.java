@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
  * instead of manual tree walking. All child nodes are accessed via:
  *   sidebar.btnHotels, list.mainTable, detail.detailName, etc.
  */
-public class AdminController implements Initializable {
+public class AdminController3 implements Initializable {
 
     // ── Injected roots from fx:include ────────────────────────────────────────
     @FXML private AnchorPane adminSidebar;

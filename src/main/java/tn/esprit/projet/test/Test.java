@@ -2,11 +2,10 @@ package tn.esprit.projet.test;
 
 import tn.esprit.projet.entities.*;
 import tn.esprit.projet.services.*;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Test class for inserting sample data into the database.
@@ -17,7 +16,7 @@ public class Test {
     public static void main(String[] args) {
         System.out.println("=== GoVacate - Insertion des donnees de test ===\n");
 
-        Connection cnx = MyDBConnexion.getInstance().getConnection();
+        Connection cnx = MyDBConnexion1.getInstance().getConnection();
         
         HotelService hotelService = new HotelService();
         RoomService roomService = new RoomService();

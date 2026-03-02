@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class AdminReservationViewController {
 
-    private final AdminController    admin;
+    private final AdminController3 admin;
     private final ReservationService reservationService;
 
     private List<ReservationDetail>            masterList     = Collections.emptyList();
@@ -37,7 +37,7 @@ public class AdminReservationViewController {
     private Label             boundSubtitle;
     private boolean           listenersWired = false;
 
-    public AdminReservationViewController(AdminController admin) {
+    public AdminReservationViewController(AdminController3 admin) {
         this.admin              = admin;
         this.reservationService = new ReservationService();
     }

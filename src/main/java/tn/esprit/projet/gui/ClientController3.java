@@ -40,7 +40,7 @@ import java.util.ResourceBundle;
  *  {@link ImageGalleryBuilder}       - generic image gallery
  *  {@link GuiUtils}               - pure static utilities
  */
-public class ClientController implements Initializable {
+public class ClientController3 implements Initializable {
 
     // Included section roots
     @FXML private AnchorPane clientSidebar;

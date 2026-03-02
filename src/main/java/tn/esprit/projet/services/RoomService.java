@@ -1,7 +1,7 @@
 package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.Room;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Service class for Room CRUD operations.
  */
-public class RoomService implements CRUD<Room> {
+public class RoomService implements IService<Room> {
 
     private final Connection cnx;
 
     public RoomService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
     }
 
     @Override

@@ -39,4 +39,4 @@ build/
 .DS_Store
 
 ### env ###
-.env
+../../Documents/pi/GoVacate/.env

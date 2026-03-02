@@ -1,20 +1,21 @@
 package tn.esprit.projet.services;
 
-import java.sql.SQLException;
 import java.util.List;
+import java.sql.SQLException;
 
-/**
- * Generic CRUD interface for all service classes.
- */
-public interface CRUD<T> {
-    
-    void create(T entity) throws SQLException;
-    
+public interface IService<T> {
+    // Créer une nouvelle entrée
+    void create(T t) throws SQLException;
+
+    // Récupérer toutes les entrées
     List<T> getAll() throws SQLException;
-    
-    T getById(int id) throws SQLException;
-    
-    void update(T entity) throws SQLException;
-    
+
+    // Mettre à jour une entrée existante
+    void update(T t) throws SQLException;
+
+    // Supprimer une entrée par son identifiant
     void delete(int id) throws SQLException;
+
+    // Récupérer une seule entrée par son identifiant
+    T getById(int id) throws SQLException;
 }

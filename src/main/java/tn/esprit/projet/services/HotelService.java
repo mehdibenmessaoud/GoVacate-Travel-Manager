@@ -4,7 +4,7 @@ import tn.esprit.projet.API.common.ApiException;
 import tn.esprit.projet.API.hotels.GeoapifyPlacesApiClient;
 import tn.esprit.projet.API.hotels.NominatimHotelApiClient;
 import tn.esprit.projet.entities.Hotel;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,14 +14,14 @@ import java.util.Optional;
 /**
  * Service class for Hotel CRUD operations.
  */
-public class HotelService implements CRUD<Hotel> {
+public class HotelService implements IService<Hotel> {
 
     private Connection cnx;
     private final GeoapifyPlacesApiClient geoapifyApiClient;
     private final NominatimHotelApiClient nominatimHotelApiClient;
 
     public HotelService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
         geoapifyApiClient      = new GeoapifyPlacesApiClient();
         nominatimHotelApiClient = new NominatimHotelApiClient();
     }

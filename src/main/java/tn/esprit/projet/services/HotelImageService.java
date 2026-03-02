@@ -2,19 +2,19 @@ package tn.esprit.projet.services;
 
 import tn.esprit.projet.entities.HotelImage;
 import tn.esprit.projet.API.images.ImagePipelineService;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HotelImageService implements CRUD<HotelImage> {
+public class HotelImageService implements IService<HotelImage> {
 
     private Connection cnx;
     private final ImagePipelineService imagePipelineService;
 
     public HotelImageService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
         imagePipelineService = new ImagePipelineService();
     }
 

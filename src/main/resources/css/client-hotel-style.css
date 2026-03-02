@@ -1,8 +1,8 @@
 /* =============================================================
    GOVACATE  ·  Client Portal
-   Client-specific overrides on top of common-style.css
+   Client-specific overrides on top of common-hotel-style.css
    ============================================================= */
-@import 'common-style.css';
+@import 'common-hotel-style.css';
 
 /* ── Page Header (client sizes) ────────────────────────────── */
 .text-header {

@@ -25,10 +25,10 @@ public class AdminReviewViewController {
     private static final String MODERATION_PREFIX = "[Avis masque par moderation]";
 
     private final AdminSharedState state;
-    private final AdminController admin;
+    private final AdminController3 admin;
     private final HotelReviewService reviewService;
 
-    public AdminReviewViewController(AdminSharedState state, AdminController admin,
+    public AdminReviewViewController(AdminSharedState state, AdminController3 admin,
                                      HotelReviewService reviewService) {
         this.state = state;
         this.admin = admin;

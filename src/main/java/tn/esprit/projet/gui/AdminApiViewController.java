@@ -38,7 +38,7 @@ public class AdminApiViewController {
     private static final int    OSM_TILE_SIZE            = 256;
     private static final String OSM_TILE_URL_TEMPLATE    = "https://tile.openstreetmap.org/%d/%d/%d.png";
 
-    private final AdminController    admin;
+    private final AdminController3 admin;
     private final HotelService       hotelService;
     private final Map<String, Image> osmTileCache         = new HashMap<>();
     // Stores the last Geoapify search query so the import cell factory can
@@ -46,7 +46,7 @@ public class AdminApiViewController {
     private String                   lastGeoapifyQuery    = "";
     private       boolean            apiRequestInProgress = false;
 
-    public AdminApiViewController(AdminController admin, HotelService hotelService) {
+    public AdminApiViewController(AdminController3 admin, HotelService hotelService) {
         this.admin        = admin;
         this.hotelService = hotelService;
     }
@@ -513,7 +513,7 @@ public class AdminApiViewController {
         pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
-        java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
+        java.net.URL cssUrl = getClass().getResource("/css/admin-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 
@@ -871,7 +871,7 @@ public class AdminApiViewController {
         pane.setMinHeight(680);
         pane.getStyleClass().add("gv-detail-dialog-pane");
 
-        java.net.URL cssUrl = getClass().getResource("/css/admin-style.css");
+        java.net.URL cssUrl = getClass().getResource("/css/admin-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 

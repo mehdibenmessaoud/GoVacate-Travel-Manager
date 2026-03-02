@@ -3,10 +3,9 @@ package tn.esprit.projet.gui;
 import javafx.collections.ObservableList;
 import tn.esprit.projet.entities.Hotel;
 import tn.esprit.projet.entities.Room;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
-import java.util.*;
 
 /**
  * Admin-specific shared state. Extends SharedState with:
@@ -60,7 +59,7 @@ public class AdminSharedState extends SharedState {
     public java.util.List<ReviewUserOption> loadReviewUserOptions() {
         java.util.List<ReviewUserOption> options = new java.util.ArrayList<>();
         try {
-            java.sql.Connection cnx = MyDBConnexion.getInstance().getConnection();
+            java.sql.Connection cnx = MyDBConnexion1.getInstance().getConnection();
             if (cnx == null) return options;
 
             java.sql.DatabaseMetaData meta    = cnx.getMetaData();
@@ -145,7 +144,7 @@ public class AdminSharedState extends SharedState {
         String p = country == null ? "" : country.trim();
         if (n.isEmpty()) throw new IllegalArgumentException("Le nom de la destination ne peut pas être vide.");
 
-        Connection cnx = MyDBConnexion.getInstance().getConnection();
+        Connection cnx = MyDBConnexion1.getInstance().getConnection();
         String sql = "INSERT INTO destination (name_destination, ville, pays) VALUES (?, ?, ?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, n);

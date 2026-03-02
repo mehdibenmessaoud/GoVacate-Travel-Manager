@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
  */
 public class ClientReservationViewController {
 
-    private final ClientController   controller;
+    private final ClientController3 controller;
     private final ReservationService reservationService;
 
     /** In-memory list loaded from DB – status changes live here during session. */
     private List<ReservationDetail> sessionReservations = new ArrayList<>();
 
-    public ClientReservationViewController(ClientController controller) {
+    public ClientReservationViewController(ClientController3 controller) {
         this.controller         = controller;
         this.reservationService = new ReservationService();
     }

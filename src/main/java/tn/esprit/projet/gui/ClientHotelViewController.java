@@ -11,7 +11,6 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 
 import tn.esprit.projet.entities.*;
-import tn.esprit.projet.services.HotelService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -29,14 +28,14 @@ public class ClientHotelViewController {
     private final ClientReviewViewController reviewVC;
     private final Function<String, Image>  imageLoader;
     /** Callback: tell ClientController to show the room detail view. */
-    private final ClientController         controller;
+    private final ClientController3 controller;
 
     public ClientHotelViewController(
             ClientSharedState        state,
             DialogHelper.ClientDialogs       dialogs,
             ClientReviewViewController reviewVC,
             Function<String, Image>  imageLoader,
-            ClientController         controller
+            ClientController3 controller
     ) {
         this.state      = state;
         this.dialogs    = dialogs;

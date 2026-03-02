@@ -1,7 +1,7 @@
 package tn.esprit.projet.services;
 
-import tn.esprit.projet.entities.Reservation;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.entities.ReservationHotelChambre;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -13,12 +13,12 @@ import java.util.List;
  * Also provides {@link #getAllWithDetails()} which JOINs room and hotel
  * so the UI can display human-readable names without extra lookups.
  */
-public class ReservationService implements CRUD<Reservation> {
+public class ReservationService implements IService<ReservationHotelChambre> {
 
     private final Connection cnx;
 
     public ReservationService() {
-        cnx = MyDBConnexion.getInstance().getConnection();
+        cnx = MyDBConnexion1.getInstance().getConnection();
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -26,7 +26,7 @@ public class ReservationService implements CRUD<Reservation> {
     // ═══════════════════════════════════════════════════════════════════════
 
     @Override
-    public void create(Reservation r) throws SQLException {
+    public void create(ReservationHotelChambre r) throws SQLException {
         boolean autoCommitBefore = cnx.getAutoCommit();
         cnx.setAutoCommit(false);
         try {
@@ -70,7 +70,7 @@ public class ReservationService implements CRUD<Reservation> {
      * dynamically so we never miss a required field regardless of the exact
      * schema used in the project.</p>
      */
-    private int insertParentReservation(Reservation r) throws SQLException {
+    private int insertParentReservation(ReservationHotelChambre r) throws SQLException {
         // ── 1. Discover all NOT NULL / no-default columns ──────────────────
         List<String> requiredCols = new ArrayList<>();
         try (Statement st = cnx.createStatement();
@@ -182,8 +182,8 @@ public class ReservationService implements CRUD<Reservation> {
     }
 
     @Override
-    public List<Reservation> getAll() throws SQLException {
-        List<Reservation> list = new ArrayList<>();
+    public List<ReservationHotelChambre> getAll() throws SQLException {
+        List<ReservationHotelChambre> list = new ArrayList<>();
         String sql = "SELECT * FROM reservation_hotel ORDER BY id DESC";
         try (Statement st = cnx.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -193,7 +193,7 @@ public class ReservationService implements CRUD<Reservation> {
     }
 
     @Override
-    public Reservation getById(int id) throws SQLException {
+    public ReservationHotelChambre getById(int id) throws SQLException {
         String sql = "SELECT * FROM reservation_hotel WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -205,7 +205,7 @@ public class ReservationService implements CRUD<Reservation> {
     }
 
     @Override
-    public void update(Reservation r) throws SQLException {
+    public void update(ReservationHotelChambre r) throws SQLException {
         String sql = "UPDATE reservation_hotel " +
                 "SET hotel_id=?, chambre_id=?, date_checkin=?, date_checkout=?, prix=? " +
                 "WHERE id=?";
@@ -273,9 +273,9 @@ public class ReservationService implements CRUD<Reservation> {
     // HELPERS
     // ═══════════════════════════════════════════════════════════════════════
 
-    private Reservation extract(ResultSet rs) throws SQLException {
+    private ReservationHotelChambre extract(ResultSet rs) throws SQLException {
         Integer chambreId = rs.getObject("chambre_id") != null ? rs.getInt("chambre_id") : null;
-        return new Reservation(
+        return new ReservationHotelChambre(
                 rs.getInt("id"),
                 rs.getInt("reservation_id"),
                 rs.getInt("hotel_id"),

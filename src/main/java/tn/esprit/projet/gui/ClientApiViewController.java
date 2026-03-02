@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -334,7 +333,7 @@ public class ClientApiViewController {
         pane.getStyleClass().add("gv-detail-dialog-pane");
         pane.setMinWidth(520); pane.setPrefWidth(560); pane.setMaxWidth(620);
 
-        java.net.URL cssUrl = getClass().getResource("/css/client-style.css");
+        java.net.URL cssUrl = getClass().getResource("/css/client-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
 
@@ -485,7 +484,7 @@ public class ClientApiViewController {
         DialogPane pane = dialog.getDialogPane();
         pane.setContent(content); pane.setPadding(Insets.EMPTY);
         pane.setMinWidth(860); pane.setPrefWidth(900); pane.setMinHeight(680);
-        URL cssUrl = getClass().getResource("/css/client-style.css");
+        URL cssUrl = getClass().getResource("/css/client-hotel-style.css");
         if (cssUrl != null && !pane.getStylesheets().contains(cssUrl.toExternalForm()))
             pane.getStylesheets().add(cssUrl.toExternalForm());
         pane.getStyleClass().addAll("gv-map-dialog", "gv-detail-dialog-pane");

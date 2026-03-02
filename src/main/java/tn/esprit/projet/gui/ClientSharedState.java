@@ -2,7 +2,7 @@ package tn.esprit.projet.gui;
 
 import tn.esprit.projet.entities.Hotel;
 import tn.esprit.projet.services.*;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.*;
@@ -39,7 +39,7 @@ public class ClientSharedState extends SharedState {
 
     public int resolveClientReviewUserId() {
         try {
-            Connection cnx = MyDBConnexion.getInstance().getConnection();
+            Connection cnx = MyDBConnexion1.getInstance().getConnection();
             if (cnx == null) return 1;
 
             DatabaseMetaData meta      = cnx.getMetaData();

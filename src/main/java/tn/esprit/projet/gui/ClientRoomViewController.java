@@ -6,11 +6,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.control.DatePicker;
 
 import tn.esprit.projet.entities.*;
-import tn.esprit.projet.services.ReservationService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -24,13 +22,13 @@ public class ClientRoomViewController {
     private final ClientSharedState  state;
     private final DialogHelper.ClientDialogs dialogs;
     private final Function<String, Image> imageLoader;
-    private final ClientController   controller;
+    private final ClientController3 controller;
 
     public ClientRoomViewController(
             ClientSharedState  state,
             DialogHelper.ClientDialogs dialogs,
             Function<String, Image> imageLoader,
-            ClientController   controller
+            ClientController3 controller
     ) {
         this.state       = state;
         this.dialogs     = dialogs;
@@ -479,7 +477,7 @@ public class ClientRoomViewController {
             }
 
             // Persist to database
-            Reservation dbReservation = new Reservation();
+            ReservationHotelChambre dbReservation = new ReservationHotelChambre();
             dbReservation.setReservationId(0); // generated in service
             dbReservation.setHotelId(resolvedHotelId);
             dbReservation.setChambreId(room.getId());

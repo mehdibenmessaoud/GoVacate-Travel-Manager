@@ -1,7 +1,7 @@
 package tn.esprit.projet.gui;
 
 import tn.esprit.projet.services.*;
-import tn.esprit.projet.utils.MyDBConnexion;
+import tn.esprit.projet.utils.MyDBConnexion1;
 
 import java.sql.*;
 import java.util.*;
@@ -74,7 +74,7 @@ public abstract class SharedState {
         if (!databaseAvailable) return;
 
         try {
-            Connection cnx = MyDBConnexion.getInstance().getConnection();
+            Connection cnx = MyDBConnexion1.getInstance().getConnection();
             String sql = "SELECT id, name_destination, pays, ville FROM destination ORDER BY name_destination, ville, id";
             PreparedStatement ps = cnx.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();

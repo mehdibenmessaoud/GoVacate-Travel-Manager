@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Circle?>
 
-<StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@css/client-style.css"
+<StackPane fx:id="rootPane" prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@css/client-hotel-style.css"
            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="tn.esprit.projet.gui.ClientController">
+           fx:controller="tn.esprit.projet.gui.ClientController3">
 
     <Pane styleClass="deep-water-bg">
         <Circle fill="#FF8210" layoutX="150.0" layoutY="150.0" opacity="0.15" radius="180.0">

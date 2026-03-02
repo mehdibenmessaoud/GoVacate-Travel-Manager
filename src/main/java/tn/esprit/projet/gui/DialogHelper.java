@@ -133,7 +133,7 @@ public final class DialogHelper {
      *
      * @param dialog             the dialog to style
      * @param destructivePrimary if true, primary button gets danger style
-     * @param cssFile            CSS resource path, e.g. "/css/admin-style.css"
+     * @param cssFile            CSS resource path, e.g. "/css/admin-hotel-style.css"
      * @param cssOwner           class used to resolve the CSS resource
      */
     public static void styleDialog(Dialog<?> dialog, boolean destructivePrimary, String cssFile, Class<?> cssOwner) {
@@ -159,7 +159,7 @@ public final class DialogHelper {
 
     /** Convenience: admin-style dialog */
     public static void styleAdminDialog(Dialog<?> dialog, boolean destructivePrimary, Class<?> cssOwner) {
-        styleDialog(dialog, destructivePrimary, "/css/admin-style.css", cssOwner);
+        styleDialog(dialog, destructivePrimary, "/css/admin-hotel-style.css", cssOwner);
     }
 
     /**
@@ -171,7 +171,7 @@ public final class DialogHelper {
 
     /** Convenience: client-style dialog */
     public static void styleClientDialog(Dialog<?> dialog, boolean destructivePrimary, Class<?> cssOwner) {
-        styleDialog(dialog, destructivePrimary, "/css/client-style.css", cssOwner);
+        styleDialog(dialog, destructivePrimary, "/css/client-hotel-style.css", cssOwner);
     }
 
     private static void applyTransparentStage(Dialog<?> dialog) {
@@ -234,7 +234,7 @@ public final class DialogHelper {
     // ── Notifications (admin-style) ───────────────────────────────────────────
 
     public static void showNotification(String message, String type, Class<?> cssOwner) {
-        showNotification(message, type, "/css/admin-style.css", cssOwner);
+        showNotification(message, type, "/css/admin-hotel-style.css", cssOwner);
     }
 
     public static void showNotification(String message, String type, String cssFile, Class<?> cssOwner) {
@@ -253,7 +253,7 @@ public final class DialogHelper {
     // ── Confirm delete ────────────────────────────────────────────────────────
 
     public static void confirmDelete(String type, String name, Runnable onConfirm, Class<?> cssOwner) {
-        confirmDelete(type, name, onConfirm, "/css/admin-style.css", cssOwner);
+        confirmDelete(type, name, onConfirm, "/css/admin-hotel-style.css", cssOwner);
     }
 
     public static void confirmDelete(String type, String name, Runnable onConfirm, String cssFile, Class<?> cssOwner) {
@@ -359,23 +359,23 @@ public final class DialogHelper {
         }
 
         public void showWarning(String title, String message) {
-            DialogHelper.showWarning(title, message, "/css/client-style.css", cssContext);
+            DialogHelper.showWarning(title, message, "/css/client-hotel-style.css", cssContext);
         }
 
         public void showError(String title, String message) {
-            DialogHelper.showError(title, message, "/css/client-style.css", cssContext);
+            DialogHelper.showError(title, message, "/css/client-hotel-style.css", cssContext);
         }
 
         public void showSuccess(String title, String message) {
-            DialogHelper.showSuccess(title, message, "/css/client-style.css", cssContext);
+            DialogHelper.showSuccess(title, message, "/css/client-hotel-style.css", cssContext);
         }
 
         public void showInfo(String title, String message) {
-            DialogHelper.showInfo(title, message, "/css/client-style.css", cssContext);
+            DialogHelper.showInfo(title, message, "/css/client-hotel-style.css", cssContext);
         }
 
         public void showImagePreview(String imagePath, String title) {
-            DialogHelper.showImagePreview(imagePath, title, imageLoader, "/css/client-style.css", cssContext);
+            DialogHelper.showImagePreview(imagePath, title, imageLoader, "/css/client-hotel-style.css", cssContext);
         }
 
         public void styleDialog(Dialog<?> dialog, boolean destructivePrimary) {

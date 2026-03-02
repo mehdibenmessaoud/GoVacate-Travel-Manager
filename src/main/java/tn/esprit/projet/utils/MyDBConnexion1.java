@@ -4,16 +4,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class MyDBConnexion {
+public class MyDBConnexion1 {
 
     private static final String URL      = "jdbc:mysql://localhost:3306/govacate";
     private static final String USER     = "root";
     private static final String PASSWORD = "";
 
     private Connection connection;
-    private static volatile MyDBConnexion instance;
+    private static volatile MyDBConnexion1 instance;
 
-    private MyDBConnexion() {
+    private MyDBConnexion1() {
         openConnection();
     }
 
@@ -26,11 +26,11 @@ public class MyDBConnexion {
         }
     }
 
-    public static MyDBConnexion getInstance() {
+    public static MyDBConnexion1 getInstance() {
         if (instance == null) {
-            synchronized (MyDBConnexion.class) {
+            synchronized (MyDBConnexion1.class) {
                 if (instance == null) {
-                    instance = new MyDBConnexion();
+                    instance = new MyDBConnexion1();
                 }
             }
         }
