@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="40.0" styleClass="main-form-container"
+      stylesheets="@/css/admin.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.projet.gui.UserFormController">
+
+    <padding>
+        <Insets bottom="50.0" left="60.0" right="60.0" top="50.0" />
+    </padding>
+
+    <VBox spacing="10.0" maxWidth="650.0">
+        <Label fx:id="titleLabel" text="DÃ©tails de l'Utilisateur" styleClass="form-header-title" />
+        <Separator opacity="0.1" />
+    </VBox>
+
+    <GridPane vgap="20.0" hgap="30.0" maxWidth="650.0" alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="200.0" halignment="LEFT" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="300.0" prefWidth="450.0" />
+        </columnConstraints>
+
+        <children>
+            <Label text="Nom complet :" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="nomField" promptText="Saisir le nom..." styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label text="Adresse Email :" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="emailField" promptText="exemple@govacate.tn" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label text="TÃ©lÃ©phone :" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="telField" promptText="+216 ..." styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label text="RÃ´le systÃ¨me :" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <ComboBox fx:id="roleCombo" maxWidth="Infinity" styleClass="form-combo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <Label text="Statut actuel :" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <ComboBox fx:id="statusCombo" maxWidth="Infinity" styleClass="form-combo" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        </children>
+    </GridPane>
+
+    <HBox spacing="20.0" alignment="CENTER_RIGHT" maxWidth="650.0">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-cancel" prefHeight="45.0" prefWidth="120.0" />
+        <Button text="ENREGISTRER" onAction="#handleSave" styleClass="btn-save-orange" prefHeight="45.0" prefWidth="180.0" />
+    </HBox>
+</VBox>

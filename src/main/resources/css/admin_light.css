@@ -1,0 +1,308 @@
+/* ==================== LIGHT MODE CSS ==================== */
+/* Palette: Blue #00447B, Orange #FF8210, Light #F8F9FA, White #FFFFFF */
+
+/* ======== GENERAL ======== */
+* {
+    -fx-font-family: 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+}
+
+.main-bg {
+    -fx-background-color: #F8F9FA;
+}
+
+.content-area {
+    -fx-background-color: #F8F9FA;
+}
+
+/* ======== SIDEBAR ======== */
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #00447B, #003d6f);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 2, 0);
+}
+
+.sidebar-label {
+    -fx-text-fill: rgba(255,255,255,0.6);
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
+}
+
+.logo-circle {
+    -fx-fill: #FF8210;
+}
+
+.logo-text {
+    -fx-font-size: 22;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 14;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 15;
+    -fx-background-radius: 8;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.15);
+    -fx-text-fill: white;
+}
+
+.nav-btn:pressed {
+    -fx-background-color: rgba(255,255,255,0.25);
+}
+
+.nav-active {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+.nav-active:hover {
+    -fx-background-color: #e07200;
+}
+
+/* ======== TOP BAR ======== */
+.top-bar {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);
+}
+
+.view-title {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00447B;
+}
+
+.admin-name {
+    -fx-font-size: 14;
+    -fx-text-fill: #6C6D6F;
+    -fx-font-weight: 500;
+}
+
+.mode-label {
+    -fx-text-fill: #6C6D6F;
+    -fx-font-size: 13;
+}
+
+/* ======== THEME TOGGLE (iOS STYLE) ======== */
+.ios-switch {
+    -fx-background-color: #d0d0d0;
+    -fx-padding: 3;
+}
+
+.ios-switch:selected {
+    -fx-background-color: #FF8210;
+}
+
+/* ======== BUTTONS ======== */
+.btn-primary {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-padding: 11 22;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,130,16,0.3), 8, 0, 0, 2);
+}
+
+.btn-primary:hover {
+    -fx-background-color: #e07200;
+    -fx-effect: dropshadow(gaussian, rgba(255,130,16,0.5), 12, 0, 0, 3);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #cc6600;
+}
+
+.btn-secondary {
+    -fx-background-color: #e8eaea;
+    -fx-text-fill: #333;
+    -fx-font-size: 14;
+    -fx-padding: 11 22;
+    -fx-background-radius: 6;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #d0d2d2;
+}
+
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-font-size: 16;
+    -fx-padding: 10 10;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-background-color: rgba(255,130,16,0.1);
+    -fx-text-fill: #FF8210;
+}
+
+.btn-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #999;
+    -fx-font-size: 16;
+    -fx-padding: 5;
+}
+
+.btn-close:hover {
+    -fx-text-fill: #333;
+}
+
+/* ======== TABLES ======== */
+.modern-table {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);
+}
+
+.modern-table .column-header {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-font-size: 13;
+}
+
+.modern-table .column-header-background {
+    -fx-background-color: #f0f0f0;
+}
+
+.modern-table .table-row-cell {
+    -fx-font-size: 12;
+    -fx-text-fill: #333;
+}
+
+.modern-table .table-row-cell:filled:hover {
+    -fx-background-color: #f5f5f5;
+}
+
+.modern-table .table-row-cell:filled:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+/* ======== FORMS & INPUTS ======== */
+.modern-input {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 10 12;
+    -fx-font-size: 13;
+    -fx-text-fill: #333;
+}
+
+.modern-input:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 2;
+}
+
+.modern-input:promptText {
+    -fx-text-fill: #aaa;
+}
+
+.search-field {
+    -fx-control-inner-background: #f5f5f5;
+    -fx-text-fill: #333;
+    -fx-font-size: 12;
+    -fx-padding: 10 12;
+    -fx-border-radius: 6;
+}
+
+.form-section-label {
+    -fx-text-fill: #333;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+}
+
+/* Spinner */
+.spinner {
+    -fx-background-color: white;
+}
+
+.spinner .text-field {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6;
+    -fx-padding: 10 12;
+}
+
+.spinner .text-field:focused {
+    -fx-border-color: #FF8210;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6;
+    -fx-padding: 10 12;
+    -fx-font-size: 13;
+}
+
+.combo-box:focused {
+    -fx-border-color: #FF8210;
+    -fx-border-width: 2;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8 12;
+}
+
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color: #f5f5f5;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+}
+
+/* TextArea */
+.text-area {
+    -fx-control-inner-background: white;
+    -fx-focus-color: #FF8210;
+    -fx-faint-focus-color: rgba(255,130,16,0.15);
+    -fx-font-size: 13;
+    -fx-font-family: 'Segoe UI';
+}
+
+.text-area .text {
+    -fx-text-fill: #333;
+}
+
+/* ======== MODALS ======== */
+.modal-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 8);
+}
+
+.modal-title {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-fill: #00447B;
+}
+
+/* ======== LABELS & TEXT ======== */
+.section-header {
+    -fx-font-size: 22;
+    -fx-font-weight: bold;
+    -fx-fill: #00447B;
+}
+
+/* Separator */
+.separator:vertical {
+    -fx-border-color: #e0e0e0;
+}
+
+.separator:horizontal {
+    -fx-border-color: #e0e0e0;
+}

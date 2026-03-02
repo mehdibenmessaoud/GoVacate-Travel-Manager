@@ -1,0 +1,51 @@
+/* Palette : Bleu #00447B, Orange #FF8210, Gris #6C6D6F */
+
+.main-bg { -fx-background-color: #F5F5F0; }
+.sidebar { -fx-background-color: #00447B; }
+.header-title { -fx-font-size: 28; -fx-fill: #00447B; -fx-font-weight: bold; }
+
+.side-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #C0C0C0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 220;
+    -fx-padding: 12;
+    -fx-cursor: hand;
+}
+.side-btn:hover { -fx-background-color: rgba(255,255,255,0.1); }
+.side-btn:focused { -fx-background-color: #FF8210; -fx-text-fill: white; }
+
+.btn-add {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 3);
+}
+
+.form-card {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-background-radius: 15;
+    -fx-border-color: #00447B;
+    -fx-border-width: 2;
+}
+
+.input-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #6C6D6F;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8;
+}
+.input-field:focused { -fx-border-color: #FF8210; }
+
+.btn-save { -fx-background-color: #00447B; -fx-text-fill: white; -fx-padding: 10 20; }
+.btn-cancel { -fx-background-color: #6C6D6F; -fx-text-fill: white; -fx-padding: 10 20; }
+
+.profile-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #FFBD59;
+    -fx-text-fill: #FFBD59;
+    -fx-border-radius: 5;
+}

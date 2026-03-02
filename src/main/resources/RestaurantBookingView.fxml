@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="800.0" prefWidth="1200.0" styleClass="main-bg" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.RestaurantBookingController">
+    <children>
+        <AnchorPane pickOnBounds="false">
+            <Button onAction="#toggleTheme" text="ðŸŒ“ Mode" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20"
+                    style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" />
+        </AnchorPane>
+
+        <VBox alignment="CENTER" maxWidth="500.0" spacing="30.0">
+            <children>
+                <VBox alignment="CENTER" spacing="5">
+                    <Label style="-fx-letter-spacing: 3;" text="GASTRONOMIE LUXE" textFill="#00FFCC">
+                        <font><Font name="System Bold" size="11.0" /></font>
+                    </Label>
+                    <Label text="RÃ©server une Table" textFill="WHITE" styleClass="title-label">
+                        <font><Font name="Segoe UI Bold" size="32.0" /></font>
+                    </Label>
+                    <Separator maxWidth="50" style="-fx-opacity: 0.3; -fx-background-color: #FFBD59;" />
+                </VBox>
+
+                <VBox spacing="25.0" styleClass="glass-card">
+                    <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+                    <children>
+                        <VBox spacing="8">
+                            <Label style="-fx-font-weight: bold;" text="ðŸ½ï¸ Restaurant" styleClass="field-label" />
+                            <ComboBox fx:id="comboResto" prefHeight="45.0" prefWidth="400.0" promptText="Choisir un lieu..." />
+                        </VBox>
+                        <HBox spacing="15">
+                            <children>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="ðŸ“… Date" styleClass="field-label" />
+                                    <DatePicker fx:id="dateRes" prefHeight="45.0" prefWidth="200.0" />
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="â° Heure" styleClass="field-label" />
+                                    <ComboBox fx:id="comboHeure" prefHeight="45.0" prefWidth="200.0" promptText="--:--" />
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <VBox spacing="8">
+                            <Label style="-fx-font-weight: bold;" text="ðŸ‘¥ InvitÃ©s" styleClass="field-label" />
+                            <TextField fx:id="txtPersonnes" prefHeight="45.0" promptText="Nombre de personnes" />
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <VBox alignment="CENTER" spacing="15.0">
+                    <Button fx:id="btnValider" onAction="#handleReserverRestaurant" prefHeight="55.0" prefWidth="350.0" styleClass="btn-confirm" text="CONFIRMER LA RÃ‰SERVATION">
+                        <font><Font name="System Bold" size="15.0" /></font>
+                    </Button>
+                    <Button fx:id="btnAnnuler" managed="false" visible="false" onAction="#handleCancel" prefHeight="40.0" prefWidth="350.0" styleClass="btn-cancel" text="ANNULER LES MODIFICATIONS" />
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

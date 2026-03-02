@@ -1,0 +1,50 @@
+6|CLIENT|client1|aa|02:57|01/03
+6|CLIENT|client1|wink|03:01|01/03
+6|ADMIN|Admin|aa|03:52|01/03
+6|CLIENT|client1|salem|03:56|01/03
+6|CLIENT|client1|aa|04:01|01/03
+6|ADMIN|Admin|cava wink|04:01|01/03
+6|ADMIN|Admin|cava wink|04:02|01/03
+7|ADMIN|Admin|aaa|04:02|01/03
+6|CLIENT|client1|aaa|04:08|01/03
+6|ADMIN|Admin|slm|04:08|01/03
+6|CLIENT|client1|slm|04:14|01/03
+6|CLIENT|client1|aa|04:16|01/03
+6|CLIENT|client1|salemmmmmmmmmmm|04:17|01/03
+6|CLIENT|client1|ahla|04:19|01/03
+6|ADMIN|Admin|slm|04:20|01/03
+6|ADMIN|Admin|ahla|04:26|01/03
+6|ADMIN|Admin|aa4|04:32|01/03
+6|ADMIN|Admin|aaa4|04:32|01/03
+6|CLIENT|client1|aaa|04:33|01/03
+6|CLIENT|client1|ahla|04:36|01/03
+6|CLIENT|client1|ahla|04:37|01/03
+6|CLIENT|client1|aaaaaaaaaaaaaaaaaa|04:37|01/03
+6|CLIENT|client1|wink|04:37|01/03
+6|CLIENT|client1|ahla wnik labes|04:37|01/03
+6|ADMIN|Admin|cava hamdlh|04:38|01/03
+6|CLIENT|client1|aaa|04:46|01/03
+6|CLIENT|client1|hello|04:48|01/03
+6|CLIENT|client1|aaaa|04:51|01/03
+6|CLIENT|client1|aaa|04:55|01/03
+6|CLIENT|client1|ahla|04:58|01/03
+6|CLIENT|client1|aa|04:59|01/03
+6|ADMIN|Admin|slm|04:59|01/03
+5|CLIENT|haboub|aa|05:00|01/03
+5|ADMIN|Admin|ahla|15:20|01/03
+6|ADMIN|Admin|ahla|15:21|01/03
+5|ADMIN|Admin|aaa|00:44|02/03
+5|CLIENT|haboub|aaa|00:59|02/03
+5|CLIENT|haboub|AQQq|01:03|02/03
+5|CLIENT|haboub|qqq|01:03|02/03
+5|CLIENT|haboub|aaa|01:09|02/03
+5|CLIENT|haboub|aaa|01:09|02/03
+5|CLIENT|haboub|aa|01:09|02/03
+5|CLIENT|haboub|slm|01:09|02/03
+5|CLIENT|haboub|aa|01:52|02/03
+6|ADMIN|Admin|ahal bel zin|02:49|02/03
+6|ADMIN|Admin|aaa|02:49|02/03
+6|ADMIN|Admin|aa|02:50|02/03
+7|ADMIN|Admin|aa|02:50|02/03
+5|CLIENT|haboub|aaaa|02:51|02/03
+5|ADMIN|Admin|aa|02:51|02/03

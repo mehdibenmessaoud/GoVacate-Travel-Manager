@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane fx:id="cardRoot" onMouseClicked="#handleClick" prefHeight="200.0" prefWidth="300.0" styleClass="destination-card" stylesheets="@css/client_style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.DestinationCardController">
+    <children>
+        <ImageView fx:id="destinationImage" fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false" />
+
+        <Rectangle height="80.0" layoutY="120.0" stroke="TRANSPARENT" width="300.0" styleClass="card-overlay" />
+
+        <VBox layoutX="15.0" layoutY="135.0" spacing="2.0" styleClass="card-text-container">
+            <children>
+                <Label fx:id="nameLabel" styleClass="destination-name" text="Nom Destination" />
+                <Label fx:id="locationLabel" styleClass="destination-location" text="Ville, Pays" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

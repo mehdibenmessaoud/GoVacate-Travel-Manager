@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="800.0" prefWidth="1200.0" styleClass="main-bg" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.ExcursionBookingController">
+
+    <children>
+        <AnchorPane pickOnBounds="false">
+            <children>
+                <Button onAction="#toggleTheme" text="ðŸŒ“ Mode" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" />
+            </children>
+        </AnchorPane>
+
+        <VBox alignment="CENTER" maxWidth="500.0" spacing="35.0">
+            <children>
+
+                <VBox alignment="CENTER" spacing="5">
+                    <children>
+                        <Label style="-fx-letter-spacing: 3;" text="AVENTURE &amp; NATURE" textFill="#00FFCC">
+                            <font><Font name="System Bold" size="11.0" /></font>
+                        </Label>
+                        <Label styleClass="title-label" text="RÃ©server une Excursion" textFill="WHITE">
+                            <font><Font name="Segoe UI Bold" size="32.0" /></font>
+                        </Label>
+                        <Separator maxWidth="50" style="-fx-opacity: 0.3; -fx-background-color: #00FFCC;" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="25.0" styleClass="glass-card">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER" spacing="15.0">
+                            <children>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" styleClass="field-label" text="ðŸ“… Date" textFill="#679AC1" />
+                                    <DatePicker fx:id="dateExc" prefHeight="45.0" prefWidth="200.0" promptText="Choisir date" />
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" styleClass="field-label" text="â° Heure" textFill="#679AC1" />
+                                    <ComboBox fx:id="comboHeure" prefHeight="45.0" prefWidth="200.0" promptText="--:--" />
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER" spacing="15">
+                            <children>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" styleClass="field-label" text="ðŸ‘¥ Participants" textFill="#679AC1" />
+                                    <TextField fx:id="txtPersonnes" prefHeight="45.0" promptText="Nombre" style="-fx-background-radius: 10;" />
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" styleClass="field-label" text="ðŸ’° Prix Unit. (DT)" textFill="#679AC1" />
+                                    <TextField fx:id="txtPrixUnitaire" editable="false" prefHeight="45.0" styleClass="price-field" />
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox alignment="CENTER" spacing="15.0">
+                    <children>
+                        <Button fx:id="btnValider" mnemonicParsing="false" onAction="#handleReserverExcursion" prefHeight="55.0" prefWidth="350.0" styleClass="btn-confirm" text="CONFIRMER LA RÃ‰SERVATION">
+                            <font><Font name="System Bold" size="15.0" /></font>
+                        </Button>
+
+                        <Button fx:id="btnAnnuler" managed="false" mnemonicParsing="false" onAction="#handleBack" prefHeight="40.0" prefWidth="350.0" styleClass="btn-cancel" text="ANNULER LES MODIFICATIONS" visible="false">
+                        </Button>
+
+                        <Label styleClass="hint-label" text="Explorez les plus beaux paysages avec nos guides" textFill="rgba(255,255,255,0.4)">
+                            <font><Font size="11.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

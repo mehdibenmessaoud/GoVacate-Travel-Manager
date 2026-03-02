@@ -1,0 +1,130 @@
+
+/* Container */
+.booking-root { -fx-background-color: transparent; }
+
+.badge-top {
+    -fx-text-fill: #FFBD59;
+    -fx-font-weight: 900;
+    -fx-font-size: 11px;
+    -fx-letter-spacing: 4px;
+}
+
+.main-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+}
+
+/* Glass Ticket */
+.modern-ticket-card {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 30;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 30, 0, 0, 15);
+}
+
+.icon-glow-container {
+    -fx-background-color: rgba(255, 130, 16, 0.1);
+    -fx-background-radius: 20;
+    -fx-min-width: 65; -fx-min-height: 65;
+    -fx-border-color: rgba(255, 130, 16, 0.3);
+    -fx-border-radius: 20;
+}
+
+.ticket-pack-name { -fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: 900; }
+.ticket-category { -fx-text-fill: #94A3B8; -fx-font-size: 12px; }
+
+.date-info-strip {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1 0 1 0;
+    -fx-padding: 20 0;
+}
+
+.label-dim { -fx-text-fill: #64748B; -fx-font-size: 10px; -fx-font-weight: 900; }
+.value-bright { -fx-text-fill: #F1F5F9; -fx-font-size: 16px; -fx-font-weight: bold; }
+
+.ticket-price {
+    -fx-text-fill: #FF8210;
+    -fx-font-size: 36px;
+    -fx-font-weight: 900;
+}
+
+.badge-secure {
+    -fx-background-color: rgba(74, 222, 128, 0.1);
+    -fx-text-fill: #4ADE80;
+    -fx-border-color: rgba(74, 222, 128, 0.4);
+    -fx-border-radius: 5;
+    -fx-padding: 4 10;
+}
+
+/* Button primary */
+.btn-action-primary {
+    -fx-background-color: linear-gradient(to right, #FF8210, #FFBD59);
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+.modern-ticket-card {
+    /* Background akhaf chwaya bech yban el contrast */
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 25;
+    /* Bordure s7i7a bech t-limit el card */
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 30, 0, 0, 15);
+}
+
+.date-info-strip {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1 0 1 0;
+    -fx-padding: 20 0;
+}
+
+.ticket-price {
+    -fx-text-fill: #FFBD59; /* Gold/Orange wadhah akther */
+    -fx-font-size: 34px;
+    -fx-font-weight: 900;
+}
+
+.label-dim {
+    -fx-text-fill: #94A3B8; /* Gris clair bech ya3ti contrast m3a el blanc */
+    -fx-font-size: 10px;
+}
+
+.value-bright {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+/* El label (ktaba sghira) mta3 PRIX TOTAL TTC */
+.label-dim-small {
+    -fx-text-fill: #CBD5E1; /* Gris fatih barcha (clair) bech yopp d-direct */
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-transform: uppercase;
+    -fx-opacity: 1.0; /* Na77i el opacity el naqsa */
+}
+
+/* El montant d-dhabet (Ex: 850.0 DT) */
+.ticket-price {
+    /* Nasta3mlou el Gold (#FFBD59) bech yji vibrant m3a el bleu nuit */
+    -fx-text-fill: #FFBD59;
+    -fx-font-size: 38px;
+    -fx-font-weight: 900;
+    /* Glow sghir bech el prix i-walli "Neon" w wadhah */
+    -fx-effect: dropshadow(gaussian, rgba(255, 189, 89, 0.4), 15, 0, 0, 0);
+}
+
+/* El badge mta3 el paiement sécurisé bech yebda n-dhif */
+.badge-secure {
+    -fx-background-color: rgba(74, 222, 128, 0.15);
+    -fx-text-fill: #4ADE80; /* Vert fati7 */
+    -fx-border-color: #4ADE80;
+    -fx-border-radius: 4;
+    -fx-padding: 3 8;
+    -fx-font-weight: bold;
+}

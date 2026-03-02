@@ -1,0 +1,230 @@
+/* GoVacate - Premium Profile Theme
+   Palette : Bleu Nuit #051937, Orange #FF8210, Bleu Acier #679AC1, Verre rgba(255,255,255,0.05)
+*/
+
+/* =========================================================
+   CONTENEURS & SCROLL (Deep Water Background)
+========================================================= */
+.profile-scroll {
+    -fx-background-color: #051937;
+    -fx-background-insets: 0;
+}
+
+.profile-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.profile-container {
+    -fx-background-color: transparent;
+    -fx-padding: 30;
+}
+
+.profile-content-wrapper {
+    -fx-max-width: 950;
+}
+
+/* =========================================================
+   HEADER CARD (Glassmorphism & Cover)
+========================================================= */
+.profile-header-card {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 25;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 30, 0, 0, 15);
+}
+
+.profile-cover-area {
+    -fx-background-color: linear-gradient(to right, #FF8210, #e6760e);
+    -fx-pref-height: 140;
+    -fx-background-radius: 25 25 0 0;
+}
+
+.profile-header-info {
+    -fx-padding: 0 0 35 0;
+    -fx-translate-y: -65;
+}
+
+/* =========================================================
+   AVATAR ET TEXTES PRO
+========================================================= */
+.profile-avatar {
+    -fx-fill: #1A2F48;
+    -fx-stroke: #051937;
+    -fx-stroke-width: 5;
+}
+
+.profile-avatar-initials {
+    -fx-font-size: 46px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #FF8210;
+}
+
+.profile-avatar-edit-btn {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-background-radius: 50;
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+.profile-fullname {
+    -fx-font-size: 30px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+}
+
+.profile-role-badge-client {
+    -fx-background-color: rgba(255, 130, 16, 0.15);
+    -fx-text-fill: #FF8210;
+    -fx-padding: 5 15;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-border-color: rgba(255, 130, 16, 0.3);
+    -fx-border-radius: 20;
+}
+
+.profile-stat-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+}
+
+.profile-stat-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #679AC1;
+    -fx-text-transform: uppercase;
+    -fx-font-weight: bold;
+}
+
+/* =========================================================
+   TABS (ONGLETS STYLE APPLE/DASHBOARD)
+========================================================= */
+.profile-tabs {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 30;
+    -fx-padding: 5;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+}
+
+.profile-tab-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdc3c7;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-background-radius: 25;
+    -fx-cursor: hand;
+}
+
+.profile-tab-btn:hover {
+    -fx-text-fill: white;
+}
+
+.profile-tab-btn-active {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.3), 10, 0, 0, 0);
+}
+
+/* =========================================================
+   CARDS & FORMULAIRES (Glassmorphism Inputs)
+========================================================= */
+.profile-card {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20;
+    -fx-padding: 30;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+}
+
+.profile-card-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+}
+
+.profile-form-label {
+    -fx-text-fill: #679AC1;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.profile-form-field {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-padding: 12;
+    -fx-font-size: 14px;
+}
+
+.profile-form-field:focused {
+    -fx-border-color: #FF8210;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+}
+
+.profile-form-field-readonly {
+    -fx-opacity: 0.6;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-text-fill: #bdc3c7;
+}
+
+/* =========================================================
+   BOUTONS D'ACTION (Orange Glow)
+========================================================= */
+.btn-back {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-back:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-border-color: #FF8210;
+}
+
+.profile-btn-save, .btn-reserve-pack {
+    -fx-background-color: #FF8210;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12 30;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 130, 16, 0.4), 15, 0, 0, 5);
+}
+
+.profile-btn-save:hover, .btn-reserve-pack:hover {
+    -fx-background-color: #e6760e;
+    -fx-translate-y: -2;
+}
+
+.btn-back-simple {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 12;
+    -fx-padding: 12 25;
+    -fx-cursor: hand;
+}
+
+.btn-back-simple:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* =========================================================
+   DATE PICKER STYLING (HACK)
+========================================================= */
+.date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+.date-picker {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-background-radius: 10;
+}

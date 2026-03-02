@@ -1,0 +1,57 @@
+/* Fond principal */
+.main-bg {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 120%, #1A3E66, #0A1929);
+}
+
+/* Carte centrale (Effet Glassmorphism compatible JavaFX) */
+.glass-card {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 15, 0, 0, 10);
+}
+
+/* Champs de saisie (Inputs, ComboBox, DatePicker) */
+.text-input, .combo-box, .date-picker, .date-picker > .text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #679AC1;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.text-input:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #00FFCC;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 204, 0.3), 10, 0, 0, 0);
+}
+
+/* Bouton de confirmation */
+.btn-confirm {
+    -fx-background-color: linear-gradient(to right, #FF8210, #FFBD59);
+    -fx-background-radius: 30;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-confirm:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 130, 16, 0.5), 15, 0, 0, 0);
+}
+/* This targets the text inside the ComboBox box AFTER you select a time */
+.combo-box > .list-cell {
+    -fx-text-fill: white !important;
+}
+
+/* This targets the arrow button to make it more visible (optional but better) */
+.combo-box > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+/* Fix for the DatePicker text as well so it matches */
+.date-picker > .text-field {
+    -fx-text-fill: white !important;
+}

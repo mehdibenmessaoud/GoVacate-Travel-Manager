@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="35" alignment="CENTER" styleClass="booking-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.projet.gui.PackBookingController">
+    <padding><Insets top="50" bottom="50" left="40" right="40"/></padding>
+
+    <VBox spacing="10" alignment="CENTER">
+        <Label text="VÉRIFICATION FINALE" styleClass="badge-top" />
+        <Label text="Récapitulatif de votre voyage" styleClass="main-title" />
+        <Separator maxWidth="80" styleClass="title-separator" />
+    </VBox>
+
+    <VBox maxWidth="550.0" styleClass="modern-ticket-card">
+        <children>
+            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="ticket-header">
+                <padding><Insets top="25" right="30" bottom="25" left="30"/></padding>
+                <StackPane styleClass="icon-glow-container">
+                    <Label text="✈" style="-fx-font-size: 26; -fx-text-fill: #FF8210;"/>
+                </StackPane>
+                <VBox spacing="5">
+                    <Label fx:id="lblPackName" text="EXPÉDITION SAHARA" styleClass="ticket-pack-name"/>
+                    <Label fx:id="lblCategorie" text="AVENTURE PREMIUM" styleClass="ticket-category"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="0" alignment="CENTER" styleClass="date-info-strip">
+                <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="8">
+                    <Label text="DÉPART" styleClass="label-dim"/>
+                    <Label fx:id="lblDateDepart" text="23 FÉV 2026" styleClass="value-bright"/>
+                </VBox>
+                <Separator orientation="VERTICAL" maxHeight="40" styleClass="inner-separator"/>
+                <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="8">
+                    <Label text="RETOUR" styleClass="label-dim"/>
+                    <Label fx:id="lblDateArrivee" text="28 FÉV 2026" styleClass="value-bright"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="20" styleClass="ticket-footer">
+                <padding><Insets top="25" right="30" bottom="30" left="30"/></padding>
+                <HBox alignment="CENTER">
+                    <VBox spacing="5">
+                        <Label text="PRIX TOTAL TTC" styleClass="label-dim-small"/>
+                        <Label fx:id="lblPrix" text="850.0 DT" styleClass="ticket-price"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <VBox alignment="CENTER_RIGHT" spacing="8">
+                        <Label text="🔒 PAIEMENT SÉCURISÉ" styleClass="badge-secure"/>
+                        <Label text="via Stripe &amp; SSL" style="-fx-text-fill: #64748b; -fx-font-size: 9;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </children>
+    </VBox>
+
+    <VBox spacing="20" alignment="CENTER">
+        <Button onAction="#handleReserve" prefHeight="60.0" prefWidth="420.0" styleClass="btn-action-primary" text="CONFIRMER ET RÉSERVER" />
+        <Hyperlink onAction="#handleCancel" text="Modifier ma sélection" styleClass="btn-cancel-link"/>
+    </VBox>
+</VBox>
